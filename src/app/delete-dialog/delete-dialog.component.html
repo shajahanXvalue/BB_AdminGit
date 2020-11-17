@@ -1,0 +1,14 @@
+<div class="modal-header">
+    <h5 style="margin: auto;color:white">{{title}}</h5>
+</div>
+<div>
+    <div class="content-container" style="flex-wrap: wrap;text-align: center;">
+        <span class="content-span full-width">{{data.message}}</span>
+    </div>
+    <div style="text-align: center;padding: 8%;">
+        <button mat-flat-button id="no-button" class="btn-confirm btn-no" [mat-dialog-close]="false"
+            (click)="dialogRef.close(false)">NO</button>
+        <button mat-flat-button id="yes-button" class="btn-confirm btn-yes" [mat-dialog-close]="true"
+            (click)="dialogRef.close(true)">YES</button>
+    </div>
+</div>

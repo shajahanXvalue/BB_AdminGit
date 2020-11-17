@@ -1,0 +1,67 @@
+<div class="animated fadeIn" style="padding-top: 10px;">
+  <div class="row">
+
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          Admin
+        </div>
+        <div style="padding: 7px 20px 0 0">
+          <input *ngIf="isSuperAdmin" style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+            [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching">
+          <span class="btn-add" (click)="addAdmin()" *ngIf="isSuperAdmin">Add</span>
+
+        </div>
+        <div class="card-body" style="padding-top: 7px;">
+
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <!-- <th>S.No</th> -->
+                <th (click)="orderAdmin()" style="cursor: pointer;">Admin Id&nbsp;<i *ngIf="!orderAdminFlag"
+                    class="fa fa-caret-down"></i>
+                  <i *ngIf="orderAdminFlag" class="fa fa-caret-up"></i></th>
+                <!-- <th>Admin SchoolId</th> -->
+                <th>Admin Username</th>
+                <th>Admin Password</th>
+                <th>Options</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let list of adminList | filter:searchText | paginate
+                      : {
+                          id: 'list_pagination',
+                          itemsPerPage: 10,
+                          currentPage: page,
+                          totalItems: totalRecords
+                        }; let i=index; ">
+                <!-- <td>{{i+1}}</td> -->
+                <td>{{list.id}}</td>
+                <!-- <td>{{list.schoolid}}</td> -->
+                <td>{{list.username}}</td>
+                <td>*********</td>
+                <td>
+                  <div> <span class="fa fa-pencil fa-options" (click)="editAdmin(list)"></span>&nbsp;&nbsp;
+                    <span class="fa fa-trash-o fa-options" (click)="deleteAdmin(list.id)" *ngIf="isSuperAdmin"></span>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+          <!-- <h1 *ngIf="adminList.length===0" style="margin-left: 340px;">No results found..</h1> -->
+          <div style="padding: 7px 20px 0 0;margin-left: 150px;">
+            <pagination-controls id="list_pagination" maxSize="10" directionLinks="true" (pageChange)="page = $event"
+              (pageBoundsCorrection)="page=$event" autoHide="true" responsive="true" previousLabel="Previous"
+              nextLabel="Next" screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
+              screenReaderCurrentLabel="You're on page">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/.col-->
+  </div>
+  <!--/.row-->
+
+</div>

@@ -1,0 +1,18 @@
+<div *ngIf="success">
+    <div align="center">
+        <img src="assets/img/success2.gif" width="100" height="80" alt="">
+    </div><br>
+    <p style="font-size: 18px;text-align: center;min-width: 200px;">{{message}}</p><br>
+    <div align="center" style="padding-bottom: 10px;">
+        <button  class="btn btn-success" (click)="close()">Close</button>
+    </div>
+</div>
+<div *ngIf="!success">
+    <div align="center">
+        <img src="assets/img/alert2.gif" width="100" height="90">
+    </div><br>
+    <p style="font-size: 18px;text-align: center;min-width: 200px;">{{message}}</p><br>
+    <div align="center" style="padding-bottom: 10px;">
+        <button class="btn btn-danger" (click)="close()">Close</button>
+    </div>
+</div>

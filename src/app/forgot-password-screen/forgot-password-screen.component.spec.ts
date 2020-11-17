@@ -1,0 +1,25 @@
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ForgotPasswordScreenComponent } from './forgot-password-screen.component';
+
+describe('ForgotPasswordScreenComponent', () => {
+  let component: ForgotPasswordScreenComponent;
+  let fixture: ComponentFixture<ForgotPasswordScreenComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ ForgotPasswordScreenComponent ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ForgotPasswordScreenComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

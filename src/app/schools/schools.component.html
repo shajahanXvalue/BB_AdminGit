@@ -1,0 +1,107 @@
+<div class="animated fadeIn" style="padding-top: 10px;">
+  <div class="row">
+
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          School
+          <!-- <a style="margin-left:750px;" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i>
+            Logout</a> -->
+            <label  *ngIf="showSuperAdmin" style="margin-left:700px;font-weight: bold;">Jump To </label>
+             <input *ngIf="showSuperAdmin" style="width: 65px;border-radius: 5;" type="number"  max={{totalPages}} name="search"
+              [(ngModel)]="page"  autocomplete="off" placeholder="Page No" (ngModelChange)="pageChanged($event)">
+               <label  *ngIf="showSuperAdmin" style="font-weight: bold;">limit: {{totalPages}} </label>
+        </div>
+        <!-- <div class="card-header" *ngIf="!showSuperAdmin">
+          Admin
+          <a style="margin-left:780px;" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i> Logout</a>
+        </div> -->
+        <div>
+          <div style="padding: 7px 20px 0 0">
+          <!-- (ngModelChange)="searchSchool($event)" style="margin:auto;max-width:300px"-->
+          <form (ngSubmit)="schoolSearch(searchText)" >
+              <input *ngIf="showSuperAdmin" style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+              [(ngModel)]="searchText"  autocomplete="off" placeholder="Start searching" [ngModelOptions]="{standalone: true}" (ngModelChange)="showClear($event)" >
+              <span *ngIf="visibleClear&&showSuperAdmin" class="fa fa-close" style="margin-left:-47px" (click)="clearResult()" ></span>
+              <button *ngIf="visibleClear&&showSuperAdmin" type="submit"  style="margin-left:1px"><i class="fa fa-search"></i></button>
+              <button *ngIf="!visibleClear&&showSuperAdmin" type="submit"  style="margin-left:-31px"><i class="fa fa-search"></i></button>
+              <select *ngIf="showSuperAdmin" style="height:27px;width: 130px;color: #405065;" (change)="stateFilter($event.target.value)"
+              [(ngModel)]="selectedState" [ngModelOptions]="{standalone: true}"  >
+              <option [ngValue]="null" [disabled]="true" hidden>State Filter</option>
+              <option value="">All</option>
+              <option *ngFor="let opt of stateItems" value={{opt.statename}}>
+                {{opt.statename}}</option>
+            </select>
+             <span class="btn-add" style="margin-left: 10px; margin-bottom:5px;background-color: seagreen"
+              (click)="excelDownload()">Excel
+              Download</span>
+            <span *ngIf="showSuperAdmin" class="btn-add" style="margin-left: 10px; background-color: seagreen"
+              (click)="excelUpload()">Excel
+              Upload</span>
+            <span class="btn-add" (click)="addSchool()" *ngIf="showSuperAdmin">Add</span>
+</form>
+            <!-- (ngModelChange)="schoolSearch($event)" -->
+              <!-- <a href="#" (click)="doLogOut()"><i class="fa fa-search"></i>search</a> -->
+
+
+
+            <!-- <select style="height:27px;width: 130px;color: #405065;" (change)="zipCodeFilter($event.target.value)"
+              [(ngModel)]="selectedZipCode">
+              <option [ngValue]="null" [disabled]="true" hidden>ZipCode Filter</option>
+              <option value="">All</option>
+              <option *ngFor="let opt of dataList" value={{opt.schoolName}}>
+                {{opt.schoolName}}</option>
+            </select> -->
+
+
+          </div>
+          <div class="card-body" style="padding-top: 7px;">
+
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th (click)="order()" style="cursor: pointer;">School Name&nbsp;<i *ngIf="!orderFlag"
+                      class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
+                  <th>School Address</th>
+                  <th>School Zipcode</th>
+                  <th>School State</th>
+                  <th>Options</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- | filter:searchText -->
+                <tr *ngFor="let list of dataList  | paginate
+                      : {
+                          id: 'list_pagination',
+                          itemsPerPage: itemPerPage,
+                          currentPage: page,
+                          totalItems: totalRecords
+                        }; let i=index; ">
+                  <td>{{i+1}}</td>
+                  <td>{{list.schoolName}}</td>
+                  <td>{{list.schoolAddress}}</td>
+                  <td>{{list.zipCode}}</td>
+                  <td>{{list.statename}}</td>
+                  <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
+                  <td>
+                    <div> <span class="fa fa-pencil fa-options" (click)="editSchool(list)"></span>&nbsp;&nbsp;
+                      <span class="fa fa-trash-o fa-options" (click)="deleteSchool(list.id) "
+                        *ngIf="showSuperAdmin"></span>
+                    </div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+            <h1 *ngIf="showNoRecord" style="margin-left: 340px;">No results found..</h1>
+            <div style="padding: 7px 20px 0 0;margin-left: 150px;">
+               <pagination-controls id="list_pagination" maxSize="10" directionLinks="true"
+              (pageChange)="pageChanged($event)" (pageSizeChange)="setPage($event)" (pageBoundsCorrection)="pageChanged($event)" autoHide="true" responsive="true"
+              previousLabel="Previous" nextLabel="Next" screenReaderPaginationLabel="Pagination"
+              screenReaderPageLabel="page" screenReaderCurrentLabel="You're on page">
+            </pagination-controls>
+            </div>
+          </div>
+        </div>
+      </div>

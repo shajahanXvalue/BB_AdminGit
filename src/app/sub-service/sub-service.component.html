@@ -1,0 +1,91 @@
+<div class="animated fadeIn" style="padding-top: 10px">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">Incidents</div>
+        <div style="padding: 7px 20px 0 0">
+          <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+            [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching">
+          <select style="height:27px;width: 130px;color: #405065;" (change)="dayFilter($event.target.value)"
+            [(ngModel)]="selectedValue">
+            <option [ngValue]="null" [disabled]="true" hidden>Daily Filter</option>
+            <option *ngFor="let opt of optionItems" [ngValue]="opt.value">
+              {{opt.text}}</option>
+          </select>
+          <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelDownload()">Excel
+            Download</span>
+          <!--    <span class="btn-add"
+            (click)="addIncident()">Add</span> -->
+
+        </div>
+
+        <div class="card-body" style="padding-top: 7px">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <!-- <th>S.No</th> -->
+                <th (click)="order()" style="cursor: pointer">
+                  User Id&nbsp;<i *ngIf="!orderFlag" class="fa fa-caret-down"></i>
+                  <i *ngIf="orderFlag" class="fa fa-caret-up"></i>
+                </th>
+                <th>User Name</th>
+                <th>User Age</th>
+                <!-- <th>School Id</th> -->
+                <th>Bully Name</th>
+                <!-- <td>Days Bullied</td> -->
+                <th>Bully Type</th>
+                <th>Bully Description</th>
+                <!-- <th>Video URL</th> -->
+                <th>File</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="
+                  let list of dataList| filter:searchText
+                    | paginate
+                      : {
+                          id: 'list_pagination',
+                          itemsPerPage: 10,
+                          currentPage: page,
+                          totalItems: totalRecords
+                        };
+                  let i = index
+                ">
+                <!-- <td [ngStyle]="{ 'color' : (list.bullyStatus=='1')? 'green' : 'red' }">{{ i + 1 }}</td> -->
+                <td>{{ list.userId }}
+                </td>
+                <td>{{ list.name }}</td>
+                <td>{{ list.age }}</td>
+                <!-- <td [ngStyle]="{ 'color' : (list.bullyStatus=='1')? 'green' : 'red' }">{{ list.schoolId }}</td> -->
+                <td>{{ list.bullyName }}</td>
+                <!-- <td>{{list.noOfDaysBullied}}</td> -->
+                <td>{{ list.bullyType }}</td>
+                <td>{{ list.bullyDescription }}</td>
+                <!-- <td><a>{{list.videoURL}}</a></td> -->
+                <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
+                <td>
+                  <div>
+                     <span class="fa fa-file fa-options" (click)="fileOpen(list.videoURL)"></span>
+                     <!-- <span class="fa fa-pencil fa-options" (click)="editIncident(list)"></span> -->
+                    <!--&nbsp;&nbsp; -->
+                    <!-- <span class="fa fa-trash-o fa-options" (click)="deleteIncident(list.id)"></span> -->
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <h1 *ngIf="showNoRecord" style="margin-left: 340px;">No results found..</h1>
+          <div *ngIf="data.length!==0" style="padding: 7px 20px 0 0;margin-left: 150px;">
+            <pagination-controls id="list_pagination" maxSize="10" directionLinks="true" (pageChange)="page = $event"
+              (pageBoundsCorrection)="page=$event" autoHide="true" responsive="true" previousLabel="Previous"
+              nextLabel="Next" screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
+              screenReaderCurrentLabel="You're on page">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/.col-->
+  </div>
+  <!--/.row-->
+</div>

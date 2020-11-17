@@ -1,0 +1,231 @@
+<div class="animated fadeIn" style="padding-top: 10px;">
+  <div class="row">
+
+    <div class="col-lg-10">
+      <div class="card">
+        <div class="card-header">
+          School
+          <!-- <a style="margin-left:750px;" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i>
+            Logout</a> -->
+        </div>
+        <!-- <div class="card-header" *ngIf="!showSuperAdmin">
+          Admin
+          <a style="margin-left:780px;" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i> Logout</a>
+        </div> -->
+        <div>
+          <div style="padding: 7px 20px 0 0" *ngIf="showSuperAdmin"><span class="btn-add"
+              (click)="addSchool()">Add</span>
+
+          </div>
+          <div class="card-body" style="padding-top: 7px;">
+
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th (click)="order()" style="cursor: pointer;">School Name&nbsp;<i *ngIf="!orderFlag"
+                      class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
+                  <th>School Address</th>
+                  <th>School State</th>
+                  <th>Options</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let list of dataList; let i=index; ">; let i=index; ">
+                  <td>{{i+1}}</td>
+                  <td>{{list.schoolName}}</td>
+                  <td>{{list.schoolAddress}}</td>
+                  <td>{{list.stateId}}</td>
+                  <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
+                  <td>
+                    <div> <span class="fa fa-pencil fa-options" (click)="editSchool(list)"></span>&nbsp;&nbsp;
+                      <span class="fa fa-trash-o fa-options" (click)="deleteSchool(list.id) "
+                        *ngIf="showSuperAdmin"></span>
+                    </div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+      <!--
+        <jqxTabs *ngIf="showSuperAdmin" [width]='"100%"' [position]='"top"' [animationType]='"none"'
+          [selectionTracker]='false'>
+          <ul>
+            <li style="margin-left: 30px;">Schools</li>
+            <li>Admins</li>
+          </ul>
+          <div>
+            <div style="padding: 7px 20px 0 0"><span class="btn-add" (click)="addSchool()">Add</span>
+
+            </div>
+            <div class="card-body" style="padding-top: 7px;">
+
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>S.No</th>
+                    <th (click)="order()" style="cursor: pointer;">School Name&nbsp;<i *ngIf="!orderFlag"
+                        class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
+                    <th>School Address</th>
+                    <th>Options</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let list of dataList; let i=index; ">
+                    <td>{{i+1}}</td>
+                    <td>{{list.schoolName}}</td>
+                    <td>{{list.schoolAddress}}</td>
+                    <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
+      <!-- <td>
+                      <div> <span class="fa fa-pencil fa-options" (click)="editSchool(list)"></span>&nbsp;&nbsp;
+                        <span class="fa fa-trash-o fa-options" (click)="deleteSchool(list.id)"></span></div>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <div class="card-body" style="padding-top: 7px;">
+              <div style="padding: 7px 20px 0 0"><span class="btn-add" (click)="addSchool()">Add</span>
+
+              </div>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>S.No</th>
+                    <th (click)="orderAdmin()" style="cursor: pointer;">Admin Id&nbsp;<i *ngIf="!orderFlag"
+                        class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
+                    <th>Admin Name</th>
+                    <th>Admin SchoolId</th>
+                    <th>Admin Address</th>
+                    <th>Options</th>
+                  </tr>
+                </thead>
+                <tbody> -->
+      <!-- <tr *ngFor="let list of pagedItems; let i=index; ">
+                  <tr *ngFor="let list of adminList; let i=index; ">
+                    <td>{{i+1}}</td>
+                    <td>{{list.id}}</td>
+                    <td>{{list.name}}</td>
+                    <td>{{list.schoolId}}</td>
+                    <td>{{list.address}}</td>
+                    <td>
+                      <div> <span class="fa fa-pencil fa-options" (click)="editAdmin(list)"></span>&nbsp;&nbsp;
+                        <span class="fa fa-trash-o fa-options" (click)="deleteAdmin(list.id)"></span></div>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+
+            </div>
+
+          </div>
+        </jqxTabs>
+
+        <jqxTabs *ngIf="!showSuperAdmin" [width]='"100%"' [position]='"top"' [animationType]='"none"'
+          [selectionTracker]='false'>
+          <ul>
+            <li style="margin-left: 30px;">Admins</li>
+          </ul>
+
+          <div>
+            <div class="card-body" style="padding-top: 7px;">
+              <div style="padding: 7px 20px 0 0"><span class="btn-add" (click)="addSchool()">Add</span>
+
+              </div>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>S.No</th>
+                    <th (click)="orderAdmin()" style="cursor: pointer;">Admin Id&nbsp;<i *ngIf="!orderFlag"
+                        class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
+                    <th>Admin Name</th>
+                    <th>Admin SchoolId</th>
+                    <th>Admin Address</th>
+                    <th>Options</th>
+                  </tr>
+                </thead>
+                <tbody> -->
+      <!-- <tr *ngFor="let list of pagedItems; let i=index; "> -->
+      <!-- <tr *ngFor="let list of adminList; let i=index; ">
+                    <td>{{i+1}}</td>
+                    <td>{{list.id}}</td>
+                    <td>{{list.name}}</td>
+                    <td>{{list.schoolId}}</td>
+                    <td>{{list.address}}</td>
+                    <td>
+                      <div> <span class="fa fa-pencil fa-options" (click)="editAdmin(list)"></span>&nbsp;&nbsp;
+                        <span class="fa fa-trash-o fa-options" (click)="deleteAdmin(list.id)"></span></div>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+
+            </div>
+
+          </div>
+        </jqxTabs>
+      </div>
+    </div>  -->
+      <!--/.col-->
+      <!--<div class="col-lg-2">
+      <div class="card text-white bg-info">
+        <div class="card-body pb-0"><button class="btn btn-transparent p-0 float-right" type="button"><i
+              class="fa fa-users"></i></button>
+          <div class="text-value">900</div>
+          <div style="padding-bottom: 30px;">Registered Users</div>
+        </div>
+
+
+      </div>
+      <div class="card text-white bg-danger">
+
+        <div class="card-body pb-0">
+          <div class="btn-group float-right"><button class="btn btn-transparent  p-0" type="button"><i
+                class="fa fa-user"></i></button>
+            -->
+      <!--</div>
+          <div class="text-value">100</div>
+          <div style="padding-bottom: 30px;">Registered Vendors</div>
+        </div>
+      </div>
+
+      <div class="brand-card">
+        <div class="brand-card-header bg-facebook" style="height: 4rem;"><i class="fa fa-facebook"></i>
+          <div class="chart-wrapper">
+            <div class="chartjs-size-monitor">
+              <div class="chartjs-size-monitor-expand">
+                <div class=""></div>
+              </div>
+              <div class="chartjs-size-monitor-shrink">
+                <div class=""></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="brand-card-body">
+          <div>
+            <div class="text-value">890</div>
+            <div class="text-uppercase text-muted small">Users</div>
+          </div>
+          <div>
+            <div class="text-value">459</div>
+            <div class="text-uppercase text-muted small">feeds</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>-->
+      <!--/.row-->
+
+    </div>

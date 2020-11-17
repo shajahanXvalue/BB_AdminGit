@@ -1,0 +1,22 @@
+.modal-header {
+    border-radius: 4px 4px 0px 0px;
+    text-align: center;
+    margin: 24px 0 12px 0;
+    position: relative;
+    margin-top: 0px ;
+    background-color: red;
+    height: 50px;
+  }
+
+  .mat-dialog-container {
+    padding: 0px !important;
+}
+
+.mat-datepicker-content .mat-calendar-next-button, .mat-datepicker-content .mat-calendar-previous-button, .mat-datepicker-toggle {
+  color: black;
+}
+
+.mat-datepicker-content .mat-calendar {
+  width: 250px !important;
+  height: 300px !important;
+}

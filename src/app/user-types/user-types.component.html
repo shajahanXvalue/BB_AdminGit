@@ -1,0 +1,69 @@
+<div class="animated fadeIn" style="padding-top: 10px;">
+  <div class="row">
+
+    <div class="col-lg-10">
+      <div class="card">
+        <div class="card-header">
+          User Types.
+          <!-- <a style="margin-left:750px;" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i>
+            Logout</a> -->
+        </div>
+        <!-- <div class="card-header" *ngIf="!showSuperAdmin">
+          Admin
+          <a style="margin-left:780px;" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i> Logout</a>
+        </div> -->
+        <!-- <div>-->
+        <div style="padding: 7px 20px 0 0">
+          <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+            [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching">
+          <span class="btn-add" style="margin-left: 10px; margin-bottom:5px;background-color: seagreen"
+            (click)="excelDownload()">Excel
+            Download</span>
+          <!-- <span class="btn-add" (click)="addState()" *ngIf="!showSuperAdmin">Add</span> -->
+
+        </div>
+        <div class="card-body" style="padding-top: 7px;">
+
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th (click)="order()" style="cursor: pointer;">Type Id&nbsp;<i *ngIf="!orderFlag"
+                    class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
+                <th>User Type</th>
+                <!-- <th *ngIf="!showSuperAdmin">Options</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let list of dataList | filter:searchText | paginate
+                      : {
+                          id: 'list_pagination',
+                          itemsPerPage: 10,
+                          currentPage: page,
+                          totalItems: totalRecords
+                        }; let i=index; ">
+                <td>{{i+1}}</td>
+                <td>{{list.id}}</td>
+                <td>{{list.type}}</td>
+                <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
+                <!-- <td>
+                    <div *ngIf="!showSuperAdmin"> <span class="fa fa-pencil fa-options" (click)="editState(list)"></span>&nbsp;&nbsp;
+                      <span class="fa fa-trash-o fa-options" (click)="deleteState(list.id)"></span>
+                    </div>
+                  </td> -->
+              </tr>
+
+            </tbody>
+          </table>
+          <div style="padding: 7px 20px 0 0;margin-left: 150px;">
+            <pagination-controls id="list_pagination" maxSize="10" directionLinks="true" (pageChange)="page = $event"
+              (pageBoundsCorrection)="page=$event" autoHide="true" responsive="true" previousLabel="Previous"
+              nextLabel="Next" screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
+              screenReaderCurrentLabel="You're on page">
+            </pagination-controls>
+          </div>
+        </div>
+      </div>
+
+
+    </div>

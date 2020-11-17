@@ -1,0 +1,77 @@
+<div class="animated fadeIn" style="padding-top: 10px;">
+  <div class="row">
+
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+         Approve School
+          <!-- <a style="margin-left:750px;" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i>
+            Logout</a> -->
+        </div>
+        <!-- <div class="card-header" *ngIf="!showSuperAdmin">
+          Admin
+          <a style="margin-left:780px;" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i> Logout</a>
+        </div> -->
+        <div>
+          <div style="padding: 7px 20px 0 0">
+            <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+              [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching">
+            <!-- <select style="height:27px;width: 130px;color: #405065;" (change)="stateFilter($event.target.value)"
+              [(ngModel)]="selectedState">
+              <option [ngValue]="null" [disabled]="true" hidden>State Filter</option>
+              <option value="">All</option>
+              <option *ngFor="let opt of stateItems" value={{opt.statename}}>
+                {{opt.statename}}</option>
+            </select>
+            <select style="height:27px;width: 130px;color: #405065;" (change)="zipCodeFilter($event.target.value)"
+              [(ngModel)]="selectedZipCode">
+              <option [ngValue]="null" [disabled]="true" hidden>ZipCode Filter</option>
+              <option value="">All</option>
+              <option *ngFor="let opt of zipCodeItem" value={{opt}}>
+                {{opt}}</option>
+            </select> -->
+
+          </div>
+          <div class="card-body" style="padding-top: 7px;">
+
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th (click)="order()" style="cursor: pointer;">School Name&nbsp;<i *ngIf="!orderFlag"
+                      class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
+                 <th>Options</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let list of dataList | filter:searchText | paginate
+                      : {
+                          id: 'list_pagination',
+                          itemsPerPage: 10,
+                          currentPage: page,
+                          totalItems: totalRecords
+                        }; let i=index; ">
+                  <td>{{i+1}}</td>
+                  <td>{{list.schoolName}}</td>
+                 <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
+                  <td>
+                    <div> <span class="fa fa-check fa-options" style="color:green" (click)="approveSchool(list.id)"></span>&nbsp;&nbsp;
+                      <span class="fa fa-close fa-options" (click)="rejectSchool(list.id) "
+                        *ngIf="showSuperAdmin"></span>
+                    </div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+            <h1 *ngIf="showNoRecord" style="margin-left: 340px;">No results found..</h1>
+            <div style="padding: 7px 20px 0 0;margin-left: 150px;">
+              <pagination-controls id="list_pagination" maxSize="10" directionLinks="true" (pageChange)="page = $event"
+                autoHide="true" responsive="true" previousLabel="Previous" nextLabel="Next"
+                (pageBoundsCorrection)="page=$event" screenReaderPaginationLabel="Pagination"
+                screenReaderPageLabel="page" screenReaderCurrentLabel="You're on page">
+              </pagination-controls>
+            </div>
+          </div>
+        </div>
+      </div>

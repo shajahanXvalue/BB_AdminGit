@@ -1,0 +1,77 @@
+<div class="animated fadeIn" style="padding-top: 10px;">
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    Vendors
+                </div>
+                <div *ngIf="!isApprovedVendor" style="padding: 7px 20px 0 0"><span class="btn-add"
+                        style="background-color: red;" (click)="getApprovedVendors()">Get Approved Vendors</span>
+
+                </div>
+                <div *ngIf="isApprovedVendor" style="padding: 7px 20px 0 0"><span class="btn-add"
+                        style="background-color:  #343a40;" (click)="back()">Back</span>
+
+                </div>
+                <div class="card-body" style="padding-top: 7px;">
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>Category</th>
+                                <th>Sub Category</th>
+                                <th>Service</th>
+                                <th *ngIf="isApprovedVendor">Points</th>
+                                <th *ngIf="isApprovedVendor">Rejected</th>
+                                <th *ngIf="isApprovedVendor">Suspend</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let list of dataList; let i=index; ">
+                                <td>{{i+1}}</td>
+                                <td><a *ngIf="!isApprovedVendor" (click)="getVendorDetails(list)"
+                                        style="text-decoration: underline;cursor: pointer;">{{list.first_name}}</a>
+                                    <span *ngIf="isApprovedVendor">{{list.first_name}}</span></td>
+                                <td style="width: 25%;">{{list.address}}</td>
+                                <td>{{list.category}}</td>
+                                <td>{{list.sub_category}}</td>
+                                <td>{{list.service}}</td>
+                                <td *ngIf="isApprovedVendor">{{list.vendor_points}}</td>
+                                <td *ngIf="isApprovedVendor" (click)="getVendorRejectedOrders(list)"
+                                    style="text-decoration: underline;cursor: pointer;">{{list.rejected_orders.length}}
+                                </td>
+                                <td *ngIf="isApprovedVendor">
+                                    <div *ngIf="list.is_vendor_suspend=='N'; else elseBlock">
+                                        <span class="fa fa-times fa-options" (click)="suspendVendor(list.id)"></span>
+                                    </div>
+                                    <ng-template #elseBlock>
+                                        <span style="color: green;" class="fa fa-check fa-options"
+                                            (click)="activateSuspendVendor(list.id)"></span>
+                                    </ng-template>
+                                </td>
+                                <td>
+                                    <div *ngIf="!isApprovedVendor">
+                                        <span *ngIf="list.is_vendor_rejected=='N'" class="fa fa-check fa-options" style="color: green;" (click)="approveVendor(list.id)"></span>
+                                        <span *ngIf="list.is_vendor_rejected=='N'" class="fa fa-times fa-options" (click)="rejectVendor(list.id)"></span>
+                                        <span class="fa fa-trash-o fa-options" (click)="deleteVendor(list.id)"></span>
+                                    </div>
+                                    <span *ngIf="isApprovedVendor" class="btn-add" style="float: left;"
+                                        (click)="addVendorPoints(list)">Add Points</span>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--/.col-->
+    </div>
+    <!--/.row-->
+
+</div>
