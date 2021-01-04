@@ -10,21 +10,27 @@
     src: 'assets/img/bb-logo2.png',
     width: 110,
     height: 55,
-
+    
     alt: 'Bullying Buddy' }">
   <ul class="nav navbar-nav d-md-down-none">
     <li class="nav-item px-3">
       <!-- <div style="margin-left: 950px;">
         <a class="dropdown-item" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i>
           Logout</a></div> -->
-      <a [routerLink]="['/dash/school']" style="
+      <a *ngIf="superAdmin" [routerLink]="['/dash/school']" style="
           margin-left: 450px;
-          font-size: 20px;
+          font-size: 30px;
           font-weight: bold;
           text-decoration: none;
-        " routerLinkActive="active-list-item">Bullying Buddy Admin</a>
-      <!-- </li>
-    <li class="nav-item px-3">
+        " routerLinkActive="active-list-item">Bullying Buddy Super Admin</a>
+        <a *ngIf="!superAdmin" [routerLink]="['/dash/school']" style="
+        margin-left: 450px;
+        font-size: 30px;
+        font-weight: bold;
+        text-decoration: none;
+      " routerLinkActive="active-list-item">Bullying Buddy Admin</a>
+      <!-- </li> -->
+    <!-- <li class="nav-item px-3">
       <a class="nav-link" [routerLink]="['/dash/dashboard']" routerLinkActive="active-list-item">Super Admin</a>
     </li>
     <li class="nav-item px-3">
@@ -80,21 +86,31 @@
         dropdownToggle (click)="(false)">
         <img src="assets/img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com" />
       </a>
-      <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown"> -->
-    <!--<a class="dropdown-item" href="#"><i class="fa fa-user"></i> Profile</a>
-          <a class="dropdown-item" href="#"><i class="fa fa-wrench"></i> Setting</a> -->
-    <!--<a class="dropdown-item" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i> Logout</a>
+      <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+    <a class="dropdown-item" href="#"><i class="fa fa-user"></i> Profile</a>
+          <a class="dropdown-item" href="#"><i class="fa fa-wrench"></i> Setting</a>
+    <a class="dropdown-item" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i> Logout</a>
      </div>
     </li> -->
   </ul>
 </app-header>
+
 <div class="app-body">
   <app-sidebar #appSidebar [fixed]="true" [display]="'lg'" [minimized]="sidebarMinimized"
     (minimizedChange)="toggleMinimize($event)">
-     <a *ngIf="userId.schoolid===0" class="nav-link" href="#/dash/approveschool" ><i class="fa fa-building" *ngIf='!sidebarMinimized'></i>
-      <i class="fa fa-building" *ngIf='sidebarMinimized' style="margin-left: 20px;"></i><a style="margin-left:13px" [hidden]="sidebarMinimized"> Approve School</a></a>
+    <!-- <a *ngIf="userId.schoolid===0" class="nav-link" href="#/dash/approveschool"><i class="fa fa-building"
+        *ngIf='!sidebarMinimized'></i>
+      <i class="fa fa-building" *ngIf='sidebarMinimized' style="margin-left: 20px;"></i><a style="margin-left:13px"
+        [hidden]="sidebarMinimized"> Approve School</a></a>
+
+    <a *ngIf="userId.schoolid!==0" class="nav-link" href="#/dash/roomlist"><i class="fa fa-comments-o"
+        *ngIf='!sidebarMinimized'></i>
+      <i class="fa fa-comments-o" *ngIf='sidebarMinimized' style="margin-left: 20px;"></i><a style="margin-left:13px"
+        [hidden]="sidebarMinimized">Chat</a></a> -->
+
     <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="appSidebar.minimized">
       <a class="dropdown-item" href="#" [hidden]="sidebarMinimized"><i class="fa fa-building"></i> Approve School</a>
+      <a class="dropdown-item" href="#" [hidden]="sidebarMinimized"><i class="fa fa-comments-o"></i> Chat</a>
       <a class="dropdown-item" href="#" (click)="doLogOut()"><i class="fa fa-lock"></i> Logout</a>
     </app-sidebar-nav>
     <app-sidebar-minimizer></app-sidebar-minimizer>

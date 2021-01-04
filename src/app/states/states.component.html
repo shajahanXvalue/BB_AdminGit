@@ -15,7 +15,7 @@
         <!-- <div> -->
         <div style="padding: 7px 20px 0 0">
           <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
-            [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching">
+            [(ngModel)]="searchText" autocomplete="off" placeholder="Search">
           <span class="btn-add" style="margin-left: 10px; margin-bottom:5px;background-color: seagreen"
             (click)="excelDownload()">Excel
             Download</span>
@@ -27,7 +27,7 @@
           <table class="table table-striped">
             <thead>
               <tr>
-                <th>S.No&nbsp;<i *ngIf="!orderFlag" class="fa fa-caret-down"></i><i *ngIf="orderFlag"
+                <th>No&nbsp;<i *ngIf="!orderFlag" class="fa fa-caret-down"></i><i *ngIf="orderFlag"
                     class="fa fa-caret-up"></i></th>
                 <!-- <th (click)="order()" style="cursor: pointer;">State Id&nbsp;<i *ngIf="!orderFlag"
                     class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th> -->

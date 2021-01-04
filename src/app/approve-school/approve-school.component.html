@@ -15,7 +15,7 @@
         <div>
           <div style="padding: 7px 20px 0 0">
             <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
-              [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching">
+              [(ngModel)]="searchText" autocomplete="off" placeholder="Search">
             <!-- <select style="height:27px;width: 130px;color: #405065;" (change)="stateFilter($event.target.value)"
               [(ngModel)]="selectedState">
               <option [ngValue]="null" [disabled]="true" hidden>State Filter</option>
@@ -37,7 +37,7 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>S.No</th>
+                  <th>No</th>
                   <th (click)="order()" style="cursor: pointer;">School Name&nbsp;<i *ngIf="!orderFlag"
                       class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
                  <th>Options</th>

@@ -2,7 +2,7 @@ import { WindowService } from "./forgot-password-screen/window.service";
 import { NgxPaginationModule } from "ngx-pagination";
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
-import { NgSelectModule } from '@ng-select/ng-select';
+import { NgSelectModule } from "@ng-select/ng-select";
 import { LocationStrategy, HashLocationStrategy } from "@angular/common";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 // import { HttpModule } from "@angular/http";
@@ -13,7 +13,7 @@ import { CookieModule } from "ngx-cookie";
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
 };
-
+import { OrderModule } from 'ngx-order-pipe';
 import { AppComponent } from "./app.component";
 import { NgxDropzoneModule } from "ngx-dropzone";
 // Import containers
@@ -64,7 +64,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatInputModule } from "@angular/material/input";
 import { PropertyServiceService } from "./property-service.service";
 import { jqxTabsModule } from "jqwidgets-ng/jqxtabs";
-import { SelectDropDownModule } from 'ngx-select-dropdown'
+import { SelectDropDownModule } from "ngx-select-dropdown";
 // import { BannersComponent } from "./banners/banners.component";
 // import { CustomersComponent } from "./customers/customers.component";
 // import { OrdersComponent } from "./orders/orders.component";
@@ -83,8 +83,58 @@ import { CookieService } from "angular2-cookie/services/cookies.service";
 import { DatePipe } from "@angular/common";
 import { TemplatesComponent } from "./templates/templates.component";
 import { ForgotPasswordScreenComponent } from "./forgot-password-screen/forgot-password-screen.component";
-import { BereavementComponent } from './bereavement/bereavement.component';
-import { ApproveSchoolComponent } from './approve-school/approve-school.component';
+import { BereavementComponent } from "./bereavement/bereavement.component";
+import { ApproveSchoolComponent } from "./approve-school/approve-school.component";
+import { RoomlistComponent } from "./chats/roomlist.component";
+import { ChatService } from "./chats/chat.service";
+import { Ng2AlphabetSortModule } from 'ng2-alphabet-sort';
+import {DpDatePickerModule} from 'ng2-date-picker';
+// import { NgDatepickerModule } from 'ng2-datepicker';
+import { MyDatePickerModule } from 'mydatepicker';
+import { AngularMyDatePickerModule } from 'angular-mydatepicker';
+import { NotifierModule, NotifierOptions } from 'angular-notifier';
+
+const customNotifierOptions: NotifierOptions = {
+  position: {
+		horizontal: {
+			position: 'left',
+			distance: 12
+		},
+		vertical: {
+			position: 'bottom',
+			distance: 12,
+			gap: 10
+		}
+	},
+  theme: 'material',
+  behaviour: {
+    autoHide: 5000,
+    onClick: 'hide',
+    onMouseover: 'pauseAutoHide',
+    showDismissButton: true,
+    stacking: 4
+  },
+  animations: {
+    enabled: true,
+    show: {
+      preset: 'slide',
+      speed: 300,
+      easing: 'ease'
+    },
+    hide: {
+      preset: 'fade',
+      speed: 300,
+      easing: 'ease',
+      offset: 50
+    },
+    shift: {
+      speed: 300,
+      easing: 'ease'
+    },
+    overlap: 150
+  }
+};
+
 @NgModule({
   imports: [
     jqxTabsModule,
@@ -120,6 +170,13 @@ import { ApproveSchoolComponent } from './approve-school/approve-school.componen
     SelectDropDownModule,
     // SelectDropDownModule,
     // NgModule,
+    OrderModule,
+    Ng2AlphabetSortModule,
+    DpDatePickerModule,
+    // NgDatepickerModule,
+    MyDatePickerModule,
+    AngularMyDatePickerModule,
+    NotifierModule.withConfig(customNotifierOptions)
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [
@@ -153,6 +210,7 @@ import { ApproveSchoolComponent } from './approve-school/approve-school.componen
     ForgotPasswordScreenComponent,
     BereavementComponent,
     ApproveSchoolComponent,
+    RoomlistComponent,
     // DashboardComponent,
     // DefaultLayoutComponent
   ],
@@ -165,6 +223,7 @@ import { ApproveSchoolComponent } from './approve-school/approve-school.componen
       useClass: HashLocationStrategy,
     },
     PropertyServiceService,
+    ChatService,
   ],
   entryComponents: [
     DialogModalComponent,

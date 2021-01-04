@@ -77,6 +77,7 @@
         </div>
       </div>
     </form>
+    <label style="font-size:x-medium">Created Date:  </label>&nbsp;<span style="font-size:x-medium">{{createdDate | date}}</span>
   </div>
 
   <div style="text-align: center;padding: 25px;"><button class="btn-close" [disabled]="!editForm.valid"
@@ -104,7 +105,7 @@
             <input type="text" class="form-control" formControlName="admin_zipCode"
               placeholder="Enter ZipCode" [(ngModel)]="editUserZipCode" (ngModelChange)="searchSchool($event)"
               maxlength="5">
-            <label>Admin School</label>&nbsp;<span style="color: red;">*</span>
+            <label>School</label>&nbsp;<span style="color: red;">*</span>
             <!-- <input type="text" class="form-control" formControlName="admin_school_id" placeholder="Enter School Id"
               required> -->
             <!-- <select class="form-control" [(ngModel)]="schoolId" [ngStyle]="schoolId=='' || schoolId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
@@ -174,7 +175,9 @@
             <input *ngIf='isSuperAdmin&&adminSchoolId!==0' type="text" class="form-control" formControlName="admin_zipCode"
               placeholder="Enter ZipCode" [(ngModel)]="editUserZipCode" (ngModelChange)="searchSchool($event)"
               maxlength="5">
-            <label *ngIf='!isSuperAdmin&&adminSchoolId!==0' style="margin-left:-27px">Admin School</label><label *ngIf='isSuperAdmin&&adminSchoolId!==0'>Admin School</label>&nbsp;<span style="color: red;">*</span>
+            <label *ngIf='!isSuperAdmin&&adminSchoolId!==0' style="margin-left:-27px">Admin School</label>
+            <label *ngIf='isSuperAdmin&&adminSchoolId!==0'>Admin School</label>
+            <label *ngIf='isSuperAdmin&&adminSchoolId===0' style="margin-left:-27px">Admin School</label>&nbsp;<span style="color: red;">*</span>
             <!-- <input *ngIf='!isSuperAdmin' type="text" class="form-control" formControlName="admin_school_id"
               placeholder="Enter School Id" required disabled> -->
               <!-- To Change Schools By SuperAdmin for Other Admins -->
@@ -216,7 +219,9 @@
               <option [ngValue]="null" [disabled]="true" hidden>All</option>
             </select>
               <!-- End -->
-
+              <label>School District</label>
+              <input *ngIf='isSuperAdmin' type="text" class="form-control" formControlName="admin_school_dist"
+              placeholder="Enter School District" >
             <!-- <input *ngIf='isSuperAdmin' type="text" class="form-control" formControlName="admin_school_id"
               placeholder="Enter School Id" required> -->
             <label>Admin UserName</label>&nbsp;<span style="color: red;">*</span>
@@ -233,6 +238,7 @@
         </div>
       </div>
     </form>
+    <!-- <label style="font-size:x-small">Created Date:  </label>&nbsp;<span style="font-size:x-small">{{createdDate | date}}</span> -->
   </div>
 
   <div style="text-align: center;padding: 25px;"><button class="btn-close" [disabled]="!adminEditForm.valid"
@@ -243,7 +249,7 @@
 
 <div *ngIf="divType=='addUser'" style="overflow-y: auto; height:400px;">
   <div class="card-body" style="padding:10px 25%" ng-scrollbar>
-    <form [formGroup]="saveUserForm">
+    <form [formGroup]="saveUserForm" novalidate>
       <div class="row" style="overflow-y: auto; max-height: 100%;">
         <div class="col-sm-12">
           <div class="form-group">
@@ -255,15 +261,22 @@
               <option *ngFor="let opt of userTypeList" value={{opt.id}}>{{opt.type}}</option>
             </select>
             <label *ngIf="showFields" >User Email</label>&nbsp;<span style="color: red;" *ngIf="showFields">*</span>
-            <input *ngIf="showFields" [(ngModel)]="validEmail" [ngStyle]="validEmail==''||validEmail==undefined?{'border-color':'#ef8575'}:{'border-color':''}" type="text" class="form-control" formControlName="email"
-              placeholder="Enter User Email" required>
-            <label *ngIf="showFields">User Password</label>&nbsp;<span style="color: red;" *ngIf="showFields">*</span>
+            <input *ngIf="showFields" [(ngModel)]="validEmail" type="email" class="form-control" formControlName="email"
+             [ngStyle]="validEmail==''||validEmail==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+              (ngModelChange)="userEmailChange($event)" placeholder="Enter User Email" required>
+              <span *ngIf="validationEmail" class="help-block text-danger">Please Enter valid Email</span><br>
+                <label *ngIf="showFields">User Password</label>&nbsp;<span style="color: red;" *ngIf="showFields">*</span>
             <input *ngIf="showFields" [(ngModel)]="validPassword" [ngStyle]="validPassword==''?{'border-color':'#ef8575'}:{'border-color':''}" type="text" class="form-control" formControlName="password"
               placeholder="Enter User password" required>
 
-            <label *ngIf="showFields">User Name</label>&nbsp;<span style="color: red;" *ngIf="showFields">*</span>
+            <label *ngIf="showFields">Name</label>&nbsp;<span style="color: red;" *ngIf="showFields">*</span>
             <input *ngIf="showFields" [(ngModel)]="validUName" [ngStyle]="validUName==''|| validUName== undefined?{'border-color':'#ef8575'}:{'border-color':''}" type="text" class="form-control" formControlName="name" placeholder="Enter Name"
               required>
+              <label *ngIf="showFields">User Age</label>&nbsp;<span style="color: red;" *ngIf="userTypeId =='1'">*</span>
+            <input *ngIf="userTypeId =='1'" [(ngModel)]="validUAge" [ngStyle]="validUAge==''|| validUAge== undefined?{'border-color':'#ef8575'}:{'border-color':''}" type="text" class="form-control" formControlName="age" placeholder="Enter Age"
+            maxlength="2" required>
+              <input *ngIf="userTypeId !='1'&&showFields" [(ngModel)]="validUAge" type="text" class="form-control" formControlName="age" placeholder="Enter Age"
+              >
             <!-- / -->
             <label *ngIf="showFields">State</label>&nbsp;<span *ngIf="showFields" style="color: red;">*</span>
             <select *ngIf="showFields" [(ngModel)]="validState" [ngStyle]="validState=='' || validState==undefined?{'border-color':'#ef8575'}:{'border-color':''}"  [ngModelOptions]="{standalone: true}"
@@ -309,7 +322,7 @@
             </select>
             <label *ngIf="showFields">User Phone</label>&nbsp;<span *ngIf="showFields" style="color: red;">*</span>
             <input *ngIf="showFields" [(ngModel)]="validUPhone" [ngStyle]="validUPhone==''||validUPhone==undefined?{'border-color':'#ef8575'}:{'border-color':''}" type="text" class="form-control" formControlName="userPhone"
-              placeholder="Enter UserPhone" required>
+              placeholder="Enter UserPhone" maxlength="10" required>
             <!-- <label *ngIf="userTypeId==='1'">ParentId</label> -->
             <!-- &nbsp;<span *ngIf="userTypeId==='1'"
               style="color: red;">*</span> -->
@@ -322,24 +335,24 @@
               *ngIf="userTypeId==='1'||userTypeId==='2'" style="color: red;">*</span>
             <input *ngIf="userTypeId==='1'||userTypeId==='2'" type="text" [(ngModel)]="validGrade"
             [ngStyle]="validGrade==''||validGrade==undefined?{'border-color':'#ef8575'}:{'border-color':''}" class="form-control" formControlName="grade"
-              placeholder="Enter Grade">
+              placeholder="Enter Grade" maxlength="2">
             <label *ngIf="userTypeId==='1'">Parent Phone1</label>&nbsp;<span *ngIf="userTypeId==='1'"
               style="color: red;">*</span>
-            <input *ngIf="userTypeId==='1'" [(ngModel)]="validPPhone1" [ngStyle]="validPPhone1==''||validPPhone1==undefined?{'border-color':'#ef8575'}:{'border-color':''}" type="text" class="form-control" formControlName="parentPhone1"
+            <input *ngIf="userTypeId==='1'" maxlength="10" [(ngModel)]="validPPhone1" [ngStyle]="validPPhone1==''||validPPhone1==undefined?{'border-color':'#ef8575'}:{'border-color':''}" type="text" class="form-control" formControlName="parentPhone1"
               placeholder="Enter ParentPhone1">
             <label *ngIf="userTypeId==='1'">Parent Phone2</label>
             <input *ngIf="userTypeId==='1'" type="text" class="form-control" formControlName="parentPhone2"
-              placeholder="Enter ParentPhone1">
+              placeholder="Enter ParentPhone1" maxlength="10">
             <label *ngIf="userTypeId==='1'">Driver Phone</label>
             <input *ngIf="userTypeId==='1'" type="text" class="form-control" formControlName="driverPhone"
-              placeholder="Enter DriverPhone">
+              placeholder="Enter DriverPhone" maxlength="10">
             <label *ngIf="userTypeId==='5'" style="margin-left: -16px; display:
               inline-block; margin-bottom: 0.5rem;">School Phone</label>
             <label *ngIf="userTypeId==='2'" style="margin-left: -9px; display:
               inline-block; margin-bottom: 0.5rem;">School Phone</label>
             <label *ngIf="userTypeId==='1'">School Phone</label>
             <input *ngIf="userTypeId==='1'||userTypeId==='2'||userTypeId==='5'" type="text" class="form-control"
-              formControlName="schoolPhone" placeholder="Enter SchoolPhone">
+              formControlName="schoolPhone" placeholder="Enter SchoolPhone" maxlength="10">
             <label *ngIf="showFields&&userTypeId==='1'||userTypeId==='2'||userTypeId==='5'">Address</label>
             <label *ngIf="showFields&&userTypeId==='3'||userTypeId==='4'" style="margin-left: -16px; display:
               inline-block; margin-bottom: 0.5rem;">Address</label>
@@ -357,10 +370,10 @@
               <option *ngFor="let opt of stateList" value={{opt.statename}}>{{opt.statename}}</option>
             </select> -->
             <!-- <input type="text" class="form-control" formControlName="state" placeholder="Enter State" required> -->
-            <label *ngIf="userTypeId==='1'||userTypeId==='4'">Bus Route</label>
+            <label *ngIf="userTypeId==='1'">Bus Route</label>
             <!-- <input *ngIf="userTypeId==='1'||userTypeId==='4'" type="text" class="form-control"
               formControlName="busRoute" placeholder="Enter BusRoute"> -->
-            <select *ngIf="userTypeId==='1'||userTypeId==='4'" class="form-control"
+            <select *ngIf="userTypeId==='1'" class="form-control"
               (change)="busRouteDropDown($event.target.value)">
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of busRouteList" value={{opt.busRoute}}>{{opt.busRoute}}</option>
@@ -408,9 +421,17 @@
             </select>
             <label>User Email</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validEmail" [ngStyle]="validEmail==''||validEmail==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
-            class="form-control" formControlName="email" placeholder="Enter User Email" required>
-            <label>User Name</label>&nbsp;<span style="color: red;">*</span>
+            class="form-control" formControlName="email" placeholder="Enter User Email" (ngModelChange)="userEmailChange($event)" required>
+            <span *ngIf="validationEmail" class="help-block text-danger">Please Enter valid Email</span><br>
+            <label>Name</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validUName" [ngStyle]="validUName==''||validUName==undefined?{'border-color':'#ef8575'}:{'border-color':''}"class="form-control" formControlName="name" placeholder="Enter Name" required>
+            <label>User Age</label>&nbsp;<span *ngIf="userIds=='1'" style="color: red;" >*</span>
+            <!-- <input [(ngModel)]="validUAge"
+             type="text" class="form-control" formControlName="age" placeholder="Enter Age"
+              > -->
+              <input maxlength="2" [(ngModel)]="validEditUAge" (ngModelChange)="editUSerAge($event)"type="text" class="form-control" formControlName="age" placeholder="Enter Age"
+              >
+              <!-- <input *ngIf="userIds!='1'" [(ngModel)]="validUAge" type="text" class="form-control" formControlName="age" placeholder="Enter Age"> -->
             <label>State</label>&nbsp;<span style="color: red;">*</span>
             <!-- <input type="text" class="form-control" formControlName="state" placeholder="Enter State" required> -->
             <select class="form-control" [ngStyle]="selectedState==''||selectedState==undefined||selectedState==null?{'border-color':'#ef8575'}:{'border-color':''}"
@@ -473,13 +494,13 @@
               placeholder="Enter Grade">
             <label *ngIf="userIds=='1'">Parent Phone1</label>&nbsp;<span *ngIf="userIds=='1'"
               style="color: red;">*</span>
-            <input *ngIf="userIds=='1'" [(ngModel)]="validPPhone1" [ngStyle]="validPPhone1==''||validPPhone1==undefined?{'border-color':'#ef8575'}:{'border-color':''}"type="text" class="form-control" formControlName="parentPhone1"
+            <input *ngIf="userIds=='1'" maxlength="10" [(ngModel)]="validPPhone1" [ngStyle]="validPPhone1==''||validPPhone1==undefined?{'border-color':'#ef8575'}:{'border-color':''}"type="text" class="form-control" formControlName="parentPhone1"
               placeholder="Enter ParentPhone1" required>
             <label *ngIf="userIds=='1'">Parent Phone2</label>
-            <input *ngIf="userIds=='1'" type="text" class="form-control" formControlName="parentPhone2"
+            <input *ngIf="userIds=='1'" maxlength="10" type="text" class="form-control" formControlName="parentPhone2"
               placeholder="Enter ParentPhone1">
             <label *ngIf="userIds=='1'">Driver Phone</label>
-            <input *ngIf="userIds=='1'" type="text" class="form-control" formControlName="driverPhone"
+            <input *ngIf="userIds=='1'" maxlength="10" type="text" class="form-control" formControlName="driverPhone"
               placeholder="Enter DriverPhone">
             <label *ngIf="userIds=='5'" style="margin-left: -17px; display:
               inline-block; margin-bottom: 0.5rem;">School Phone</label>
@@ -487,7 +508,7 @@
             <label *ngIf="userIds=='2'" style="margin-left: -9px; display:
               inline-block; margin-bottom: 0.5rem;">School Phone</label>
             <input *ngIf="userIds=='1'||userIds=='2'||userIds=='5'" type="text" class="form-control"
-              formControlName="schoolPhone" placeholder="Enter SchoolPhone">
+              formControlName="schoolPhone" placeholder="Enter SchoolPhone" maxlength="10">
             <label *ngIf="userIds=='1'||userIds=='2'">Address</label>
             <label *ngIf="userIds=='3'||userIds=='4'" style="margin-left: -17px; display:
               inline-block; margin-bottom: 0.5rem;">Address</label>
@@ -498,10 +519,10 @@
             <label>City</label>
             <input type="text" class="form-control" formControlName="city" placeholder="Enter City">
 
-            <label *ngIf="userIds=='1'||userIds=='4'">Bus Route</label>
+            <label *ngIf="userIds=='1'">Bus Route</label>
             <!-- <input *ngIf="userIds=='1'||userIds=='4'" type="text" class="form-control" formControlName="busRoute"
               placeholder="Enter BusRoute"> -->
-            <select *ngIf="userIds=='1'||userIds=='4'" class="form-control" [ngModelOptions]="{standalone: true}"
+            <select *ngIf="userIds=='1'" class="form-control" [ngModelOptions]="{standalone: true}"
               (change)="busRouteDropDown($event.target.value)" [(ngModel)]="userEditBusRoute">
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of busRouteList" value={{opt.busRoute}}>{{opt.busRoute}}</option>
@@ -510,6 +531,7 @@
         </div>
       </div>
     </form>
+    <label style="font-size:x-medium">Created Date:  </label>&nbsp;<span style="font-size:x-medium">{{createdDate | date}}</span>
   </div>
 
   <div style="text-align: center;padding: 25px;"><button class="btn-close" (click)="editUser()">Save</button>&nbsp;
@@ -600,17 +622,29 @@
       (click)="saveIncident()">Save</button>&nbsp;
     <button class="btn-close" (click)="close()">Close</button></div>
 
-</div>
-<div *ngIf="divType=='addTeacher'">
+</div >
+<div *ngIf="divType=='addTeacher'"  style="overflow-y: auto; height:400px;">
   <div class="card-body" style="padding:10px 25%">
     <form [formGroup]="saveTeacherForm">
       <div class="row">
         <div class="col-sm-12">
           <div class="form-group">
-            <label>Teacher Name</label>&nbsp;<span style="color: red;">*</span>
+            <label>Name</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validTUName" [ngStyle]="validTUName==''|| validTUName==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
             class="form-control" formControlName="teacher_name" placeholder="Enter Teacher Name"
               required>
+              <label>Email</label>&nbsp;<span style="color: red;">*</span>
+              <input type="text" [(ngModel)]="validTEmail" [ngStyle]="validTEmail==''|| validTEmail==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+              class="form-control" formControlName="teacher_email" placeholder="Enter Teacher Email"
+                required>
+                <label>Password</label>&nbsp;<span style="color: red;">*</span>
+                <input type="text" [(ngModel)]="validTPassword" [ngStyle]="validTPassword==''|| validTPassword==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+                class="form-control" formControlName="teacher_password" placeholder="Enter Teacher Password"
+                  required>
+                  <label>Age</label>&nbsp;<span style="color: red;">*</span>
+                  <input type="number" [(ngModel)]="validTAge" [ngStyle]="validTAge==''|| validTAge==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+                  class="form-control" formControlName="teacher_age" placeholder="Enter Teacher Age"
+                    required>
               <label *ngIf='isSuperAdmin'>State</label>&nbsp; <span *ngIf='isSuperAdmin' class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf='isSuperAdmin&&adminSchoolId!==0'style="font-size: 10px;color:red">Kindly Select State to Filter the School</label>
                <select *ngIf='isSuperAdmin' class="form-control" (change)="userStateDropDown($event.target.value)">
                    <option [ngValue]="null" [disabled]="true" hidden>Select</option>
@@ -655,12 +689,24 @@
                 <ng-option  *ngFor="let opt of allSchoolList"  value={{opt.id}} >{{opt.schoolName}}</ng-option>
             </ng-select>
 
+            <label>UserPhone</label>&nbsp;<span style="color: red;">*</span>
+            <input type="text" [(ngModel)]="validTPhone" [ngStyle]="validTPhone==''|| validTPhone==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            class="form-control" formControlName="teacher_Phone" placeholder="Enter Teacher Phone" maxlength="10"
+              required>
+
+              <label>Gender</label>&nbsp;<span style="color: red;">*</span>
+              <select  name="gender" [(ngModel)]="validTGender" [ngStyle]="validTGender=='' || validTGender==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+              [ngModelOptions]="{standalone: true}" class="form-control" (change)="selectGender($event.target.value)" required >
+               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+               <option value="M">Male</option>
+               <option value="F">Female</option>
+             </select>
             <!-- <select  *ngIf='!isSuperAdmin&&adminSchoolId!==0'  class="form-control" disabled>
                <option [ngValue]="null" [disabled]="true" hidden>{{dropSchoolName}}</option>
             </select> -->
             <label>Grade</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validTGrade" [ngStyle]="validTGrade==''|| validTGrade==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
-            class="form-control" formControlName="grade" placeholder="Enter Grade" required>
+            class="form-control" formControlName="grade" placeholder="Enter Grade" maxlength="2" required>
           </div>
         </div>
       </div>
@@ -718,11 +764,12 @@
 
             <label>Grade</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validTGrade" [ngStyle]="validTGrade==''|| validTGrade==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
-            class="form-control" formControlName="grade" placeholder="Enter Grade" required>
+            class="form-control" formControlName="grade" placeholder="Enter Grade" maxlength="2" required>
           </div>
         </div>
       </div>
     </form>
+    <label style="font-size:x-medium">Created Date:  </label>&nbsp;<span style="font-size:x-medium">{{createdDate | date}}</span>
   </div>
 
   <div style="text-align: center;padding: 25px;"><button class="btn-close" [disabled]="!editTeacherForm.valid"
@@ -781,8 +828,14 @@
      {{allSchoolList.schoolName}}
     </ng-template>   </ngx-select-dropdown> -->
              <label>Driver Id</label>&nbsp;<span style="color: red;">*</span>
-            <input type="text" [(ngModel)]="validBDId" [ngStyle]="validBDId==''|| validBDId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
-            class="form-control" formControlName="driver_id" placeholder="Enter DriverId" required>
+             <select class="form-control" [ngStyle]="validBDId==''|| validBDId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+             class="form-control" formControlName="driver_id" (change)="driverDropDown($event.target.value)">
+              <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+              <option *ngFor="let opt of driverUniqueName" value={{opt.id}}>{{opt.name}}</option>
+       </select>
+       <label *ngIf="showNoDriver" style="color: red;">No Driver Available for the Selected School.</label>
+            <!-- <input type="text" [(ngModel)]="validBDId" [ngStyle]="validBDId==''|| validBDId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            class="form-control" formControlName="driver_id" placeholder="Enter DriverId" required> -->
 
           </div>
         </div>
@@ -837,8 +890,14 @@
                 <ng-option  *ngFor="let opt of allSchoolList"  value={{opt.id}} >{{opt.schoolName}}</ng-option>
             </ng-select>
              <label>Driver Id</label>&nbsp;<span style="color: red;">*</span>
-            <input type="text" [(ngModel)]="validBDId" [ngStyle]="validBDId==''|| validBDId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
-            class="form-control" formControlName="driver_id" placeholder="Enter DriverId" required>
+             <select class="form-control" [ngStyle]="validBDId==''|| validBDId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+             class="form-control" formControlName="driver_id" (change)="driverDropDown($event.target.value)">
+              <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+              <option *ngFor="let opt of editDriverDummy" value={{opt.id}}>{{opt.name}}</option>
+       </select>
+       <label *ngIf="showNoDriver" style="color: red;">No Driver Available for the Selected School.</label>
+            <!-- <input type="text" [(ngModel)]="validBDId" [ngStyle]="validBDId==''|| validBDId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            class="form-control" formControlName="driver_id" placeholder="Enter DriverId" required> -->
             <!-- <select class="form-control" (change)="userSchoolDropDown($event.target.value)"
               [ngModelOptions]="{standalone: true}" [(ngModel)]="schoolId">
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
@@ -848,6 +907,7 @@
         </div>
       </div>
     </form>
+    <label style="font-size:x-medium">Created Date:  </label>&nbsp;<span style="font-size:x-medium">{{createdDate | date}}</span>
   </div>
 
   <div style="text-align: center;padding: 25px;"><button class="btn-close" [disabled]="!editBusRouteForm.valid"
@@ -949,6 +1009,43 @@
     <button class="btn-close" (click)="close()">Close</button></div>
 
 </div>
+
+<div *ngIf="divType=='editbereavement'">
+  <div class="card-body" style="padding:10px 25%">
+    <form [formGroup]="editBereavementForm">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label>Name</label>&nbsp;<span style="color: red;">*</span>
+            <input type="text" class="form-control" formControlName="name" placeholder="Enter Name" disabled>
+            <label>Age</label>&nbsp;<span style="color: red;">*</span>
+            <input type="text" class="form-control" formControlName="school_address" placeholder="Enter Address" disabled>
+            <label>School Name</label>&nbsp;<span style="color: red;">*</span>
+            <input type="text" class="form-control" formControlName="school" placeholder="Enter School " disabled>
+            <!-- <select class="form-control" (change)="userSchoolDropDown($event.target.value)"
+              [ngModelOptions]="{standalone: true}" [(ngModel)]="schoolId">
+              /<option [ngValue]="null" [disabled]="true" hidden>Select</option>
+              <option  value={{school}}>{{school}}</option>
+            </select> -->
+            <label>Story</label>&nbsp;<span style="color: red;">*</span>
+            <textarea  class="form-control" formControlName="story" placeholder="Enter Story" disabled></textarea>
+
+            <label>State</label>&nbsp;<span style="color: red;">*</span>
+            <input type="text" class="form-control" formControlName="school_state" placeholder="Enter State" disabled>
+            <label>District</label>&nbsp;<span style="color: red;">*</span>
+            <input type="text" class="form-control" formControlName="district" placeholder="Enter District" >
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <!-- [disabled]="!editBereavementForm.valid" -->
+  <div style="text-align: center;padding: 25px;"><button class="btn-close"
+      (click)="editBereavement()">Save</button>&nbsp;
+    <button class="btn-close" (click)="close()">Close</button></div>
+
+</div>
+
 <div *ngIf="divType=='UploadExcel'">
   <div class="card-body" style="padding:10px 25%">
     <form [formGroup]="excelUploadForm">
@@ -957,13 +1054,15 @@
           <div class="form-group">
             <!-- <label>For</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" class="form-control" formControlName="busRoute" placeholder="Enter BusRoute" required> -->
-            <label>Choose Excel File</label>&nbsp;<span style="color: red;">*</span>
+            <label>Choose Excel File</label>&nbsp;<span style="color: red;">* 1000 Records Per Upload.</span>
             <input type="file" class="form-control" formControlName="excel_file" multiple="false"
-              (change)="onFileChange($event)" accept=".xlsx,.xls" required>
+              (change)="onFileChange($event)" accept=".xlsx,.xls" required><br/>
+
           </div>
         </div>
       </div>
     </form>
+    <label *ngIf="showLoading">Uploading File</label>&nbsp;<img style="left: auto;right: auto;" *ngIf="showLoading" src="assets/img/loading.gif">
   </div>
 
   <div style="text-align: center;padding: 25px;"><button class="btn-close" [disabled]="!excelUploadForm.valid"
@@ -983,7 +1082,7 @@
             height="200" width="350" controls></video>
           <img *ngIf="fileformat==='jpg'||fileformat==='png'||fileformat==='jpeg' ||fileformat==='peg' && url" [src]="(fileUrl)" height="200" width="350"
             controls />
-             <audio *ngIf="fileformat==='mp3'||fileformat==='ogg' && url" [src]="(fileUrl)" height="200" width="350"
+             <audio *ngIf="fileformat==='mp3'||fileformat==='ogg'||fileformat ==='m4a' && url" [src]="(fileUrl)" height="200" width="350"
             controls></audio>
         </div>
         <div class="form-group" *ngIf="fileformat==='url'||fileformat==='123'||fileformat==='NoFile'">

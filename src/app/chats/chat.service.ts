@@ -23,11 +23,13 @@ export class ChatService {
   ref;
   groupRef;
   groupNameRef;
+  groupNameupdateRef;
   constructor() {
     firebase.initializeApp(firebaseConfig);
     this.ref = firebase.firestore().collection("testMessages");
     this.groupRef = firebase.firestore().collection("group_chat");
     this.groupNameRef = firebase.firestore().collection("chat_list_table");
+    this.groupNameupdateRef = firebase.firestore().collection("USERS_REFRESH");
   }
 
   getAllMessage(): Observable<any> {
@@ -41,11 +43,37 @@ export class ChatService {
       });
     });
   }
+  getOneNameById(id: string): Observable<any> {
+    return new Observable((observer) => {
+      this.groupNameRef
+        .doc(id)
+        .collection("chat_list")
+        .orderBy("updatedDateTime", "asc")
+        .get()
+        .then((doc) => {
+          let data = [];
+          doc.docs.forEach((doc) => {
+            data.push({
+              Id: doc.data().Id,
+              refId: doc.ref.id,
+              Name: doc.data().Name,
+              User_Type_Id: doc.data().User_Type_Id,
+              unreadCount: doc.data().unreadCount,
+              currentDate: doc.data().updatedDateTime,
+            });
+            // console.log("GN", doc.data(), doc.ref.id);
+          });
+          observer.next(data);
+        })
+        .catch((err) => console.log("Please try again"));
+    });
+  }
   getGroupNameById(id: string): Observable<any> {
     return new Observable((observer) => {
       this.groupNameRef
         .doc(id)
         .collection("chat_list")
+        .orderBy("updatedDateTime", "asc")
         .get()
         .then((doc) => {
           let data = [];
@@ -53,9 +81,12 @@ export class ChatService {
             // console.log("GN", doc.data());
             data.push({
               Id: doc.data().Id,
+              refId: doc.ref.id,
               Name: doc.data().Name,
               User_Type_Id: doc.data().User_Type_Id,
               unreadCount: doc.data().unreadCount,
+              currentDate: doc.data().updatedDateTime,
+              grp: doc.data().grp_per_ID,
             });
           });
           observer.next(data);
@@ -64,6 +95,108 @@ export class ChatService {
     });
   }
 
+  // update
+  upDateData(id: string, data): Observable<any> {
+    console.log("upDate", id, data, data.ref, data.unreadCount);
+    return new Observable((observer) => {
+      this.groupNameRef
+        .doc(id)
+        .collection("chat_list")
+        .doc(data.ref)
+        .update({
+          unreadCount: data.unreadCount,
+          updatedDateTime: data.updatedDateTime,
+        })
+        .then(() => {
+          observer.next();
+        })
+        .catch((err) => console.log("Please try again"));
+    });
+  }
+
+  upDateData2(id: string, data): Observable<any> {
+    console.log("upDate", id, data, data.ref, data.unreadCount);
+    return new Observable((observer) => {
+      this.groupNameRef
+        .doc(id)
+        .collection("chat_list")
+        .doc(data.ref)
+        .update({
+          updatedDateTime: data.updatedDateTime,
+        })
+        .then(() => {
+          observer.next();
+        })
+        .catch((err) => console.log("Please try again"));
+    });
+  }
+
+  upsetDateData(id: string, data): Observable<any> {
+    console.log("upDate", id, data);
+    return new Observable((observer) => {
+      this.groupNameRef
+        .doc(id)
+        .collection("chat_list")
+        .doc()
+        .set(data)
+        .then(() => {
+          observer.next();
+        })
+        .catch((err) => console.log("Please try again"));
+    });
+  }
+
+  getChatListData(id: string): Observable<any> {
+    return new Observable((observer) => {
+      this.groupNameRef
+        .doc(id)
+        .collection("chat_list")
+        .get()
+        .then((doc) => {
+          let data = [];
+          doc.docs.forEach((doc) => {
+            data.push({
+              Id: doc.data().Id,
+              refId: doc.ref.id,
+              Name: doc.data().Name,
+              User_Type_Id: doc.data().User_Type_Id,
+              unreadCount: doc.data().unreadCount,
+              currentDate: doc.data().updatedDateTime,
+            });
+          });
+
+          observer.next(data);
+        })
+        .catch((err) => console.log("Please try again"));
+    });
+  }
+  getChatListDataUpdate(id: string){
+    this.groupNameupdateRef.doc(id).get().then(function(doc) {
+      if (doc.exists) {
+          console.log("Document data:", doc.data());
+          // this.setChatListDataUpdate(id)
+      } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+      }
+  }).catch(function(error) {
+      console.log("Error getting document:", error);
+  });
+
+  }
+  setChatListDataUpdate(id:string){
+
+    this.groupNameupdateRef.doc(id).set({refresh:false});
+      // if (doc.exists) {
+      //     console.log("Document data:", doc.data());
+      // } else {
+      //     // doc.data() will be undefined in this case
+      //     console.log("No such document!");
+      // }
+
+
+
+  }
   getMessageById(id: string): Observable<any> {
     return new Observable((observer) => {
       this.groupRef
@@ -81,6 +214,7 @@ export class ChatService {
               from: doc.data().from,
               isRead: doc.data().isRead,
               text: doc.data().text,
+              currentUserType: doc.data().currentUserType
             });
           });
           observer.next(data);
@@ -97,6 +231,7 @@ export class ChatService {
         .orderBy("date", "asc")
         .get()
         .then((doc) => {
+          console.log("doc",doc);
           let data = [];
           doc.docs.forEach((doc) => {
             data.push({
@@ -106,11 +241,12 @@ export class ChatService {
               from: doc.data().from,
               isRead: doc.data().isRead,
               text: doc.data().text,
+              currentUserType: doc.data().currentUserType
             });
           });
           observer.next(data);
         })
-        .catch((err) => console.log("Please try again"));
+        .catch((err) => console.log("Please try again", err));
     });
   }
 
@@ -120,6 +256,18 @@ export class ChatService {
       this.ref
         .doc(id)
         .collection("msg")
+        .add(data)
+        .then(() => {
+          observer.next();
+        });
+    });
+  }
+  postTableMess(id, data): Observable<any> {
+    // console.log("postOneMess", id);
+    return new Observable((observer) => {
+      this.groupNameRef
+        .doc(id)
+        .collection("chat_list")
         .add(data)
         .then(() => {
           observer.next();

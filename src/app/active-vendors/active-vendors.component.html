@@ -14,15 +14,34 @@
         </div> -->
         <div>
           <div style="padding: 7px 20px 0 0">
-            <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
-              [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching">
-            <span class="btn-add" style="margin-left: 10px; margin-bottom:5px;background-color: seagreen"
+            <!-- <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+              [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching"> -->
+              <form (ngSubmit)="searchUser(searchText)" >
+                <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+                [(ngModel)]="searchText"  autocomplete="off" placeholder="Search" [ngModelOptions]="{standalone: true}"
+                (ngModelChange)="showClear($event)" >
+                <span *ngIf="visibleClear" class="fa fa-close" style="margin-left:-47px" (click)="clearResult()" ></span>
+                <button *ngIf="visibleClear" type="submit"  style="margin-left:1px"><i class="fa fa-search"></i></button>
+                <button *ngIf="!visibleClear" type="submit"  style="margin-left:-31px"><i class="fa fa-search"></i></button>
+            <!-- <span class="btn-add" style="margin-left: 10px; margin-bottom:5px;background-color: seagreen"
               (click)="excelDownload()">Excel
               Download</span>
             <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelUpload()">Excel
-              Upload</span>
+              Upload</span> -->
+              <!-- <span class="btn-add" style="margin-left: 10px;background-color: #5050503b" > -->
+                 <!-- <input type="text"onfocus="(this.type='date')" placeholder="From" id="from"  (change)="dateChanged($event)">
+                 <input type="text"onfocus="(this.type='date')" placeholder="To" id="to"  (change)="dateChanged($event)"> -->
+                 <my-date-picker class="my-date-picker"name="mydate1" id="from" placeholder="From" [options]="myDatePickerOptions"
+                 (dateChanged)="dateChanged($event)" style="margin-bottom: -8px !important;margin-left: 290px;" required></my-date-picker>
+                 <my-date-picker class="my-date-picker"name="mydate" id="to" placeholder="To" [options]="myDatePickerOptions2"
+                 (dateChanged)="dateChanged2($event)" style="margin-bottom: -8px !important;" required></my-date-picker>
+                <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelDownload()" *ngIf="!showSuperAdmin">Excel
+                Export</span>
+               <!-- </span> -->
+               <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelUpload()">Excel
+                Import</span>
             <span class="btn-add" (click)="addBusRoute()">Add</span>
-
+</form>
           </div>
           <div class="card-body" style="padding-top: 7px;">
 
@@ -35,28 +54,31 @@
                   <th>Driver Name</th>
                   <th>Bus Route</th>
                   <!-- <th>Driver Id</th> -->
-                  <!-- <th>SchoolId</th> -->
-                  <th>Options</th>
+                  <th [class.active]="orderByd === 'schoolName'"
+                  (click)="setOrder('schoolName')"
+                  class="mdl-data-table__cell--non-numeric">SchoolName<span [hidden]="reverse">▼</span>
+                  <span [hidden]="!reverse">▲[A-Z]</span></th>
+                  <th *ngIf="!showSuperAdmin">Options</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let list of dataList | filter:searchText | paginate
+                <tr *ngFor="let list of dataList | orderBy:'schoolName':reverse:true | filter:searchText | paginate
                       : {
                           id: 'list_pagination',
-                          itemsPerPage: 10,
+                          itemsPerPage: 50,
                           currentPage: page,
                           totalItems: totalRecords
                         }; let i=index; ">
                   <!-- <td>{{i+1}}</td> -->
                   <td>{{list.id}}</td>
-                  <td>{{list.name}}</td>
+                  <td>{{list.driverId=== 0?"Dummy Driver":list.name}}</td>
                   <td>{{list.busRoute}}</td>
                   <!-- <td>{{list.driverId}}</td> -->
-                  <!-- <td>{{list.schoolId}}</td> -->
+                  <td>{{list.schoolName}}</td>
                   <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
-                  <td>
-                    <div> <span class="fa fa-pencil fa-options" (click)="editBusRoute(list)"></span>&nbsp;&nbsp;
-                      <span class="fa fa-trash-o fa-options" (click)="deleteBusRoute(list.id)"></span>
+                  <td *ngIf="!showSuperAdmin">
+                    <div> <span class="fa fa-pencil fa-options" (click)="editBusRoute(list)" ></span>&nbsp;&nbsp;
+                      <span class="fa fa-trash-o fa-options" (click)="deleteBusRoute(list.id)" ></span>
                     </div>
                   </td>
                 </tr>

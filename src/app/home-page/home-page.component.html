@@ -5,33 +5,64 @@
       <div class="card">
         <div class="card-header">
           Teacher
+          <label   style="margin-left:60%;font-weight: bold;font-size: medium;">Go To </label>
+             <input  style="width: 65px;border-radius: 5;font-size: medium;" type="number"  max={{totalPages}} name="search"
+              [(ngModel)]="page"  autocomplete="off" placeholder="Page No" (ngModelChange)="pageChanged($event)">
+               <label style="font-weight: bold;font-size: medium;">Page: {{totalPages}}  </label>
+               <label style="font-weight: bold;font-size: medium;padding-left: 20px;">Total Schools: {{totalRecords}}  </label>
         </div>
          <div>
-          <div style="padding: 7px 20px 0 0">
+          <div style="padding: 7px 20px 0 0;width: 100%;height: 100%;">
 
-             <!-- <form (ngSubmit)="searchTeacher(searchWord)" >
-              <input  style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
-              [(ngModel)]="searchWord"  autocomplete="off" placeholder="Start searching" [ngModelOptions]="{standalone: true}" (ngModelChange)="showClear($event)" >
+             <form (ngSubmit)="search(searchText)" >
+              <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+              [(ngModel)]="searchText"  autocomplete="off" placeholder="Search" [ngModelOptions]="{standalone: true}"
+              (ngModelChange)="showClear($event)" >
               <span *ngIf="visibleClear" class="fa fa-close" style="margin-left:-47px" (click)="clearResult()" ></span>
               <button *ngIf="visibleClear" type="submit"  style="margin-left:1px"><i class="fa fa-search"></i></button>
               <button *ngIf="!visibleClear" type="submit"  style="margin-left:-31px"><i class="fa fa-search"></i></button>
-
-             <span class="btn-add" style="margin-left: 10px; margin-bottom:5px;background-color: seagreen"
+              <!-- <input  type="text"onfocus="(this.type='date')" placeholder="From" id="from"  (change)="dateChanged($event)">
+              <input  type="text"onfocus="(this.type='date')" placeholder="To" id="to"  (change)="dateChanged($event)"> -->
+             <!-- <span class="btn-add" style="margin-left: 10px; margin-bottom:5px;background-color: seagreen"
               (click)="excelDownload()">Excel
               Download</span>
             <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelUpload()">Excel
               Upload</span>
-            <span class="btn-add" (click)="addTeacher()">Add</span>
-</form> -->
+            <span class="btn-add" (click)="addTeacher()">Add</span> -->
+            <!-- <span class="btn-add" style="margin-left: 10px;background-color: #5050503b;width:250px" > -->
+              <!-- <input type="text"onfocus="(this.type='date')" placeholder="From" id="from" (change)="dateChanged($event)">
+              <input type="text"onfocus="(this.type='date')" placeholder="To" id="to"  (change)="dateChanged($event)"> -->
+              <input style="width:65px" max="22" type="text" onfocus="(this.type='number')" placeholder="Grade"
+           [(ngModel)]="grade" [ngModelOptions]="{standalone: true}"  (ngModelChange)="searchGrade($event)"/>
+           <my-date-picker class="my-date-picker"name="mydate1" id="from" placeholder="From"  [options]="myDatePickerOptions"
+           (dateChanged)="dateChanged($event)" style="margin-bottom: -8px !important;margin-left: 28%;" required></my-date-picker>
+           <my-date-picker class="my-date-picker"name="mydate" id="to" placeholder="To" [options]="myDatePickerOptions2"
+           (dateChanged)="dateChanged2($event)" style="margin-bottom: -8px !important;" required></my-date-picker>
+             <span class="btn-add" style="margin-left: 1%; background-color: seagreen" (click)="excelDownload()">Excel
+             Export</span>
 
-            <input style="width: 325px; margin-left:20px; border-radius: 5;" type="text" name="search"
+            <!-- </span> -->
+            <!-- <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelUpload()">Excel
+             Import</span> -->
+         <span class="btn-add" style="margin-left: 1%" (click)="addTeacher()">Add</span>
+</form>
+
+            <!-- <input style="width: 325px; margin-left:20px; border-radius: 5;" type="text" name="search"
               [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching">
-            <span class="btn-add" style="margin-left: 10px; margin-bottom:5px;background-color: seagreen"
+              <span class="btn-add" style="margin-left: 10px;background-color: #5050503b" >
+                <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelDownload()">Excel
+                Export</span>
+
+               </span>
+               <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelUpload()">Excel
+                Import</span> -->
+
+            <!-- <span class="btn-add" style="margin-left: 10px; margin-bottom:5px;background-color: seagreen"
               (click)="excelDownload()">Excel
               Download</span>
             <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelUpload()">Excel
-              Upload</span>
-            <span class="btn-add" (click)="addTeacher()">Add</span>
+              Upload</span> -->
+            <!-- <span class="btn-add" (click)="addTeacher()">Add</span> -->
 
           </div>
           <div class="card-body" style="padding-top: 7px;">
@@ -43,23 +74,26 @@
                   <th (click)="order()" style="cursor: pointer;">Id&nbsp;<i *ngIf="!orderFlag"
                       class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
                   <th>Teacher Name</th>
-                  <!-- <th>SchoolId</th> -->
+                  <th  [class.active]="orderByd === 'schoolName'"
+                  (click)="setOrder('list.schoolName')"
+                  class="mdl-data-table__cell--non-numeric">SchoolName<span [hidden]="alphaSort">▼</span
+                    ><span [hidden]="!alphaSort">▲[A-Z]</span></th>
                   <th>Grade</th>
-                  <th>Options</th>
+                  <th *ngIf="!showSuperAdmin">Options</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr *ngFor="let list of dataList | filter:searchText | paginate
+              <tbody *ngIf="alphaSort">
+                <tr *ngFor="let list of dataList | orderBy:'schoolName':reverse:true | paginate
                       : {
                           id: 'list_pagination',
-                          itemsPerPage: 10,
+                          itemsPerPage: itemPerPage,
                           currentPage: page,
                           totalItems: totalRecords
                         }; let i=index; ">
                   <!-- <td>{{i+1}}</td> -->
                   <td>{{list.id}}</td>
-                  <td>{{list.teacherName}}</td>
-                  <!-- <td>{{list.schoolId}}</td> -->
+                  <td>{{list.name}}</td>
+                  <td>{{list.schoolName}}</td>
                   <td>{{list.grade}}</td>
                   <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
                   <td>
@@ -70,14 +104,36 @@
                 </tr>
 
               </tbody>
+              <tbody *ngIf="!alphaSort">
+                <tr *ngFor="let list of dataList | paginate
+                      : {
+                          id: 'list_pagination',
+                          itemsPerPage: itemPerPage,
+                          currentPage: page,
+                          totalItems: totalRecords
+                        }; let i=index; ">
+                  <!-- <td>{{i+1}}</td> -->
+                  <td>{{list.id}}</td>
+                  <td>{{list.name}}</td>
+                  <td>{{list.schoolName}}</td>
+                  <td>{{list.grade}}</td>
+                  <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
+                  <td *ngIf="!showSuperAdmin">
+                    <div> <span class="fa fa-pencil fa-options" (click)="editTeacher(list)"></span>&nbsp;&nbsp;
+                      <span class="fa fa-trash-o fa-options" (click)="deleteTeacher(list.id)"></span>
+                    </div>
+                  </td>
+                </tr>
+
+              </tbody>
             </table>
             <h1 *ngIf="showNoRecord" style="margin-left: 340px;">No results found..</h1>
             <div style="padding: 7px 20px 0 0;margin-left: 120px;">
-              <pagination-controls id="list_pagination" maxSize="10" directionLinks="true" (pageChange)="page = $event"
-                (pageBoundsCorrection)="page=$event" autoHide="true" responsive="true" previousLabel="Previous"
-                nextLabel="Next" screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
-                screenReaderCurrentLabel="You're on page">
-              </pagination-controls>
+              <pagination-controls id="list_pagination" maxSize="10" directionLinks="true"
+              (pageChange)="pageChanged($event)" (pageBoundsCorrection)="page=$event" autoHide="true" responsive="true"
+              previousLabel="Previous" nextLabel="Next" screenReaderPaginationLabel="Pagination"
+              screenReaderPageLabel="page" screenReaderCurrentLabel="You're on page">
+            </pagination-controls>
             </div>
           </div>
         </div>

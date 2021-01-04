@@ -1,4 +1,4 @@
-import { BereavementComponent } from './bereavement/bereavement.component';
+import { BereavementComponent } from "./bereavement/bereavement.component";
 import { ForgotPasswordScreenComponent } from "./forgot-password-screen/forgot-password-screen.component";
 import { TemplatesComponent } from "./templates/templates.component";
 import { SchoolsComponent } from "./schools/schools.component";
@@ -29,6 +29,7 @@ import { ActiveVendorsComponent } from "./active-vendors/active-vendors.componen
 import { HomePageComponent } from "./home-page/home-page.component";
 import { EmergencyReportComponent } from "./emergency-report/emergency-report.component";
 import { ApproveSchoolComponent } from "./approve-school/approve-school.component";
+import { RoomlistComponent } from "./chats/roomlist.component";
 
 export const routes: Routes = [
   {
@@ -95,7 +96,7 @@ export const routes: Routes = [
         component: SchoolsComponent,
       },
       {
-        path:"approveschool",
+        path: "approveschool",
         component: ApproveSchoolComponent,
       },
       {
@@ -135,7 +136,7 @@ export const routes: Routes = [
         component: ActiveVendorsComponent,
       },
       {
-        path:"bereavement",
+        path: "bereavement",
         component: BereavementComponent,
       },
       {
@@ -159,10 +160,10 @@ export const routes: Routes = [
       //   path: "reports",
       //   component: ReportsComponent,
       // },
-        // {
-        //   path: "promocode",
-        //   component: PromocodeComponent,
-        // },
+      // {
+      //   path: "promocode",
+      //   component: PromocodeComponent,
+      // },
       // {
       //   path: "faq",
       //   component: FaqComponent,
@@ -210,6 +211,10 @@ export const routes: Routes = [
         path: "widgets",
         loadChildren: () =>
           import("./views/widgets/widgets.module").then((m) => m.WidgetsModule),
+      },
+      {
+        path: "roomlist",
+        component: RoomlistComponent,
       },
     ],
   },

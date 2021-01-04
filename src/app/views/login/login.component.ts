@@ -29,6 +29,15 @@ export class LoginComponent {
     this.cookieService.remove("LoginStatus");
     localStorage.removeItem("UserInfo");
     localStorage.removeItem("States");
+    localStorage.removeItem("doc");
+    localStorage.removeItem("chatList");
+    localStorage.removeItem("OneChatcount");
+    localStorage.removeItem("GroupChatUserlength");
+    localStorage.removeItem("GroupChatUsercount");
+    localStorage.removeItem("allchatCount");
+    localStorage.removeItem("OneChatUsercount");
+    localStorage.removeItem("GroupChatUserCount");
+    localStorage.removeItem("OneChatUserLength");
   }
   login() {
     if (this.username !== "" && this.password !== "") {
@@ -43,6 +52,7 @@ export class LoginComponent {
       this.http
         .post(this.url + "bully-buddy/admin/admin_login", formObj)
         .subscribe((res: any) => {
+          console.log("res",res)
           if (res.status == "200") {
             let resData = JSON.stringify(res.result);
             // console.log("REs" + resData);
@@ -52,7 +62,15 @@ export class LoginComponent {
             localStorage.setItem("UserInfo", resData);
             this.router.navigateByUrl("/dash");
           }
-
+          else {
+            this.dialog.open(SuccessComponent, {
+              width: "20%",
+              data: {
+                value: "NetWork Error or Service Unavailable",
+                type: false,
+              },
+            });
+          }
           if (res.message === "School Id Not Found") {
             alert(
               res.message + " Please Enter the Correct UserName and Password!."
@@ -61,6 +79,10 @@ export class LoginComponent {
             res.status == "401" ||
             res.message == "Invalid Credentials" || res.message =="Please enter valid details"
           ) {
+          //   let resData = JSON.stringify(res.result);
+          //   this.cookieService.put("LoginStatus", "login");
+          // localStorage.setItem("UserInfo", resData);
+          // this.router.navigateByUrl("/dash");
             this.dialog.open(SuccessComponent, {
               width: "20%",
               data: {
@@ -69,6 +91,7 @@ export class LoginComponent {
               },
             });
           }
+
         });
     }
   }

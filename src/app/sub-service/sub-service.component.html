@@ -1,19 +1,59 @@
-<div class="animated fadeIn" style="padding-top: 10px">
+<div class="animated fadeIn" style="padding-top: 10px;">
   <div class="row">
     <div class="col-lg-12">
       <div class="card">
-        <div class="card-header">Incidents</div>
+        <div class="card-header">Incidents
+          <label style="margin-left:60%;font-size: medium;">Go To </label>
+          <input  style="width: 65px;border-radius: 5;font-size: medium;" type="number" max={{totalPages}} name="search"
+           [(ngModel)]="page"  autocomplete="off" placeholder="Page No" (ngModelChange)="pageChanged($event)">
+            <label style="font-size: medium;">Page: {{totalPages}} </label>
+            <label style="font-size: medium;padding-left: 20px;">Total Incidents: {{totalRecords}} </label>
+        </div>
         <div style="padding: 7px 20px 0 0">
-          <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
-            [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching">
+          <!-- <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+            [(ngModel)]="searchText" autocomplete="off" placeholder="searching">
           <select style="height:27px;width: 130px;color: #405065;" (change)="dayFilter($event.target.value)"
             [(ngModel)]="selectedValue">
             <option [ngValue]="null" [disabled]="true" hidden>Daily Filter</option>
             <option *ngFor="let opt of optionItems" [ngValue]="opt.value">
               {{opt.text}}</option>
+          </select> -->
+          <form (ngSubmit)="searchUser(searchText)" >
+            <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+            [(ngModel)]="searchText"  autocomplete="off" placeholder="Search" [ngModelOptions]="{standalone: true}"
+            (ngModelChange)="showClear($event)" >
+            <span *ngIf="visibleClear" class="fa fa-close" style="margin-left:-47px" (click)="clearResult()" ></span>
+            <button *ngIf="visibleClear" type="submit"  style="margin-left:1px"><i class="fa fa-search"></i></button>
+            <button *ngIf="!visibleClear" type="submit"  style="margin-left:-31px"><i class="fa fa-search"></i></button>
+            <select style="height: 27px; width: 130px; color: #405065" (change)="dayFilter($event.target.value)"
+            [(ngModel)]="selectedValue" [ngModelOptions]="{standalone: true}">
+            <option [ngValue]="null" [disabled]="true" hidden>
+              Daily Filter
+            </option>
+            <option *ngFor="let opt of optionItems" [ngValue]="opt.value">
+              {{ opt.text }}
+            </option>
           </select>
-          <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelDownload()">Excel
-            Download</span>
+          <input style="width:65px" max="22" type="text" onfocus="(this.type='number')" placeholder="Age"
+           [(ngModel)]="age" [ngModelOptions]="{standalone: true}"  (ngModelChange)="searchAge($event)"/>
+        <!-- <input type="text" onfocus="(this.type='date')" placeholder="From" id="from"  (change)="dateChanged($event)" >
+          <input type="text" onfocus="(this.type='date')" placeholder="To" id="to" [ngModelOptions]="{standalone: true}"
+           [(ngModel)]="toDateBind"  (change)="dateChanged($event)"> -->
+          <!-- <input angular-mydatepicker [(ngModel)]="model" [options]="myDatePickerOptions"
+          #dp="angular-mydatepicker" [locale]="locale"> -->
+          <span style="margin-top:10px !important">
+          <my-date-picker class="my-date-picker"name="mydate1" id="from" [options]="myDatePickerOptions" placeholder="From"
+                    (dateChanged)="dateChanged($event)" style="margin-bottom: -8px !important;margin-left: 25%;" required></my-date-picker>
+                    <my-date-picker class="my-date-picker"name="mydate" id="to" placeholder="To" [options]="myDatePickerOptions2"
+                    (dateChanged)="dateChanged2($event)" style="margin-bottom: -8px !important;" required></my-date-picker>
+                  </span>
+          <span class="btn-add" style="margin-left: 1%; background-color: seagreen" (click)="excelDownload()">Export</span>
+
+         <!-- </span> -->
+        </form>
+
+
+
           <!--    <span class="btn-add"
             (click)="addIncident()">Add</span> -->
 
@@ -30,22 +70,26 @@
                 </th>
                 <th>User Name</th>
                 <th>User Age</th>
-                <!-- <th>School Id</th> -->
+                <th [class.active]="orderByd === 'schoolName'"
+                (click)="setOrder('list.schoolName')"
+                class="mdl-data-table__cell--non-numeric">School<span [hidden]="alphaSort">▼</span>
+                  <span [hidden]="!alphaSort">▲[A-Z]</span></th>
                 <th>Bully Name</th>
                 <!-- <td>Days Bullied</td> -->
                 <th>Bully Type</th>
-                <th>Bully Description</th>
+                <th >Bully Description</th>
                 <!-- <th>Video URL</th> -->
                 <th>File</th>
+                <th>Created Date</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody *ngIf="alphaSort">
               <tr *ngFor="
-                  let list of dataList| filter:searchText
+                  let list of dataList | orderBy:'schoolName':reverse:true
                     | paginate
                       : {
                           id: 'list_pagination',
-                          itemsPerPage: 10,
+                          itemsPerPage: itemPerPage,
                           currentPage: page,
                           totalItems: totalRecords
                         };
@@ -56,11 +100,12 @@
                 </td>
                 <td>{{ list.name }}</td>
                 <td>{{ list.age }}</td>
+                <td style="width: 150px;">{{ list.schoolName }}</td>
                 <!-- <td [ngStyle]="{ 'color' : (list.bullyStatus=='1')? 'green' : 'red' }">{{ list.schoolId }}</td> -->
                 <td>{{ list.bullyName }}</td>
                 <!-- <td>{{list.noOfDaysBullied}}</td> -->
-                <td>{{ list.bullyType }}</td>
-                <td>{{ list.bullyDescription }}</td>
+                <td style="width: 100px;">{{ list.bullyType }}</td>
+                <td style="width: 150px !important;">{{ list.bullyDescription }}</td>
                 <!-- <td><a>{{list.videoURL}}</a></td> -->
                 <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
                 <td>
@@ -71,16 +116,59 @@
                     <!-- <span class="fa fa-trash-o fa-options" (click)="deleteIncident(list.id)"></span> -->
                   </div>
                 </td>
+                <td>{{ list.createdDateTime | date }}</td>
               </tr>
             </tbody>
-          </table>
+
+          <tbody *ngIf="!alphaSort">
+            <tr *ngFor="
+                let list of dataList
+                  | paginate
+                    : {
+                        id: 'list_pagination',
+                        itemsPerPage: itemPerPage,
+                        currentPage: page,
+                        totalItems: totalRecords
+                      };
+                let i = index
+              ">
+              <!-- <td [ngStyle]="{ 'color' : (list.bullyStatus=='1')? 'green' : 'red' }">{{ i + 1 }}</td> -->
+              <td>{{ list.userId }}
+              </td>
+              <td>{{ list.name }}</td>
+              <td>{{ list.age }}</td>
+              <td style="width: 150px;">{{ list.schoolName }}</td>
+              <!-- <td [ngStyle]="{ 'color' : (list.bullyStatus=='1')? 'green' : 'red' }">{{ list.schoolId }}</td> -->
+              <td>{{ list.bullyName }}</td>
+              <!-- <td>{{list.noOfDaysBullied}}</td> -->
+              <td style="width: 100px;">{{ list.bullyType }}</td>
+              <td style="width: 150px !important;">{{ list.bullyDescription }}</td>
+              <!-- <td><a>{{list.videoURL}}</a></td> -->
+              <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
+              <td>
+                <div>
+                   <span class="fa fa-file fa-options" (click)="fileOpen(list.videoURL)"></span>
+                   <!-- <span class="fa fa-pencil fa-options" (click)="editIncident(list)"></span> -->
+                  <!--&nbsp;&nbsp; -->
+                  <!-- <span class="fa fa-trash-o fa-options" (click)="deleteIncident(list.id)"></span> -->
+                </div>
+              </td>
+              <td>{{ list.createdDateTime | date }}</td>
+            </tr>
+          </tbody>
+        </table>
           <h1 *ngIf="showNoRecord" style="margin-left: 340px;">No results found..</h1>
           <div *ngIf="data.length!==0" style="padding: 7px 20px 0 0;margin-left: 150px;">
-            <pagination-controls id="list_pagination" maxSize="10" directionLinks="true" (pageChange)="page = $event"
+            <!-- <pagination-controls id="list_pagination" maxSize="10" directionLinks="true" (pageChange)="page = $event"
               (pageBoundsCorrection)="page=$event" autoHide="true" responsive="true" previousLabel="Previous"
               nextLabel="Next" screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
               screenReaderCurrentLabel="You're on page">
-            </pagination-controls>
+            </pagination-controls> -->
+            <pagination-controls id="list_pagination" maxSize="10" directionLinks="true"
+            (pageChange)="pageChanged($event)" (pageBoundsCorrection)="page=$event" autoHide="true" responsive="true"
+            previousLabel="Previous" nextLabel="Next" screenReaderPaginationLabel="Pagination"
+            screenReaderPageLabel="page" screenReaderCurrentLabel="You're on page">
+          </pagination-controls>
           </div>
         </div>
       </div>

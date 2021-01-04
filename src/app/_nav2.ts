@@ -1,15 +1,7 @@
 import { INavData } from "@coreui/angular";
 
-export const navItems: INavData[] = [
-  {
-    name: "Approve Schools",
-    url: "/dash/approveschool",
-    icon: "fa fa-building",
-    // badge: {
-    //   variant: "info",
-    //   text: "NEW",
-    // },
-  },
+export const navItems2: INavData[] = [
+
   {
     name: "Schools",
     url: "/dash/school",
@@ -29,7 +21,7 @@ export const navItems: INavData[] = [
     url: "/dash/users",
     icon: "cui-people",
   },
-
+ 
   {
     name: "Teachers",
     url: "/dash/teachers",
@@ -40,6 +32,7 @@ export const navItems: INavData[] = [
     url: "/dash/busroute",
     icon: "fa fa-bus",
   },
+  
   {
     name: "State",
     url: "/dash/state",
@@ -49,6 +42,27 @@ export const navItems: INavData[] = [
     name: "Incidents",
     url: "/dash/incidents",
     icon: "cui-speech",
+  },
+  {
+    name: "EmergencyReport",
+    url: "/dash/emergencyreport",
+    icon: "fa fa-warning",
+  },
+  {
+    divider: true,
+  },
+  {
+    name: "Chats",
+    url: "/dash/roomlist",
+    icon: "fa fa-comments-o",
+  },
+  {
+    divider: true,
+  },
+  {
+    name: "Templates",
+    url: "/dash/template",
+    icon: "icon-note",
   },
   // {
   //   name: "UserType",
@@ -60,35 +74,15 @@ export const navItems: INavData[] = [
   // },
 
   {
-    name: "EmergencyReport",
-    url: "/dash/emergencyreport",
-    icon: "fa fa-warning",
-  },
-  // {
-  //   divider: true,
-  // },
-  // {
-  //   name: "Templates",
-  //   url: "/dash/template",
-  //   icon: "icon-note",
-  // },
-  {
     name: "Bereavement",
     url: "/dash/bereavement",
     icon: "cui-bold",
   },
-  // {
-  //   divider: true,
-  // },
-
+  
   {
     divider: true,
   },
-  // {
-  //   name: "Chats",
-  //   url: "/dash/roomlist",
-  //   icon: "fa fa-comments-o",
-  // },
+  
   // {
   //   divider: true,
   // },
