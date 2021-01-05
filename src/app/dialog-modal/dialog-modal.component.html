@@ -1044,7 +1044,12 @@
       (click)="editBereavement()">Save</button>&nbsp;
     <button class="btn-close" (click)="close()">Close</button></div>
 
+
+
+
 </div>
+
+
 
 <div *ngIf="divType=='UploadExcel'">
   <div class="card-body" style="padding:10px 25%">
@@ -1052,16 +1057,22 @@
       <div class="row">
         <div class="col-sm-12">
           <div class="form-group">
-            <!-- <label>For</label>&nbsp;<span style="color: red;">*</span>
-            <input type="text" class="form-control" formControlName="busRoute" placeholder="Enter BusRoute" required> -->
             <label>Choose Excel File</label>&nbsp;<span style="color: red;">* 1000 Records Per Upload.</span>
-            <input type="file" class="form-control" formControlName="excel_file" multiple="false"
+            <input type="file" class="form-control" formControlName="excel_file" multiple="false" id="img" style="display:none;"
               (change)="onFileChange($event)" accept=".xlsx,.xls" required><br/>
-
+              <label for="img" class="btn-add" style="border: solid 1px;float: none;">Click to Upload File</label><br/>
+              <label style="font-weight: 600;float: left;">File: {{excel_file.name}}</label>
           </div>
         </div>
       </div>
     </form>
+    <div *ngIf="excelValidationErrors&&title==='Upload User Excel'">
+     <div [ngStyle]="excelValidationErrors.length>0?{'height':'200px','border':'solid 1px #ef8575'}:{'height':'0px','border':''}" style="overflow-y: auto;border-radius: 5px;border-top-right-radius: 2px;border-bottom-right-radius: 2px;">
+      <div *ngFor="let opt of excelValidationErrors">
+        <label style="font-weight: 500;padding-left: 5px;">{{opt}}</label>
+      </div>
+     </div>
+    </div>
     <label *ngIf="showLoading">Uploading File</label>&nbsp;<img style="left: auto;right: auto;" *ngIf="showLoading" src="assets/img/loading.gif">
   </div>
 

@@ -106,7 +106,8 @@ export interface DialogData {
   styleUrls: ["./dialog-modal.component.css"],
 })
 export class DialogModalComponent implements OnInit {
-
+  xlsToJson = [];
+  excelValidationErrors = [];
   validationEmail:boolean= false;
   allSchoolList=[];
   schoolList = [];
@@ -1401,70 +1402,174 @@ if(age === null||age=== undefined||age===""||age==="null"){
   }
 
   onFileChange(event: any) {
+
+    let pattern=/^([_a-zA-Z0-9]+(\.[_a-zA-Z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,5}))|(\d+$)$/;
+    let mobilePattern ="?[7-9][0-9]{9}";
+
 /// Convert Excel To Json Format......
     this.excel_file = event.target.files[0];
     console.log("Excel", this.excel_file);
+
     let workBook = null;
     let jsonData = [];
-    let xlsToJson = [];
+    let prexlsToJson = [];
+
     const reader = new FileReader();
     const file =  event.target.files[0];
     reader.onload = (event) => {
       const data = reader.result;
+      this.excelValidationErrors = [];
+      workBook =null;
+      jsonData = [];
+      this.xlsToJson =[];
       workBook = XLSX.read(data, { type: 'binary' });
-      // console.log("workBook",workBook);
       jsonData = workBook.SheetNames.reduce((initial, name) => {
-        const sheet = workBook.Sheets[name];
-        // console.log("sheet",sheet);
-      xlsToJson.push(initial[name] = XLSX.utils.sheet_to_json(sheet));
-        // console.log("initial[name]",initial[name]);
-        return initial;
-        // return xlsToJson;
-      }, {});
-      // xlsToJson.push(jsonData);
+       const sheet = workBook.Sheets[name];
+       prexlsToJson.push(initial[name] = XLSX.utils.sheet_to_json(sheet));
+       return initial;
+       }, {});
+
+      /// Removing the First Row From the Each Sheet
+      let SheetName= "";
+      prexlsToJson.map((item,index)=>{
+        SheetName = "Sheet"+(index+1);
+        item.map((item2,index2)=>{
+        if(index2 !== 0){
+         this.xlsToJson.push(item2)
+        }
+        })
+      })
+      /// end here ///
+
+      // xlsToJson = xlsToJson[0].splice(0)
 
       // Replacing UserTypeId from String to Int
-      xlsToJson.map((item,index)=>{
-          item.map((item2,index)=>{
-            if(item2.userTypeId === "Student"){
-              item2.userTypeId = 1;
+      this.xlsToJson.map((item2,index2)=>{
+        if(item2.countryCode === 1){
+          item2.countryCode = "+1"
+        }
+        if(item2.countryCode === 91){
+          item2.countryCode = "+91"
+        }
+        if(item2.userTypeId === "Student"){
+          item2.userTypeId = 1;
+        }
+        else if(item2.userTypeId === "Teacher"){
+          item2.userTypeId = 2;
+        }
+        else if(item2.userTypeId === "Bus Driver"){
+          item2.userTypeId = 4;
+        }
+        else{
+          item2.userTypeId = 5;
+        }
+      });
+      /// end here ///
+
+      console.log("xlsToJson",this.xlsToJson);
+      console.log("prexlsToJson",prexlsToJson);
+      // console.log("this.userInfo.schoolid",this.userInfo.schoolid)
+      /// Validation of the Columns
+      prexlsToJson.map((item,index)=>{
+        console.log("item",item);
+          item.map((item2,index2)=>{
+            if(index2+2 !== 2){
+            if(!item2.email){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Email is missing");
             }
-            else if(item2.userTypeId === "Teacher"){
-              item2.userTypeId = 2;
+            // if(item2.email !== pattern.){
+            //   this.excelValidationErrors.push("Row "+ (index2+2) +" Enter a Valid Email");
+            // }
+            if(!item2.password){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Password is missing");
             }
-            else if(item2.userTypeId === "Bus Driver"){
-              item2.userTypeId = 4;
+            if(!item2.schoolId){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" schoolId is missing");
             }
-            else{
-              item2.userTypeId = 5;
+            if(item2.schoolId&&(this.userInfo.schoolid !== item2.schoolId)){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Enter Valid schoolId");
             }
-            // console.log("userTypeId",item2.userTypeId);
+            if(!item2.userTypeId){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" userTypeId is missing");
+            }
+            if(!item2.name){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Name is missing");
+            }
+            if(!item2.gender){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Gender is missing");
+            }
+            if(!item2.userPhone){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" User PhoneNo is missing");
+            }
+            if(!item2.countryCode){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Country Code is missing");
+            }
+            if(item2.countryCode&&(item2.countryCode !=="+1"&&item2.countryCode !=="+91")){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Enter Valid Country Code");
+            }
+            // if(item2.userPhone.matches(mobilePattern)){
+            //   this.excelValidationErrors.push("Row "+ (index2+2) +" Enter Valid User PhoneNO");
+            // }
+            if(item2.userTypeId === 1){
+              // item2.userTypeId = 1;
+              if(!item2.age){
+                this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" AGE is missing");
+              }
+              if(!item2.parentPhone1){
+                this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Parent PhoneNo is missing");
+              }
+              if(!item2.grade){
+                this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Parent PhoneNo is missing");
+              }
+              // if(item2.parentPhone1 < 0){
+              //   this.excelValidationErrors.push("Row "+ (index2+2) +" Enter Valid Parent PhoneNO");
+              // }
+            }
+            if(item2.userTypeId === 2){
+              // item2.userTypeId = 2;
+              if(!item2.grade){
+                this.excelValidationErrors.push("Sheet " + (index+1) +"Row "+ (index2+2) +" Parent PhoneNo is missing");
+              }
+            }
+            // else if(item2.userTypeId === "Bus Driver"){
+            //   item2.userTypeId = 4;
+            // }
+            // else{
+            //   item2.userTypeId = 5;
+            // }
+            }
           })
-        // console.log("userTypeId",item[index].userTypeId);
       })
       /// End ///
-      console.log("xlsToJson",xlsToJson);
+      console.log("this.excelValidationErrors",this.excelValidationErrors);
+      console.log("xlsToJson",this.xlsToJson);
       const dataString = JSON.stringify(jsonData);
       console.log("dataString",jsonData);
     }
     reader.readAsBinaryString(file);
-
+    event.srcElement.value = null;
   }
 
   saveExcel() {
     this.showLoading = true;
+    let url;
     let formObj: FormData = new FormData();
     formObj.set("file", this.excel_file);
     formObj.set("filename", this.data.fileName);
     formObj.set("adminid", this.userInfo.id);
     let message = "Uploaded the file successfully: " + this.excel_file.name;
     // console.log("Name", message);
-    let url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/upload_excel";
+    if(this.title === "Upload BusRoute Excel")
+   {
     console.log("ExcelUpload", formObj);
+    this.excelValidationErrors = [];
+     url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/upload_excel";
+
+    if(this.excelValidationErrors.length === 0){
     this.http.post(url, formObj).subscribe(
       (res: any) => {
         console.log("RESS", res);
-        this.showLoading = true;
+        // this.showLoading = true;
         if (res.message == message) {
           this.showLoading = false;
           this.close();
@@ -1473,6 +1578,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
             data: { value: "Excel Uploaded", type: true },
           });
         }
+
       },
       (error) => {
         console.log("ERR", error);
@@ -1485,6 +1591,47 @@ if(age === null||age=== undefined||age===""||age==="null"){
         // }
       }
     );
+    }
+    }
+    if(this.title === "Upload User Excel")
+    {
+      url = "https://bullyingbuddyapp.com/java-service-admin/bully-buddy/user/upload_excel";
+      console.log("UserExcelUpload", this.xlsToJson);
+      if(this.excelValidationErrors.length === 0){
+        this.http.post(url, this.xlsToJson).subscribe(
+          (res: any) => {
+            console.log("RESS", res);
+            // this.showLoading = true;
+            if (res.message == "File Uploaded Successfully") {
+              this.showLoading = false;
+              this.close();
+              this.alertDialog.open(SuccessComponent, {
+                width: "30%",
+                data: { value: "Excel Uploaded", type: true },
+              });
+            }
+            if(res.status === 302){
+              this.showLoading = false;
+              this.alertDialog.open(SuccessComponent, {
+                width: "30%",
+                data: { value:res.message, type: false },
+              });
+            }
+          },
+          (error) => {
+            console.log("ERR", error);
+            this.showLoading = false;
+            // if (error instanceof HttpErroResponse) {
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: error.error.message, type: false },
+            });
+            // }
+          }
+        );
+        }
+     }
+
   }
 
   getAllSchools() {
