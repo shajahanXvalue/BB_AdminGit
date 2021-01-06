@@ -150,4 +150,7 @@ export class ForgotPasswordScreenComponent implements OnInit {
       });
     }
   }
+  cancel() {
+    this.router.navigateByUrl("/login");
+  }
 }

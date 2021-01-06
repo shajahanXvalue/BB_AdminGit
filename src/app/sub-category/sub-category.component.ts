@@ -404,6 +404,7 @@ dayFilter(eve) {
         userTypeId: list.userTypeId,
         name: list.name,
         age:list.age,
+        ccUser:list.ccUser,
         userPhone: list.userPhone,
         parentId: list.parentId,
         grade: list.grade,

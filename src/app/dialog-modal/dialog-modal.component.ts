@@ -64,6 +64,7 @@ export interface DialogData {
   instaCyber: any;
   snapShotCyber: any;
   userid:any;
+  ccUser:any;
   //incident
   id: any;
   age: any;
@@ -135,6 +136,7 @@ export class DialogModalComponent implements OnInit {
   selectedState: any;
   selectedSchool: any;
   selectedGenderValue: any;
+  selectedCountryCode: any;
   selectedBullyGender: any;
   selectedBullyClass: any;
   selectedBullyStatus: any;
@@ -156,7 +158,8 @@ export class DialogModalComponent implements OnInit {
   userEditBusRoute: any;
   editUserZipCode: any;
   createdDate:any;
-//variables for input validation
+  //variables for input validation
+  validccUser="";
   validEmail="";
   validPassword="";
   validUName="";
@@ -336,8 +339,9 @@ export class DialogModalComponent implements OnInit {
     this.validBRoute = this.data.busRoute;
     this.validBDId = this.data.driver_id;
     this.validBDSchool = this.data.school_id;
+    this.validccUser = this.data.ccUser;
     // end ///
-
+    console.log("this.validccUser",this.validccUser);
     this.selectedValue = this.data.school_state;
     this.selectedState = this.data.state;
     this.selectedGenderValue = this.data.gender;
@@ -734,6 +738,9 @@ getDriver(eve){
   selectGender(eve) {
     this.selectedGenderValue = eve;
   }
+  selectCountryCode(eve){
+    this.selectedCountryCode = eve;
+  }
   busRouteDropDown(eve) {
     // console.log("BUS", eve);
     this.busRoute = eve;
@@ -863,10 +870,11 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
       this.validUName = this.saveUserForm.get("name").value;
       this.validUPhone = this.saveUserForm.get("userPhone").value;
       this.validState = this.selectedState;
-
+      this.validccUser = this.selectedCountryCode;
     let age = this.validUAge;
     let parentPhone1;
     let busRoute;
+    let ccUser = this.validccUser;
     let email = this.saveUserForm.get("email").value;
     let password = this.saveUserForm.get("password").value;
     let schoolId = this.schoolId;
@@ -911,6 +919,7 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
       userTypeId: userTypeId,
       name: name,
       age: age,
+      ccUser:this.selectedCountryCode,
       userPhone: userPhone,
       parentId: null,
       grade: grade,
@@ -941,13 +950,16 @@ console.log("schoolId",schoolId);
     if(gender==undefined){
         alert("Please Enter gender.");
     }
+    if(ccUser==undefined){
+      alert("Please Enter Country Code.");
+   }
    if(schoolId==null){
       alert("Please selecte State to add School in order to save.");
     }
 
     // End ///
 console.log("SaveUSer",formObj);
-    if ((name != "" && name != undefined)&&(gender=="M"||gender=="F")&&(schoolId!=null)) {
+    if ((name != "" && name != undefined)&&(gender=="M"||gender=="F")&&(schoolId!=null)&&(ccUser=="+1"||ccUser=="+91")) {
       this.http
         .post(this.url + "bully-buddy/user/add_user", formObj)
         .subscribe((res: any) => {
@@ -1012,6 +1024,7 @@ console.log("SaveUSer",formObj);
     let driverPhone = this.editUserForm.get("driverPhone").value;
     let schoolPhone = this.editUserForm.get("schoolPhone").value;
     let gender =this.selectedGenderValue;
+    let countryCode = this.selectedCountryCode;
     let address = this.editUserForm.get("address").value;
     let zipCode = this.editUserForm.get("zipCode").value;
     let city = this.editUserForm.get("city").value;
@@ -1031,6 +1044,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
       userTypeId: userTypeId,
       name: name,
       age:parseInt(age),
+      ccUser:this.selectedCountryCode,
       userPhone: userPhone,
       parentId: this.parentId,
       grade: grade,
@@ -1054,6 +1068,9 @@ if(age === null||age=== undefined||age===""||age==="null"){
     if(gender==undefined){
         alert("Please Enter gender.");
     }
+    if(countryCode==undefined){
+      alert("Please Enter Country Code.");
+  }
     if(this.userTypeId===1&&(age===0||age==="0")){
       validAge =false
       alert("Please Enter age.");
@@ -1065,7 +1082,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
     // console.log("age",agee);
     console.log("this.validUAge",this.validEditUAge)
 
-    if ((name != "" && name != undefined)&&(gender=="M"||gender=="F")&&(schoolId!=null)&&(validAge === true)) {
+    if ((name != "" && name != undefined)&&(gender=="M"||gender=="F")&&(schoolId!=null)&&(validAge === true)&&(countryCode=="+1"||countryCode=="+91")) {
       console.log("User", formObj);
       this.http
         .post(this.url + "bully-buddy/user/update_user", formObj)
@@ -1559,7 +1576,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
     formObj.set("adminid", this.userInfo.id);
     let message = "Uploaded the file successfully: " + this.excel_file.name;
     // console.log("Name", message);
-    if(this.title === "Upload BusRoute Excel")
+    if(this.title === "Upload BusRoute Excel"|| this.title === "Upload School Excel")
    {
     console.log("ExcelUpload", formObj);
     this.excelValidationErrors = [];

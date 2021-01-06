@@ -165,7 +165,7 @@
               placeholder="Enter Admin Id" required disabled>
             <input *ngIf='isSuperAdmin' [(ngModel)]="validAdminId" [ngStyle]="validAdminId=='' || validAdminId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
             type="text" class="form-control" formControlName="admin_id"
-              placeholder="Enter Admin Id" required>
+              placeholder="Enter Admin Id" required disabled>
             <label *ngIf='isSuperAdmin&&adminSchoolId!==0'>State</label>&nbsp; <span *ngIf='isSuperAdmin&&adminSchoolId!==0' class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf='isSuperAdmin&&adminSchoolId!==0'style="font-size: 10px;color:red">Kindly Select State to Filter the School</label>
                <select *ngIf='isSuperAdmin&&adminSchoolId!==0' class="form-control" (change)="userStateDropDown($event.target.value)">
                    <option [ngValue]="null" [disabled]="true" hidden>Select</option>
@@ -233,7 +233,7 @@
             <input type="text" class="form-control" formControlName="admin_email" placeholder="Enter Email" required> -->
             <label>Admin Password</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validAPassword" [ngStyle]="validAPassword=='' || validAPassword==undefined?{'border-color':'#ef8575'}:{'border-color':''}" class="form-control" formControlName="admin_password" placeholder="Enter Password"
-              required>
+              required disabled>
           </div>
         </div>
       </div>
@@ -321,8 +321,14 @@
               <option value="F">Female</option>
             </select>
             <label *ngIf="showFields">User Phone</label>&nbsp;<span *ngIf="showFields" style="color: red;">*</span>
-            <input *ngIf="showFields" [(ngModel)]="validUPhone" [ngStyle]="validUPhone==''||validUPhone==undefined?{'border-color':'#ef8575'}:{'border-color':''}" type="text" class="form-control" formControlName="userPhone"
-              placeholder="Enter UserPhone" maxlength="10" required>
+            <div>
+            <select  name="gender" [(ngModel)]="validccUser" *ngIf="showFields" [ngStyle]="validccUser=='' || validccUser==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            [ngModelOptions]="{standalone: true}" class="form-control" style="width: 20%;display: inline;" (change)="selectCountryCode($event.target.value)" required >
+             <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+             <option value="+1">+1</option>
+             <option value="+91">+91</option>
+           </select><input *ngIf="showFields" [(ngModel)]="validUPhone" [ngStyle]="validUPhone==''||validUPhone==undefined?{'border-color':'#ef8575'}:{'border-color':''}" type="text" class="form-control" formControlName="userPhone"
+              placeholder="Enter UserPhone" maxlength="10" style="display:inline;width: 78%;float: right;" required></div>
             <!-- <label *ngIf="userTypeId==='1'">ParentId</label> -->
             <!-- &nbsp;<span *ngIf="userTypeId==='1'"
               style="color: red;">*</span> -->
@@ -484,7 +490,17 @@
               <option value="F">Female</option>
             </select>
             <label>User Phone</label>&nbsp;<span style="color: red;">*</span>
-            <input type="text" [(ngModel)]="validUPhone" [ngStyle]="validUPhone==''||validUPhone==undefined?{'border-color':'#ef8575'}:{'border-color':''}" class="form-control" formControlName="userPhone" placeholder="Enter UserPhone" required>
+            <div>
+              <select  name="gender" [(ngModel)]="validccUser" [ngStyle]="validccUser=='' || validccUser==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+              [ngModelOptions]="{standalone: true}" class="form-control" style="width: 20%;display: inline;padding: 5px;" (change)="selectCountryCode($event.target.value)" required >
+               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+               <option value="+1">+1</option>
+               <option value="+91">+91</option>
+              </select>
+            <input type="text" [(ngModel)]="validUPhone"
+            [ngStyle]="validUPhone==''||validUPhone==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            class="form-control" formControlName="userPhone"  style="display:inline;width: 78%;float: right;"  placeholder="Enter UserPhone" required>
+            </div>
             <!-- <label *ngIf="userIds=='1'">Parent Id</label>
             <input *ngIf="userIds=='1'" type="text" class="form-control" formControlName="parentId"
               placeholder="Enter ParentId"> -->
@@ -1062,6 +1078,7 @@
               (change)="onFileChange($event)" accept=".xlsx,.xls" required><br/>
               <label for="img" class="btn-add" style="border: solid 1px;float: none;">Click to Upload File</label><br/>
               <label style="font-weight: 600;float: left;">File: {{excel_file.name}}</label>
+              <!-- &nbsp;<img style="left: auto;right: auto;top:10px;width: 45px;height: 40px;" src="assets/img/loader.gif"> -->
           </div>
         </div>
       </div>
