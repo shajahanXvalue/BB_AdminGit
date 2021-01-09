@@ -311,6 +311,7 @@ export class DialogModalComponent implements OnInit {
     this.userEditBusRoute = this.data.busRoute;
     this.editUserZipCode = this.data.zipCode;
     console.log("EDITSchool",this.data.schoolId);
+    console.log("editUserZipCode",this.editUserZipCode)
     // this.userIds = this.data.userTypeId;
     // console.log("userIds", this.userEditBusRoute);
     this.selectedBullyClass = this.data.isBullyClassmate;
@@ -1462,11 +1463,11 @@ if(age === null||age=== undefined||age===""||age==="null"){
 
       // Replacing UserTypeId from String to Int
       this.xlsToJson.map((item2,index2)=>{
-        if(item2.countryCode === 1){
-          item2.countryCode = "+1"
+        if(item2.ccUser === 1){
+          item2.ccUser = "+1"
         }
-        if(item2.countryCode === 91){
-          item2.countryCode = "+91"
+        if(item2.ccUser === 91){
+          item2.ccUser = "+91"
         }
         if(item2.userTypeId === "Student"){
           item2.userTypeId = 1;
@@ -1518,10 +1519,11 @@ if(age === null||age=== undefined||age===""||age==="null"){
             if(!item2.userPhone){
               this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" User PhoneNo is missing");
             }
-            if(!item2.countryCode){
+            if(!item2.ccUser){
               this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Country Code is missing");
             }
-            if(item2.countryCode&&(item2.countryCode !=="+1"&&item2.countryCode !=="+91")){
+            console.log("item2.ccUseritem2.ccUser",item2.ccUser)
+            if(item2.ccUser&&(item2.ccUser !=="+1"&&item2.ccUser !=="+91")){
               this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Enter Valid Country Code");
             }
             // if(item2.userPhone.matches(mobilePattern)){
@@ -1580,7 +1582,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
    {
     console.log("ExcelUpload", formObj);
     this.excelValidationErrors = [];
-     url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/upload_excel";
+     url = this.url+"api/excel/upload_excel";
 
     if(this.excelValidationErrors.length === 0){
     this.http.post(url, formObj).subscribe(
@@ -1612,7 +1614,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
     }
     if(this.title === "Upload User Excel")
     {
-      url = "https://bullyingbuddyapp.com/java-service-admin/bully-buddy/user/upload_excel";
+      url = this.url+"bully-buddy/user/upload_excel";
       console.log("UserExcelUpload", this.xlsToJson);
       if(this.excelValidationErrors.length === 0){
         this.http.post(url, this.xlsToJson).subscribe(

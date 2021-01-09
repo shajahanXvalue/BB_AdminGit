@@ -96,16 +96,16 @@
 
             <!-- <input type="text" class="form-control" formControlName="admin_name" placeholder="Enter Admin Name"c
               required> -->
-            <label>State</label>&nbsp; <span class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label style="font-size: 10px;color:red">Kindly Select State to Filter the School</label>
+            <label>State</label>&nbsp; <span class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label style="font-size: 10px;color:red">Kindly Select State to Filter the School (Optional) - Will not be saved</label>
                <select class="form-control" (change)="userStateDropDown($event.target.value)">
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of stateList" value={{opt.statename}}>{{opt.statename}}</option>
             </select>
-            <label>Zip Code</label>&nbsp;<span class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label style="font-size: 10px;color:red">To Filter the School (Optional)</label>
+            <label>Zip Code</label>&nbsp; <span class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label style="font-size: 10px;color:red">To Filter the School (Optional) - Will not be saved</label>
             <input type="text" class="form-control" formControlName="admin_zipCode"
               placeholder="Enter ZipCode" [(ngModel)]="editUserZipCode" (ngModelChange)="searchSchool($event)"
               maxlength="5">
-            <label>School</label>&nbsp;<span style="color: red;">*</span>
+            <label>School</label>&nbsp;<span style="color: red;">*</span>&nbsp; <span *ngIf="schoolList.length === 0" class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf="schoolList.length === 0" style="font-size: 10px;color:red">Select State to get the school list..</label>
             <!-- <input type="text" class="form-control" formControlName="admin_school_id" placeholder="Enter School Id"
               required> -->
             <!-- <select class="form-control" [(ngModel)]="schoolId" [ngStyle]="schoolId=='' || schoolId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
@@ -166,18 +166,18 @@
             <input *ngIf='isSuperAdmin' [(ngModel)]="validAdminId" [ngStyle]="validAdminId=='' || validAdminId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
             type="text" class="form-control" formControlName="admin_id"
               placeholder="Enter Admin Id" required disabled>
-            <label *ngIf='isSuperAdmin&&adminSchoolId!==0'>State</label>&nbsp; <span *ngIf='isSuperAdmin&&adminSchoolId!==0' class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf='isSuperAdmin&&adminSchoolId!==0'style="font-size: 10px;color:red">Kindly Select State to Filter the School</label>
+            <label *ngIf='isSuperAdmin&&adminSchoolId!==0'>State</label>&nbsp; <span *ngIf='isSuperAdmin&&adminSchoolId!==0' class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf='isSuperAdmin&&adminSchoolId!==0'style="font-size: 10px;color:red">Kindly Select State to Filter the School (Optional) - Will not be saved</label>
                <select *ngIf='isSuperAdmin&&adminSchoolId!==0' class="form-control" (change)="userStateDropDown($event.target.value)">
                    <option [ngValue]="null" [disabled]="true" hidden>Select</option>
                    <option *ngFor="let opt of stateList" value={{opt.statename}}>{{opt.statename}}</option>
             </select>
-            <label *ngIf='isSuperAdmin&&adminSchoolId!==0'>Zip Code</label>&nbsp;<span *ngIf='isSuperAdmin&&adminSchoolId!==0' class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf='isSuperAdmin&&adminSchoolId!==0'style="font-size: 10px;color:red">To Filter the School (Optional)</label>
+            <label *ngIf='isSuperAdmin&&adminSchoolId!==0'>Zip Code</label>&nbsp;<span *ngIf='isSuperAdmin&&adminSchoolId!==0' class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf='isSuperAdmin&&adminSchoolId!==0'style="font-size: 10px;color:red">To Filter the School (Optional) - Will not be saved</label>
             <input *ngIf='isSuperAdmin&&adminSchoolId!==0' type="text" class="form-control" formControlName="admin_zipCode"
               placeholder="Enter ZipCode" [(ngModel)]="editUserZipCode" (ngModelChange)="searchSchool($event)"
               maxlength="5">
             <label *ngIf='!isSuperAdmin&&adminSchoolId!==0' style="margin-left:-27px">Admin School</label>
             <label *ngIf='isSuperAdmin&&adminSchoolId!==0'>Admin School</label>
-            <label *ngIf='isSuperAdmin&&adminSchoolId===0' style="margin-left:-27px">Admin School</label>&nbsp;<span style="color: red;">*</span>
+            <label *ngIf='isSuperAdmin&&adminSchoolId===0' style="margin-left:-27px">Admin School</label>&nbsp;<span style="color: red;">*</span>&nbsp; <span *ngIf="schoolList.length === 0&&isSuperAdmin&&adminSchoolId!==0" class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf="schoolList.length === 0&&isSuperAdmin&&adminSchoolId!==0" style="font-size: 10px;color:red">Select State to get the school list..</label>
             <!-- <input *ngIf='!isSuperAdmin' type="text" class="form-control" formControlName="admin_school_id"
               placeholder="Enter School Id" required disabled> -->
               <!-- To Change Schools By SuperAdmin for Other Admins -->

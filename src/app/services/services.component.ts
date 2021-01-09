@@ -189,17 +189,17 @@ clearResult(){
     });
   }
   search(eve){
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
      console.log("eve",eve)
       let search = eve;
-     
+
       if(search === undefined || search === null|| search === ""){
         search = "null"
       }
       else{
         search = eve
       }
-     
+
       if(search==="null"){
         this.getAllAdmin();
       }
@@ -212,9 +212,9 @@ clearResult(){
             this.adminList  = res.result;
             this.data = res.result;
             this.totalUserRecords = res.result.length
-            
+
             console.log("Report",res.result);
-           } 
+           }
            if(this.totalUserRecords>0){
 
             this.showNoRecord=false;
