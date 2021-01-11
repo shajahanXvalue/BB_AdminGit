@@ -98,7 +98,7 @@ public myDatePickerOptions2: IMyDpOptions = {
     if (this.getCookies === "") {
       localStorage.removeItem("userInfo");
       // this.router.navigateByUrl("/login");
-      // window.location.href = "/login";
+      // window.location.href = this.url+"admin/#/login";
       window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.schoolId === null || this.schoolId === undefined) {

@@ -64,6 +64,7 @@ export class ChatService {
             // console.log("GN", doc.data(), doc.ref.id);
           });
           observer.next(data);
+          console.log("GN", data)
         })
         .catch((err) => console.log("Please try again"));
     });
@@ -166,6 +167,7 @@ export class ChatService {
           });
 
           observer.next(data);
+          console.log("Pleasedata",data)
         })
         .catch((err) => console.log("Please try again"));
     });
@@ -198,6 +200,7 @@ export class ChatService {
 
   }
   getMessageById(id: string): Observable<any> {
+    debugger;
     return new Observable((observer) => {
       this.groupRef
         .doc(id)
@@ -222,8 +225,10 @@ export class ChatService {
         .catch((err) => console.log("Please try again"));
     });
   }
+  // newCommonChatRoomIdd=chatPersonUserId+"@"+chatPersonUserType+
+  //               "+"+currentUserIdd+"@"+currentUserType;
 
-  getOneMessageById(id: string): Observable<any> {
+  getOneMessageById(id:string): Observable<any> {
     return new Observable((observer) => {
       this.ref
         .doc(id)
@@ -231,9 +236,10 @@ export class ChatService {
         .orderBy("date", "asc")
         .get()
         .then((doc) => {
-          console.log("doc",doc);
+          // console.log("doc",doc);
           let data = [];
           doc.docs.forEach((doc) => {
+            console.log("doc.data",doc.data());
             data.push({
               chatId: doc.data().chatId,
               currentUserId: doc.data().currentUserId,
@@ -245,12 +251,13 @@ export class ChatService {
             });
           });
           observer.next(data);
+          console.log("doc.data",data);
         })
         .catch((err) => console.log("Please try again", err));
     });
   }
 
-  postOneMess(id, data): Observable<any> {
+  postOneMess(id:string, data): Observable<any> {
     // console.log("postOneMess", id);
     return new Observable((observer) => {
       this.ref

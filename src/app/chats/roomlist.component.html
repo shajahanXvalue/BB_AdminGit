@@ -35,7 +35,7 @@
           </div>
           <div *ngIf="sortData.length!==0" class="inbox_chat">
             <div *ngFor="let chat of sortData | filter:searchText ; let i = index;"
-              (click)="setRow({index:i,chatId: chat.Id,userType:chat.userType,docId:chat.docId, name: chat.Name , ref: chat.ref, chatCountNo: chat.chatCount, grp: chat.groupParId})"
+              (click)="setRow({index:i,chatId: chat.Id,userType:chat.userType,docId:chat.docId, name: chat.Name , ref: chat.ref, chatCountNo: chat.chatCount, grp: chat.groupParId,User_Type_Id:chat.User_Type_Id})"
               [ngClass]="{'active_chat': selectedIndex === i}" class="chat_list">
               <div class="chat_people">
                 <div class="chat_img"> <img src="assets/img/{{chat.userImg}}" alt="bb"> </div>
@@ -44,9 +44,9 @@
                     <span class="chat_date badge badge-success" *ngIf="chat.chatCount !== '0'">{{chat.chatCount}}</span>
                   </h5>
                   <div>
-                  <span *ngIf="chat.chatGroupType!=='Driver'" class="time_date userTypecolor">{{chat.chatGroupType}} | Grade: {{chat.Grade}}
+                  <span *ngIf="chat.chatGroupType!=='Driver'&&chat.chatGroupType!=='Parent'" class="time_date userTypecolor">{{chat.chatGroupType}} | Grade: {{chat.Grade}}
                    </span>
-                   <span *ngIf="chat.chatGroupType==='Driver'" class="time_date userTypecolor">{{chat.chatGroupType}}
+                   <span *ngIf="chat.chatGroupType==='Driver'||chat.chatGroupType ==='Parent'" class="time_date userTypecolor">{{chat.chatGroupType}}
                   </span>
                 </div>
                   <h5>
@@ -99,7 +99,7 @@
                 <div class="received_msg">
                   <div class="received_withd_msg">
                     <h5 *ngIf="m.currentUserType!==undefined">{{m.currentUserType=='5'?"Admin":m.currentUserType=='1'?"Student":m.currentUserType=='2'?"Teacher":m.currentUserType=='3'?"Parent":""}}</h5>
-                    <!-- <h5 *ngIf="m.currentUserType===undefined">{{chatName}}</h5> -->
+                    <h5 *ngIf="m.currentUserType===undefined">{{chatName}}</h5>
                     <p>{{m.text}}</p>
                     <span class="time_date">{{m.date | date: 'shortTime' }} | {{m.date | date: 'mediumDate' }}</span>
                   </div>
@@ -108,7 +108,7 @@
               <div class="outgoing_msg" *ngIf="m.currentUserId == userId.userId">
                 <div class="sent_msg">
                   <h5 *ngIf="m.currentUserType!==undefined">{{m.currentUserType=='5'?"Admin":m.currentUserType=='1'?"Student":m.currentUserType=='2'?"Teacher":m.currentUserType=='3'?"Parent":""}}</h5>
-                  <!-- <h5 *ngIf="m.currentUserType===undefined">You</h5> -->
+                  <h5 *ngIf="m.currentUserType===undefined">You</h5>
                   <p>{{m.text}}</p>
                   <span class="time_date">{{m.date | date: 'shortTime' }} | {{m.date | date: 'mediumDate' }}</span>
                 </div>

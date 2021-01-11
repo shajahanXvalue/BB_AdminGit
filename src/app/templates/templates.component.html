@@ -27,7 +27,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr *ngIf="userInfo.schoolid !== 0">
                 <td>Users</td>
                 <td> <span class="btn-add" style="margin-left:10px; margin-bottom:5px;background-color: seagreen"
                     (click)="userExcelDownload()">Excel

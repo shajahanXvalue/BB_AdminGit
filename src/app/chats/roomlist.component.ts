@@ -13,6 +13,7 @@ import { ChatService } from "./chat.service";
 import { ItemComponent } from "ngx-dropdown-list/src/ngx-dropdown-list/item/item.component";
 // import { timeStamp } from 'console';
 import { CookieService } from "ngx-cookie-service";
+import { PropertyServiceService } from "../property-service.service";
 
 @Component({
   selector: "app-roomlist",
@@ -55,8 +56,9 @@ export class RoomlistComponent implements OnInit, AfterViewChecked {
   group = null;
   userChatCount ="0";
   groupChatCount = "0";
-  url = "https://bullyingbuddyapp.com/java-service-admin";
-
+  // url = "https://bullyingbuddyapp.com/java-service-admin";
+  chatUser_Type_Id = "";
+  currentChat ="";
   // unReadCount = [];
   // ref = firebase.firestore().collection("testMessages");
   messageForm: FormGroup;
@@ -71,10 +73,12 @@ export class RoomlistComponent implements OnInit, AfterViewChecked {
     private formBuilder: FormBuilder,
     private chat: ChatService,
     private cookieService: CookieService,
-    private notifier: NotifierService
+    private notifier: NotifierService,
+    private property: PropertyServiceService,
   ) {
     this.notifier = notifier;
   }
+  url = this.property.uri;
   getCookies: string = this.cookieService.get("LoginStatus");
   get sortData() {
     let oneChatCount = localStorage.getItem("OneChatUserLength");
@@ -126,13 +130,13 @@ export class RoomlistComponent implements OnInit, AfterViewChecked {
     if (this.getCookies === "") {
       localStorage.removeItem("userInfo");
       // this.router.navigateByUrl("/login");
-      // window.location.href = "/login";
+      // window.location.href = this.url+"admin/#/login";
       window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.userId === null || this.userId === undefined) {
       alert("You Have been LogOut, Kindly LogIn to Continue!");
       // this.router.navigateByUrl("/login");
-      // window.location.href = "/login";
+      // window.location.href = this.url+"admin/#/login";
       window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     // this.playAudio();
@@ -176,6 +180,7 @@ export class RoomlistComponent implements OnInit, AfterViewChecked {
 //   } );
 // 	}
 playAudio(){
+  // this.setRow(this.currentChat);
   let OneChatcount= localStorage.getItem("OneChatcount")
   // console.log("this.newMessage",this.newMessage);
   if(parseInt(OneChatcount) < this.newMessage){
@@ -228,7 +233,7 @@ playAudioo(){
             this.chat
               .getOneNameById(JSON.stringify(this.userId.userId))
               .subscribe((data) => {
-                // console.log("list data1", data);
+                console.log("list data1", data);
                 data.forEach((es) => {
                   fireData.push({
                     Id: es.Id,
@@ -358,7 +363,7 @@ playAudioo(){
             this.chat
               .getOneNameById(JSON.stringify(this.userId.userId))
               .subscribe((data) => {
-                // console.log("list data12", data);
+                console.log("list data12", data);
                 data.forEach((e) => {
                   fireData.push({
                     Id: e.Id,
@@ -480,6 +485,7 @@ playAudioo(){
       const id = this.formId;
       const data = {
         chatId: this.userChatId,
+        // chatId:this.userChatId+"@"+this.ref+"+"+this.userId.userId+"@"+5,
         currentUserId: JSON.stringify(this.userId.userId),
         date: date,
         from: this.formId,
@@ -502,7 +508,10 @@ playAudioo(){
         this.addCollection();
       } else {
         if (this.apiType == "one") {
-          this.chat.getChatListData(this.userChatId).subscribe((e: any) => {
+          let newCommonChatRoomIdd=this.userChatId+"@"+this.chatUser_Type_Id+"+"+this.userId.userId+"@"+5;
+          // this.chat.getChatListData(this.userChatId).subscribe((e: any) => {
+            this.chat.getChatListData(this.userChatId).subscribe((e: any) => {
+            console.log("Pleasedata",e)
             e.forEach((dd) => {
               // console.log(dd, this.userId.userId, "my id");
               if (dd.Id == this.userId.userId) {
@@ -570,14 +579,17 @@ playAudioo(){
         "0",
         this.ref
       );
+      let docId = JSON.parse(localStorage.getItem("doc"));
       // console.log("submit", c, this.chatCountNo, JSON.parse(this.userChatId));
+      let newCommonChatRoomIdd=this.userChatId+"@"+this.chatUser_Type_Id+"+"+this.userId.userId+"@"+5;
       if (this.apiType == "one") {
         return new Promise<void>((resolve, reject) => {
-          this.chat.postOneMess(id, data).subscribe((res: any) => {
+          // this.chat.postOneMess(this.userChatId, data).subscribe((res: any) => {
+            this.chat.postOneMess(newCommonChatRoomIdd, data).subscribe((res: any) => {
             this.sentMess();
             this.onReset();
             let data1 = JSON.parse(localStorage.getItem("doc"));
-            this.getMessage(this.apiType, this.formId);
+            this.getMessage(this.apiType,this.userChatId,this.chatUser_Type_Id);
           });
           resolve();
         });
@@ -587,7 +599,7 @@ playAudioo(){
             this.sentMess();
             this.onReset();
             let data = JSON.parse(localStorage.getItem("doc"));
-            this.getMessage(this.apiType, this.formId);
+            this.getMessage(this.apiType, this.formId,this.userChatId);
           });
           resolve();
         });
@@ -601,6 +613,11 @@ playAudioo(){
   }
 
   public setRow(_index) {
+    this.currentChat = _index;
+    this.stopTimer();
+    this.stoprefreshTimer()
+    this.stopFirebaseTimer();
+    this.stopChatCountTimer();
     console.log("indexxxxx",_index)
     this.scrollToBottom();
     this.formId = "";
@@ -610,6 +627,7 @@ playAudioo(){
     this.allChatUser=[];
     this.selectedIndex = _index.index;
     this.show = true;
+    this.chatUser_Type_Id = _index.User_Type_Id;
     this.messageForm.setValue({
       message: "",
       chatId: JSON.stringify(_index.chatId),
@@ -618,6 +636,7 @@ playAudioo(){
     let store = {
       type: _index.userType,
       id: JSON.stringify(_index.docId),
+      userType:_index.ref,
     };
     localStorage.setItem("doc", JSON.stringify(store));
     // console.log("click formId ", JSON.stringify(_index.docId));
@@ -642,7 +661,8 @@ playAudioo(){
     }
   }
     // console.log(" this.chatCountNothis.newMessage ", this.newMessage);
-    this.getMessage(_index.userType, JSON.stringify(_index.docId));
+    // this.getMessage(_index.userType, JSON.stringify(_index.docId),_index.User_Type_Id);
+    this.getMessage(_index.userType, this.userChatId,_index.User_Type_Id);
     // console.log("chatCount", _index.docId);
     this.groupTypeApi(_index.userType, _index.chatId);
 
@@ -700,7 +720,7 @@ stopChatCountTimer() {
     let data = JSON.parse(localStorage.getItem("doc"));
     this.timer = setInterval(() => {
       this.allChatUser=[];
-      this.getMessage(data.type, data.id);
+      this.getMessage(data.type, data.id,data.userType);
       this.getUnreadCount();
     }, 10000);
   }
@@ -716,7 +736,7 @@ startrefreshTimer() {
   let data = JSON.parse(localStorage.getItem("doc"));
   this.timer = setInterval(() => {
     // this.allChatUser=[];
-    this.getMessage(data.type, data.id);
+    this.getMessage(data.type, data.id,data.userType);
     this.getUnreadCount();
   }, 7500);
 }
@@ -727,9 +747,12 @@ stoprefreshTimer() {
 }
 
 
-  getMessage(userType, docId) {
+  getMessage(userType, docId,chatUserType) {
+    let newCommonChatRoomIdd=docId+"@"+chatUserType+"+"+this.userId.userId+"@"+5;
     if (userType == "one") {
-      this.chat.getOneMessageById(docId).subscribe((data) => {
+
+      // this.chat.getOneMessageById(docId).subscribe((data) => {
+        this.chat.getOneMessageById(newCommonChatRoomIdd).subscribe((data) => {
         console.log("message1", data);
         if (data.length == 0) {
           this.stopTimer();
@@ -931,7 +954,7 @@ stoprefreshTimer() {
 
   }
 getOnechatFirebase(){
-  this.allChatUser=[];
+  // this.allChatUser=[];
   let onechat
   this.OneChatUser.forEach((e) => {
     // e.Id
@@ -1041,6 +1064,7 @@ getOnechatFirebase(){
                             // this.refresh();
 
                             this.playAudio();
+                            // this.setRow(this.currentChat)
                             // this.startChatCountTimer();
                             // this.getOnechatFirebase()
                             // this.getGroupChatFireBase();
@@ -1110,7 +1134,7 @@ getOnechatFirebase(){
   // }
 
   getGroupChatUser() {
-    this.allChatUser=[]
+    // this.allChatUser=[];
     const formData = new FormData();
     formData.append("id", this.userId.userId);
     formData.append("userTypeId", "5");

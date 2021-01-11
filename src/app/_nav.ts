@@ -67,11 +67,11 @@ export const navItems: INavData[] = [
   // {
   //   divider: true,
   // },
-  // {
-  //   name: "Templates",
-  //   url: "/dash/template",
-  //   icon: "icon-note",
-  // },
+  {
+    name: "Templates",
+    url: "/dash/template",
+    icon: "icon-note",
+  },
   {
     name: "Bereavement",
     url: "/dash/bereavement",
