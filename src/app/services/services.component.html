@@ -40,6 +40,7 @@
                 (click)="setOrder('list.schoolName')"
                 class="mdl-data-table__cell--non-numeric">Admin School<span [hidden]="alphaSort">▼</span>
                 <span [hidden]="!alphaSort">▲[A-Z]</span></th>
+                <th>Admin State</th>
                 <th>Admin Username</th>
                 <th>Admin Password</th>
                 <th>Options</th>
@@ -57,6 +58,7 @@
                 <td>{{list.id}}</td>
                 <td  *ngIf="isSuperAdmin">{{list.schoolName}}</td>
                 <td  *ngIf="!isSuperAdmin">{{userInfo.schoolName}}</td>
+                <td>{{list.stateName!== null?list.stateName:" "}}</td>
                 <td>{{list.username}}</td>
                 <td>*********</td>
                 <td>
@@ -79,6 +81,7 @@
                 <td>{{list.id}}</td>
                 <td  *ngIf="isSuperAdmin">{{list.schoolName}}</td>
                 <td  *ngIf="!isSuperAdmin">{{userInfo.schoolName}}</td>
+                <td>{{list.stateName!== null?list.stateName:" "}}</td>
                 <td>{{list.username}}</td>
                 <td>*********</td>
                 <td>

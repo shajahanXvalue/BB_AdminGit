@@ -32,6 +32,7 @@ export interface DialogData {
   school_id: any;
   admin_id: any;
   admin_school_id: any;
+  admin_statename:any;
   admin_school_dist: any;
   admin_name: string;
   admin_username: string;
@@ -159,6 +160,7 @@ export class DialogModalComponent implements OnInit {
   editUserZipCode: any;
   createdDate:any;
   //variables for input validation
+  validAState="";
   validccUser="";
   validEmail="";
   validPassword="";
@@ -341,8 +343,10 @@ export class DialogModalComponent implements OnInit {
     this.validBDId = this.data.driver_id;
     this.validBDSchool = this.data.school_id;
     this.validccUser = this.data.ccUser;
+    this.validAState = this.data.admin_statename;
     // end ///
     console.log("this.validccUser",this.validccUser);
+    console.log("this.validAState",this.validAState);
     this.selectedValue = this.data.school_state;
     this.selectedState = this.data.state;
     this.selectedGenderValue = this.data.gender;
@@ -396,6 +400,7 @@ export class DialogModalComponent implements OnInit {
     this.adminEditForm = this.formBuilder.group({
       admin_school_id: [this.data.admin_school_id],
       admin_school_dist: [this.data.admin_school_dist],
+
       // admin_name: [""],
       admin_username: [this.data.admin_username],
       // admin_email: [],
@@ -676,8 +681,9 @@ getDriver(eve){
       schoolid: this.schoolId,
       username: admin_username,
       password: admin_password,
+      stateName:this.selectedState
     };
-    if (admin_username !== "" && admin_username !== undefined) {
+    if ((admin_username !== "" && admin_username !== undefined)&&(this.selectedState != "" && this.selectedState != undefined)) {
       this.http
         .post(this.url + "bully-buddy/admin/add_admin", formObj)
         .subscribe((res: any) => {
@@ -700,7 +706,8 @@ getDriver(eve){
     let school_id = this.adminEditForm.get("admin_school_id").value;
     let admin_username = this.adminEditForm.get("admin_username").value;
     let admin_password = this.adminEditForm.get("admin_password").value;
-
+    let stateName = this.selectedState === undefined?this.validAState:this.selectedState;
+    console.log("this.selectedState",stateName)
     if (
       this.schoolId === "" ||
       this.schoolId === null ||
@@ -713,8 +720,9 @@ getDriver(eve){
       schoolid: this.schoolId,
       username: admin_username,
       password: admin_password,
+      stateName: stateName
     };
-    if (admin_username != "" && admin_username != undefined) {
+    if((admin_username != "" && admin_username != undefined)&&(stateName != "" && stateName != undefined)) {
       this.http
         .post(this.url + "bully-buddy/admin/update_admin", formData)
         .subscribe((res: any) => {
@@ -763,6 +771,7 @@ getDriver(eve){
     console.log("state", eve);
     // console.log("opt", opt);
     this.selectedState = eve;
+    this.validSState = eve;
     // &&(this.zipCodesrch !== undefined || this.zipCodesrch !== "")
     if (
       (this.selectedState !== undefined || this.selectedState !== "")
@@ -1305,11 +1314,13 @@ if(age === null||age=== undefined||age===""||age==="null"){
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
+            this.driverUniqueName = [];
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "BusRoute Updated Successfully", type: true },
           });
           }else{
+            this.driverUniqueName = [];
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "BusRoute Update Failed", type: false },
@@ -1442,8 +1453,11 @@ if(age === null||age=== undefined||age===""||age==="null"){
       this.xlsToJson =[];
       workBook = XLSX.read(data, { type: 'binary' });
       jsonData = workBook.SheetNames.reduce((initial, name) => {
-       const sheet = workBook.Sheets[name];
+      if(name !== "States"){
+        const sheet = workBook.Sheets[name];
+        console.log("SHEETS",name)
        prexlsToJson.push(initial[name] = XLSX.utils.sheet_to_json(sheet));
+       }
        return initial;
        }, {});
 
@@ -1475,7 +1489,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
         else if(item2.userTypeId === "Teacher"){
           item2.userTypeId = 2;
         }
-        else if(item2.userTypeId === "Bus Driver"){
+        else if(item2.userTypeId === "BusDriver"){
           item2.userTypeId = 4;
         }
         else{
@@ -1519,6 +1533,12 @@ if(age === null||age=== undefined||age===""||age==="null"){
             if(!item2.userPhone){
               this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" User PhoneNo is missing");
             }
+            if(!item2.state){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" state is missing");
+            }
+            if(item2.state&&(this.userInfo.stateName !== item2.state)){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Enter Valid state");
+            }
             if(!item2.ccUser){
               this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Country Code is missing");
             }
@@ -1538,7 +1558,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
                 this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Parent PhoneNo is missing");
               }
               if(!item2.grade){
-                this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Parent PhoneNo is missing");
+                this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Grade is missing");
               }
               // if(item2.parentPhone1 < 0){
               //   this.excelValidationErrors.push("Row "+ (index2+2) +" Enter Valid Parent PhoneNO");
@@ -1547,7 +1567,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
             if(item2.userTypeId === 2){
               // item2.userTypeId = 2;
               if(!item2.grade){
-                this.excelValidationErrors.push("Sheet " + (index+1) +"Row "+ (index2+2) +" Parent PhoneNo is missing");
+                this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Grade is missing");
               }
             }
             // else if(item2.userTypeId === "Bus Driver"){
@@ -1736,6 +1756,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
             // this.totalRecords = res.result.length;
             console.log("BUS1", this.busRouteList);
             // this.data = res.result;
+
             // this.uniqueDriver = this.busRouteList.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
             this.uniqueDriver = this.driverName.filter(({name:id1}) => !this.busRouteList.some(({name:id2 }) => id2 === id1))
             console.log("this.uniqueDriver",this.uniqueDriver);
@@ -1751,25 +1772,28 @@ if(age === null||age=== undefined||age===""||age==="null"){
             if(this.driverUniqueName.length === 0){
 
               // debugger;
-              this.busRouteList.map((item)=>{
-                if(item.driverId === this.validBDId)
+              this.busRouteList.map((item)=>{debugger;
+                if((item.driverId === this.validBDId)&&(item.driverId !== this.editDriverDummy.id))
                 {
                   this.editDriverDummy.push({"name":item.name,"id":item.driverId});
                 }
               });
+              this.editDriverDummy = this.editDriverDummy.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
+              // console.log("selffilter",selffilter);
               console.log("Dummy",this.editDriverDummy);
             }
             else{
               this.driverUniqueName.map((item)=>{
+                console.log("Dummyyyyy",this.editDriverDummy);
                 this.editDriverDummy.push({"name":item.name,"id":item.id});
               });
               this.busRouteList.map((item)=>{
-                if(item.driverId === this.validBDId)
+                if((item.driverId === this.validBDId) &&(item.driverId !== this.editDriverDummy.id))
                 {
                   this.editDriverDummy.push({"name":item.name,"id":item.driverId});
                 }
               });
-
+              this.editDriverDummy = this.editDriverDummy.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
             }
 
           } else {

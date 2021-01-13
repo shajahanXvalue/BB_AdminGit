@@ -31,11 +31,12 @@ export class TemplatesComponent implements OnInit {
   }
 
   userExcelDownload() {
-    let url = "https://bullyingbuddyapp.com/admin/templates/user_upload.xlsx";
+    let url =  "https://bullyingbuddyapp.com/admin/templates/user_upload.xlsx"
+    // "https://bullyingbuddyapp.com/admin/templates/user_upload.xlsx";
     window.location.href = url;
     // window.open(url, "_blank");
     // this.router.navigateByUrl(
-    //   "http://3.128.136.18/admin/templates/user_upload.xlsx"
+      // "http://3.128.136.18/var/www/htmladmin/templates/user_upload.xlsx"
     // );
     // this.http.get(url, { responseType: "blob" }).subscribe((data) => {
     //   console.log("BLOB", data);

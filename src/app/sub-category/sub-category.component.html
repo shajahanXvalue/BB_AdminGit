@@ -49,6 +49,7 @@
            <!-- </span> -->
            <span class="btn-add" style="margin-left: 1%; background-color: seagreen" (click)="excelUpload()" *ngIf="!isSuperAdmin">Excel
             Import</span>
+
            <span class="btn-add" style="margin-left: 1%;" (click)="addUser()">Add</span>
 </form>
 <!--
@@ -147,8 +148,8 @@
                   <div>
                     <span class="fa fa-pencil fa-options" (click)="editUser(list)"></span>
                     &nbsp;&nbsp;
-                    <span *ngIf="list.type!=='Bus Driver'" class="fa fa-trash-o fa-options" (click)="deleteUser(list)"></span>
-                    <span *ngIf="list.type==='Bus Driver'"  class="fa fa-trash-o fa-options" (click)="deleteDriver(list.id)"></span>
+                    <span *ngIf="list.type!=='Bus Driver'&&!isSuperAdmin" class="fa fa-trash-o fa-options" (click)="deleteUser(list)"></span>
+                    <span *ngIf="list.type==='Bus Driver'&&!isSuperAdmin"  class="fa fa-trash-o fa-options" (click)="deleteDriver(list.id)"></span>
                   </div>
                 </td>
               </tr>

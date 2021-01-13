@@ -181,6 +181,7 @@ clearResult(){
         divType: "editAdmin",
         admin_id: list.id,
         admin_school_id: list.schoolid,
+        admin_statename: list.stateName,
         // admin_school_dist: list.schooldist,
         admin_username: list.username,
         admin_password: list.password,
