@@ -1455,7 +1455,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
       jsonData = workBook.SheetNames.reduce((initial, name) => {
       if(name !== "States"){
         const sheet = workBook.Sheets[name];
-        console.log("SHEETS",name)
+        // console.log("SHEETS",name)
        prexlsToJson.push(initial[name] = XLSX.utils.sheet_to_json(sheet));
        }
        return initial;
@@ -1498,12 +1498,16 @@ if(age === null||age=== undefined||age===""||age==="null"){
       });
       /// end here ///
 
-      console.log("xlsToJson",this.xlsToJson);
-      console.log("prexlsToJson",prexlsToJson);
+      // console.log("xlsToJson",this.xlsToJson);
+      // console.log("prexlsToJson",prexlsToJson);
       // console.log("this.userInfo.schoolid",this.userInfo.schoolid)
       /// Validation of the Columns
+      // console.log("prexlsToJson[0].length",prexlsToJson[0].length);
+      if(prexlsToJson[0].length <= 1){
+        this.excelValidationErrors.push("Sheet is Empty" );
+      }
       prexlsToJson.map((item,index)=>{
-        console.log("item",item);
+        // console.log("item",item);
           item.map((item2,index2)=>{
             if(index2+2 !== 2){
             if(!item2.email){
@@ -1580,17 +1584,17 @@ if(age === null||age=== undefined||age===""||age==="null"){
           })
       })
       /// End ///
-      console.log("this.excelValidationErrors",this.excelValidationErrors);
-      console.log("xlsToJson",this.xlsToJson);
+      // console.log("this.excelValidationErrors",this.excelValidationErrors);
+      // console.log("xlsToJson",this.xlsToJson);
       const dataString = JSON.stringify(jsonData);
-      console.log("dataString",jsonData);
+      // console.log("dataString",jsonData);
     }
     reader.readAsBinaryString(file);
     event.srcElement.value = null;
   }
 
   saveExcel() {
-    this.showLoading = true;
+    // this.showLoading = true;
     let url;
     let formObj: FormData = new FormData();
     formObj.set("file", this.excel_file);
@@ -1600,11 +1604,12 @@ if(age === null||age=== undefined||age===""||age==="null"){
     // console.log("Name", message);
     if(this.title === "Upload BusRoute Excel"|| this.title === "Upload School Excel")
    {
-    console.log("ExcelUpload", formObj);
+    // console.log("ExcelUpload", formObj);
     this.excelValidationErrors = [];
      url = this.url+"api/excel/upload_excel";
 
     if(this.excelValidationErrors.length === 0){
+      this.showLoading = true;
     this.http.post(url, formObj).subscribe(
       (res: any) => {
         console.log("RESS", res);
@@ -1637,6 +1642,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
       url = this.url+"bully-buddy/user/upload_excel";
       console.log("UserExcelUpload", this.xlsToJson);
       if(this.excelValidationErrors.length === 0){
+        this.showLoading = true;
         this.http.post(url, this.xlsToJson).subscribe(
           (res: any) => {
             console.log("RESS", res);
@@ -1650,6 +1656,13 @@ if(age === null||age=== undefined||age===""||age==="null"){
               });
             }
             if(res.status === 302){
+              this.showLoading = false;
+              this.alertDialog.open(SuccessComponent, {
+                width: "30%",
+                data: { value:res.message, type: false },
+              });
+            }
+            if(res.status === 400){
               this.showLoading = false;
               this.alertDialog.open(SuccessComponent, {
                 width: "30%",
