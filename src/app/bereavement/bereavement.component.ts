@@ -415,6 +415,7 @@ searchUser(eve) {
     let fileURl;
     let file = list;
     let type;
+    let defaultImage="No";
     let fileURL=this.property.fileUrl3
     console.log("File",file);
     // let type = list.substr(list.indexOf(".") + 1, list.length);
@@ -440,6 +441,9 @@ if(type === "peg"){
     }else{
       type="NoFile"
     }
+    if(file.includes("images/Group+10178")){
+      defaultImage = "DefaultImage"
+    }
 // console.log("TYPE", type);
     // console.log("fileURl", fileURl);
     this.dialog.open(DialogModalComponent, {
@@ -449,6 +453,7 @@ if(type === "peg"){
         divType: "openFile",
         fileURL: fileURl,
         type: type,
+        defaultImage:defaultImage
       },
     });
   }

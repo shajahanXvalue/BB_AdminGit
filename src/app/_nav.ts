@@ -30,11 +30,11 @@ export const navItems: INavData[] = [
     icon: "cui-people",
   },
 
-  {
-    name: "Teachers",
-    url: "/dash/teachers",
-    icon: "fa fa-id-badge",
-  },
+  // {
+  //   name: "Teachers",
+  //   url: "/dash/teachers",
+  //   icon: "fa fa-id-badge",
+  // },
   {
     name: "BusRoute",
     url: "/dash/busroute",

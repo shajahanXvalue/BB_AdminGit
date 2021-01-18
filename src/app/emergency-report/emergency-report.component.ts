@@ -348,6 +348,7 @@ dateChanged2(event,id){
     let fileURl;
     let file = list;
     let type;
+    let defaultImage="No";
     // let type = list.substr(list.indexOf(".") + 1, list.length);
     // console.log("File",file);
     if(file!==""||file!==undefined||file!==null){
@@ -362,7 +363,9 @@ dateChanged2(event,id){
     }else{
       type="NoFile"
     }
-
+    if(file.includes("images/Group+10178")){
+      defaultImage = "DefaultImage"
+    }
     // console.log("fileURl", fileURl);
     this.dialog.open(DialogModalComponent, {
       width: "50%",
@@ -371,6 +374,7 @@ dateChanged2(event,id){
         divType: "openFile",
         fileURL: fileURl,
         type: type,
+        defaultImage:defaultImage
       },
     });
   }

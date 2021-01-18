@@ -11,7 +11,7 @@
             <label style="font-size: medium;">Page: {{totalPages}} </label>
             <label style="font-size: medium;padding-left: 20px;">Total Users: {{totalRecords}} </label>
         </div>
-        <div *ngIf="isSuperAdmin" style="padding: 7px 20px 0 0">
+        <div style="padding: 7px 20px 0 0">
           <!-- <input *ngIf="isSuperAdmin" style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
             [(ngModel)]="searchText" autocomplete="off" placeholder="Search"> -->
             <form (ngSubmit)="search(searchText)" >
@@ -21,7 +21,7 @@
               <span *ngIf="visibleClear" class="fa fa-close" style="margin-left:-47px" (click)="clearResult()" ></span>
               <button *ngIf="visibleClear" type="submit"  style="margin-left:1px"><i class="fa fa-search"></i></button>
               <button *ngIf="!visibleClear" type="submit"  style="margin-left:-31px"><i class="fa fa-search"></i></button>
-              <span class="btn-add" (click)="addAdmin()" *ngIf="isSuperAdmin">Add</span>
+              <span class="btn-add" (click)="addAdmin()">Add</span>
             </form>
 
 
@@ -33,9 +33,9 @@
             <thead>
               <tr>
                 <!-- <th>S.No</th> -->
-                <th (click)="orderAdmin()" style="cursor: pointer;">Admin Id&nbsp;<i *ngIf="!orderAdminFlag"
+                <!-- <th (click)="orderAdmin()" style="cursor: pointer;">Admin Id&nbsp;<i *ngIf="!orderAdminFlag"
                     class="fa fa-caret-down"></i>
-                  <i *ngIf="orderAdminFlag" class="fa fa-caret-up"></i></th>
+                  <i *ngIf="orderAdminFlag" class="fa fa-caret-up"></i></th> -->
                 <th [class.active]="orderByd === 'schoolName'"
                 (click)="setOrder('list.schoolName')"
                 class="mdl-data-table__cell--non-numeric">Admin School<span [hidden]="alphaSort">▼</span>
@@ -55,7 +55,7 @@
                           totalItems: totalRecords
                         }; let i=index; ">
                 <!-- <td>{{i+1}}</td> -->
-                <td>{{list.id}}</td>
+                <!-- <td>{{list.id}}</td> -->
                 <td  *ngIf="isSuperAdmin">{{list.schoolName}}</td>
                 <td  *ngIf="!isSuperAdmin">{{userInfo.schoolName}}</td>
                 <td>{{list.stateName!== null?list.stateName:" "}}</td>
@@ -78,7 +78,7 @@
                           totalItems: totalRecords
                         }; let i=index; ">
                 <!-- <td>{{i+1}}</td> -->
-                <td>{{list.id}}</td>
+                <!-- <td>{{list.id}}</td> -->
                 <td  *ngIf="isSuperAdmin">{{list.schoolName}}</td>
                 <td  *ngIf="!isSuperAdmin">{{userInfo.schoolName}}</td>
                 <td>{{list.stateName!== null?list.stateName:" "}}</td>

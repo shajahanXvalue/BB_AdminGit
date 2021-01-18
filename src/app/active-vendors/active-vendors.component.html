@@ -49,8 +49,8 @@
               <thead>
                 <tr>
                   <!-- <th>S.No</th> -->
-                  <th (click)="order()" style="cursor: pointer;">Id&nbsp;<i *ngIf="!orderFlag"
-                      class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
+                  <!-- <th (click)="order()" style="cursor: pointer;">Id&nbsp;<i *ngIf="!orderFlag"
+                      class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th> -->
                   <th>Driver Name</th>
                   <th>Bus Route</th>
                   <!-- <th>Driver Id</th> -->
@@ -70,7 +70,7 @@
                           totalItems: totalRecords
                         }; let i=index; ">
                   <!-- <td>{{i+1}}</td> -->
-                  <td>{{list.id}}</td>
+                  <!-- <td>{{list.id}}</td> -->
                   <td>{{list.driverId=== 0?"Dummy Driver":list.name}}</td>
                   <td>{{list.busRoute}}</td>
                   <!-- <td>{{list.driverId}}</td> -->

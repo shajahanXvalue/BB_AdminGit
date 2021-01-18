@@ -71,8 +71,8 @@
               <thead>
                 <tr>
                   <!-- <th>S.No</th> -->
-                  <th (click)="order()" style="cursor: pointer;">Id&nbsp;<i *ngIf="!orderFlag"
-                      class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
+                  <!-- <th (click)="order()" style="cursor: pointer;">Id&nbsp;<i *ngIf="!orderFlag"
+                      class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th> -->
                   <th>Teacher Name</th>
                   <th  [class.active]="orderByd === 'schoolName'"
                   (click)="setOrder('list.schoolName')"
@@ -91,7 +91,7 @@
                           totalItems: totalRecords
                         }; let i=index; ">
                   <!-- <td>{{i+1}}</td> -->
-                  <td>{{list.id}}</td>
+                  <!-- <td>{{list.id}}</td> -->
                   <td>{{list.name}}</td>
                   <td>{{list.schoolName}}</td>
                   <td>{{list.grade}}</td>
@@ -113,7 +113,7 @@
                           totalItems: totalRecords
                         }; let i=index; ">
                   <!-- <td>{{i+1}}</td> -->
-                  <td>{{list.id}}</td>
+                  <!-- <td>{{list.id}}</td> -->
                   <td>{{list.name}}</td>
                   <td>{{list.schoolName}}</td>
                   <td>{{list.grade}}</td>

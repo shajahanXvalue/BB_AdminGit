@@ -98,7 +98,8 @@
               required> -->
             <label>State</label>&nbsp;<span style="color: red;">*</span>
 
-               <select class="form-control" (change)="userStateDropDown($event.target.value)" [ngStyle]="validAState=='' || validAState==undefined?{'border-color':'#ef8575'}:{'border-color':''}">
+               <select class="form-control"  [ngModelOptions]="{standalone: true}" [(ngModel)]="validAState"
+               (change)="userStateDropDown($event.target.value)" [ngStyle]="validAState=='' || validAState==undefined?{'border-color':'#ef8575'}:{'border-color':''}">
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of stateList" value={{opt.statename}}>{{opt.statename}}</option>
             </select>
@@ -109,13 +110,11 @@
             <label>School</label>&nbsp;<span style="color: red;">*</span>&nbsp; <span *ngIf="schoolList.length === 0" class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf="schoolList.length === 0" style="font-size: 10px;color:red">Select State to get the school list..</label>
             <!-- <input type="text" class="form-control" formControlName="admin_school_id" placeholder="Enter School Id"
               required> -->
-            <!-- <select class="form-control" [(ngModel)]="schoolId" [ngStyle]="schoolId=='' || schoolId==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
-            (change)="userSchoolDropDown($event.target.value)" required>
-              <option [ngValue]="null" [disabled]="true" hidden>Select</option>
-              <option *ngFor="let opt of schoolList" value={{opt.id}}>{{opt.schoolName}}</option>
-            </select> -->
+            <select *ngIf='!isSuperAdmin' class="form-control" disabled>
+              <option [ngValue]="null" [disabled]="true">{{this.userInfo.schoolName}}</option>
+            </select>
 
-                <ng-select bindLabel="name"
+                <ng-select *ngIf='isSuperAdmin' bindLabel="name"
                 notFoundText="loading..."
                 placeholder="Type to search School"
                 loadingText="Data Loading..."
@@ -131,7 +130,19 @@
                     {{opt.schoolName}}
                 </ng-option>
     </ng-select>
-
+    <label>User Phone</label>&nbsp;<span style="color: red;">*</span>
+    <div>
+      <select  name="gender" [(ngModel)]="validccUser" [ngStyle]="validccUser=='' || validccUser==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+      [ngModelOptions]="{standalone: true}" class="form-control" style="width: 20%;display: inline;padding: 5px;" (change)="selectCountryCode($event.target.value)" required >
+       <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+       <option value="+1">+1</option>
+       <option value="+91">+91</option>
+      </select>
+    <input type="text" [(ngModel)]="validAPhone"
+    [ngStyle]="validAPhone==''||validAPhone==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+    class="form-control" formControlName="admin_phone"  style="display:inline;width: 78%;float: right;"
+    max-length="10" required>
+    </div>
             <label>Admin UserName</label>&nbsp;<span style="color: red;">*</span>
             <input type="text"[(ngModel)]="validUName" [ngStyle]="validUName=='' || validUName==undefined?{'border-color':'#ef8575'}:{'border-color':''}" class="form-control" formControlName="admin_username" placeholder="Enter Admin UserName"
               required>
@@ -178,7 +189,7 @@
             </select>
             <select *ngIf='!isSuperAdmin&&adminSchoolId!==0' class="form-control" (change)="userStateDropDown($event.target.value)"
                [ngModelOptions]="{standalone: true}" [(ngModel)]="validAState"
-               [ngStyle]="validAState=='' || validAState==undefined?{'border-color':'#ef8575'}:{'border-color':''}" disabled>
+               [ngStyle]="validAState=='' || validAState==undefined?{'border-color':'#ef8575'}:{'border-color':''}">
                    <option [ngValue]="null" [disabled]="true" hidden>Select</option>
                    <option *ngFor="let opt of stateList" value={{opt.statename}}>{{opt.statename}}</option>
             </select>
@@ -235,6 +246,18 @@
               placeholder="Enter School District" > -->
             <!-- <input *ngIf='isSuperAdmin' type="text" class="form-control" formControlName="admin_school_id"
               placeholder="Enter School Id" required> -->
+              <label>User Phone</label>&nbsp;<span style="color: red;">*</span>
+            <div>
+              <select  name="gender" [(ngModel)]="validccAdmin" [ngStyle]="validccAdmin=='' || validccAdmin==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+              [ngModelOptions]="{standalone: true}" class="form-control" style="width: 20%;display: inline;padding: 5px;" (change)="selectCountryCode($event.target.value)" required >
+               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+               <option value="+1">+1</option>
+               <option value="+91">+91</option>
+              </select>
+            <input type="text" [(ngModel)]="validAPhone"
+            [ngStyle]="validAPhone==''||validAPhone==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            class="form-control" formControlName="admin_phone"  style="display:inline;width: 78%;float: right;"  placeholder="Enter UserPhone" required>
+            </div>
             <label>Admin UserName</label>&nbsp;<span style="color: red;">*</span>
             <input *ngIf='!isSuperAdmin' type="text" [(ngModel)]="validAName" [ngStyle]="validAName=='' || validAName==undefined?{'border-color':'#ef8575'}:{'border-color':''}"class="form-control" formControlName="admin_username"
               placeholder="Enter Admin UserName" required >
@@ -269,7 +292,7 @@
                           required> -->
             <select class="form-control" (change)="userTypeDropDown($event.target.value)">
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
-              <option *ngFor="let opt of userTypeList" value={{opt.id}}>{{opt.type}}</option>
+              <option *ngFor="let opt of userTypeList2" value={{opt.id}}>{{opt.type}}</option>
             </select>
             <label *ngIf="showFields" >User Email</label>&nbsp;<span style="color: red;" *ngIf="showFields">*</span>
             <input *ngIf="showFields" [(ngModel)]="validEmail" type="email" class="form-control" formControlName="email"
@@ -491,11 +514,17 @@
             <!-- <input type="text" class="form-control" formControlName="userTypeId" placeholder="Enter UserTypeId"
               required> -->
 
-            <label>Gender</label>&nbsp;<span style="color: red;">*</span>
+            <label>Gender</label>&nbsp;<span *ngIf="userIds=='1'" style="color: red;">*</span>
             <!-- <input type="text" class="form-control" formControlName="gender" placeholder="Enter Fender" required> -->
-            <select class="form-control" (change)="selectGender($event.target.value)" [(ngModel)]="selectedGenderValue"
+            <select *ngIf="userIds==='1'" class="form-control" (change)="selectGender($event.target.value)" [(ngModel)]="selectedGenderValue"
             [ngStyle]="selectedGenderValue==''||selectedGenderValue==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
-              [ngModelOptions]="{standalone: true}" required #profile="ngModel">
+              [ngModelOptions]="{standalone: true}">
+              <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+            </select>
+            <select *ngIf="userIds!=='1'" class="form-control" (change)="selectGender($event.target.value)" [(ngModel)]="selectedGenderValue"
+              [ngModelOptions]="{standalone: true}">
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option value="M">Male</option>
               <option value="F">Female</option>
@@ -1116,7 +1145,7 @@
     <!-- <form [formGroup]="ebbFileForm"> -->
     <div class="row">
       <div class="col-sm-12">
-        <div class="form-group" *ngIf="fileformat!='url'||fileformat!='123'">
+        <div class="form-group" *ngIf="fileformat!='url'||fileformat!='123'" style="text-align: center;">
           <video *ngIf="fileformat==='mp4'||fileformat==='MOV' && url" [src]="(fileUrl)"
             height="200" width="350" controls></video>
           <img *ngIf="fileformat==='jpg'||fileformat==='png'||fileformat==='jpeg' ||fileformat==='peg' && url" [src]="(fileUrl)" height="200" width="350"
@@ -1124,8 +1153,11 @@
              <audio *ngIf="fileformat==='mp3'||fileformat==='ogg'||fileformat ==='m4a' && url" [src]="(fileUrl)" height="200" width="350"
             controls></audio>
         </div>
-        <div class="form-group" *ngIf="fileformat==='url'||fileformat==='123'||fileformat==='NoFile'">
-          <h2 style="margin-left: 40px;">No Attachments Found!</h2>
+        <div class="form-group" *ngIf="defaultImage ==='DefaultImage'" style="text-align: center;">
+          <h6 >No Attachments Found! this is an default Image.</h6>
+        </div>
+        <div class="form-group" *ngIf="fileformat==='url'||fileformat==='URL'||fileformat==='123'||fileformat==='NoFile'" style="text-align: center;">
+          <h2>No Attachments Found!</h2>
         </div>
       </div>
     </div>

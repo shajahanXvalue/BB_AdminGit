@@ -21,18 +21,18 @@ export const navItems2: INavData[] = [
     url: "/dash/users",
     icon: "cui-people",
   },
- 
-  {
-    name: "Teachers",
-    url: "/dash/teachers",
-    icon: "fa fa-id-badge",
-  },
+
+  // {
+  //   name: "Teachers",
+  //   url: "/dash/teachers",
+  //   icon: "fa fa-id-badge",
+  // },
   {
     name: "BusRoute",
     url: "/dash/busroute",
     icon: "fa fa-bus",
   },
-  
+
   {
     name: "State",
     url: "/dash/state",
@@ -78,11 +78,11 @@ export const navItems2: INavData[] = [
     url: "/dash/bereavement",
     icon: "cui-bold",
   },
-  
+
   {
     divider: true,
   },
-  
+
   // {
   //   divider: true,
   // },

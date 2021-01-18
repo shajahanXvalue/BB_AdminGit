@@ -185,6 +185,8 @@ clearResult(){
         // admin_school_dist: list.schooldist,
         admin_username: list.username,
         admin_password: list.password,
+        admin_phone: list.userPhone,
+        admin_ccUser: list.ccUser
         // createdDate:list.
       },
     });

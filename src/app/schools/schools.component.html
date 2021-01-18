@@ -66,8 +66,8 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th (click)="order()" style="cursor: pointer;">No&nbsp;<i *ngIf="!orderFlag"
-                    class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th>
+                  <!-- <th (click)="order()" style="cursor: pointer;">No&nbsp;<i *ngIf="!orderFlag"
+                    class="fa fa-caret-down"></i><i *ngIf="orderFlag" class="fa fa-caret-up"></i></th> -->
                   <th [class.active]="orderByd === 'schoolName'"
                   (click)="setOrder('list.schoolName')"
                   class="mdl-data-table__cell--non-numeric">School Name<span [hidden]="alphaSort">▼</span>
@@ -87,7 +87,7 @@
                           currentPage: page,
                           totalItems: totalRecords
                         }; let i=index; ">
-                  <td>{{i+1}}</td>
+                  <!-- <td>{{i+1}}</td> -->
                   <td>{{list.schoolName}}</td>
                   <td>{{list.schoolAddress}}</td>
                   <td>{{list.zipCode}}</td>
@@ -111,7 +111,7 @@
                           currentPage: page,
                           totalItems: totalRecords
                         }; let i=index; ">
-                  <td>{{i+1}}</td>
+                  <!-- <td>{{i+1}}</td> -->
                   <td>{{list.schoolName}}</td>
                   <td>{{list.schoolAddress}}</td>
                   <td>{{list.zipCode}}</td>

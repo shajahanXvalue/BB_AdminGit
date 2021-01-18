@@ -667,10 +667,11 @@ dateChanged2(event,id){
     });
   }
 
-fileOpen(list) {
+fileOpen(list) {debugger
     let fileURl;
     let file = list;
-     let type;
+    let type;
+    let defaultImage="No";
     // let type = list.substr(list.indexOf(".") + 1, list.length);
 
     if(file!="url"||file!=undefined||file!=null){
@@ -686,7 +687,9 @@ fileOpen(list) {
     else{
       type="NoFile"
     }
-
+    if(file.includes("images/Group+10178")){
+      defaultImage = "DefaultImage"
+    }
     // console.log("fileURl", fileURl);
     this.dialog.open(DialogModalComponent, {
       width: "50%",
@@ -695,6 +698,7 @@ fileOpen(list) {
         divType: "openFile",
         fileURL: fileURl,
         type: type,
+        defaultImage:defaultImage
       },
     });
   }

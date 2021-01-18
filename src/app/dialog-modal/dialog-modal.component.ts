@@ -14,6 +14,7 @@ import { DatePipe } from "@angular/common";
 import * as XLSX from "xlsx";
 import { of, throwError } from "rxjs";
 import { DriverProvider } from "protractor/built/driverProviders";
+import { _countGroupLabelsBeforeOption } from "@angular/material/core";
 // import { FileToUpload } from "./file-to-upload";
 // import { FileUploadService } from "./file-upload.service";
 // import { FileToUpload } from "./file-to-upload";
@@ -21,7 +22,7 @@ import { DriverProvider } from "protractor/built/driverProviders";
 
 export interface DialogData {
   // imgPath: string;
-
+  defaultImage:string;
   title: string;
   fileName: string;
   divType: string;
@@ -38,6 +39,8 @@ export interface DialogData {
   admin_username: string;
   admin_email: string;
   admin_password: string;
+  admin_phone: string;
+  admin_ccUser: string;
   //User fields
   email: any;
   schoolId: any;
@@ -89,6 +92,7 @@ export interface DialogData {
 
   //Report Form
   fileURL: any;
+  // defaultImage: any;
   latitude: any;
   langitude: any;
   type: any;
@@ -116,6 +120,7 @@ export class DialogModalComponent implements OnInit {
   searchSchoolId:any;
   adminSchoolList = [];
   userTypeList = [];
+  userTypeList2 = [];
   busRouteList = [];
   stateId: any;
   stateList: any;
@@ -154,6 +159,7 @@ export class DialogModalComponent implements OnInit {
   busRoute: any;
   parentId: any;
   fileUrl: any;
+  defaultImage: any;
   fileformat: any;
   zipCodesrch: any;
   userEditBusRoute: any;
@@ -176,6 +182,8 @@ export class DialogModalComponent implements OnInit {
   validAdminId="";
   validAName="";
   validAPassword="";
+  validAPhone ="";
+  validccAdmin ="";
   validSName="";
   validSAddress="";
   validSState="";
@@ -279,6 +287,7 @@ export class DialogModalComponent implements OnInit {
     this.title = this.data.title;
     this.divType = this.data.divType;
     this.fileUrl = this.data.fileURL;
+    this.defaultImage = this.data.defaultImage;
     this.fileformat = this.data.type;
     this.fileName = this.data.fileName;
     this.adminSchoolId = this.data.admin_school_id;
@@ -332,6 +341,8 @@ export class DialogModalComponent implements OnInit {
     this.validAdminId = this.data.admin_id;
     this.validAName = this.data.admin_username;
     this.validAPassword = this.data.admin_password;
+    this.validAPhone = this.data.admin_phone;
+    this.validccAdmin = this.data.admin_ccUser;
     this.validTUName = this.data.teacher_name;
     this.validTSchool = this.data.school_id;
     this.validTGrade = this.data.grade;
@@ -343,10 +354,10 @@ export class DialogModalComponent implements OnInit {
     this.validBDId = this.data.driver_id;
     this.validBDSchool = this.data.school_id;
     this.validccUser = this.data.ccUser;
-    this.validAState = this.data.admin_statename;
+
     // end ///
+    console.log("this.validAPhone",this.validAPhone);
     console.log("this.validccUser",this.validccUser);
-    console.log("this.validAState",this.validAState);
     this.selectedValue = this.data.school_state;
     this.selectedState = this.data.state;
     this.selectedGenderValue = this.data.gender;
@@ -354,10 +365,18 @@ export class DialogModalComponent implements OnInit {
     console.log("selectedValue", this.selectedState);
     if (this.userInfo.schoolid === 0) {
       this.isSuperAdmin = true;
+      this.validAState = this.data.admin_statename;
       // console.log("SDF", this.isSuperAdmin);
     }else{
+      this.schoolId = this.userInfo.schoolid;
       this.isSuperAdmin = false;
       this.getSchoolById(this.userInfo.schoolid)
+      this.validAState = this.userInfo.stateName;
+      // this.selectedState = this.userInfo.stateName;
+      // this.getSchoolByStateZip();
+
+      console.log("this.validAState",this.validAState);
+      console.log("this.userInfo.stateName", this.userInfo.stateName);
     }
 
     if (
@@ -394,13 +413,14 @@ export class DialogModalComponent implements OnInit {
       admin_username: [],
       admin_email: [],
       admin_password: [],
-      admin_zipCode:[]
+      admin_zipCode:[],
+      admin_phone:[]
     });
 
     this.adminEditForm = this.formBuilder.group({
       admin_school_id: [this.data.admin_school_id],
       admin_school_dist: [this.data.admin_school_dist],
-
+      admin_phone:[this.data.admin_phone],
       // admin_name: [""],
       admin_username: [this.data.admin_username],
       // admin_email: [],
@@ -674,16 +694,23 @@ getDriver(eve){
   }
 
   saveAdmin() {
+    this.validccUser = this.selectedCountryCode;
     let school_id = this.adminSaveForm.get("admin_school_id").value;
     let admin_username = this.adminSaveForm.get("admin_username").value;
     let admin_password = this.adminSaveForm.get("admin_password").value;
+    let userPhone = this.adminSaveForm.get("admin_phone").value;
+    let state = this.selectedState!==undefined?this.selectedState:this.userInfo.stateName;
+    console.log("this.validAPhone",this.validAPhone);
+
     let formObj = {
       schoolid: this.schoolId,
       username: admin_username,
       password: admin_password,
-      stateName:this.selectedState
+      stateName:state,
+      ccUser: this.selectedCountryCode,
+      userPhone: userPhone,
     };
-    if ((admin_username !== "" && admin_username !== undefined)&&(this.selectedState != "" && this.selectedState != undefined)) {
+    if ((admin_username !== "" && admin_username !== undefined)&&(state != "" && state != undefined)) {
       this.http
         .post(this.url + "bully-buddy/admin/add_admin", formObj)
         .subscribe((res: any) => {
@@ -707,6 +734,8 @@ getDriver(eve){
     let admin_username = this.adminEditForm.get("admin_username").value;
     let admin_password = this.adminEditForm.get("admin_password").value;
     let stateName = this.selectedState === undefined?this.validAState:this.selectedState;
+    let userPhone = this.adminEditForm.get("admin_phone").value;
+    console.log("this.validAPhone",this.validAPhone);
     console.log("this.selectedState",stateName)
     if (
       this.schoolId === "" ||
@@ -720,9 +749,11 @@ getDriver(eve){
       schoolid: this.schoolId,
       username: admin_username,
       password: admin_password,
-      stateName: stateName
+      stateName: stateName,
+      userPhone: userPhone,
+      ccUser: this.validccAdmin
     };
-    if((admin_username != "" && admin_username != undefined)&&(stateName != "" && stateName != undefined)) {
+    if((admin_username != "" && admin_username != undefined)&&(stateName != "" && stateName != undefined)&&(this.validccAdmin != "" && this.validccAdmin != undefined)) {
       this.http
         .post(this.url + "bully-buddy/admin/update_admin", formData)
         .subscribe((res: any) => {
@@ -749,6 +780,7 @@ getDriver(eve){
   }
   selectCountryCode(eve){
     this.selectedCountryCode = eve;
+    this.validccAdmin =eve;
   }
   busRouteDropDown(eve) {
     // console.log("BUS", eve);
@@ -857,7 +889,7 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
           if (res.status == "200") {
             this.schoolList = res.result;
             this.allSchoolList = res.result;
-            // console.log("SChpols", this.schoolList);
+            console.log("SChpols", this.schoolList);
             if (this.schoolList.length === 1) {
               this.editSchoolId = this.schoolList[0].id;
             }
@@ -1016,6 +1048,8 @@ console.log("SaveUSer",formObj);
   }
   editUser() {
     let validAge=true;
+    let ccUser;
+    let genderPass = true;
     // let school_name = this.saveForm.get("school_name").value;
     // let school_address = this.saveForm.get("school_address").value;
     let id = this.data.id;
@@ -1046,6 +1080,14 @@ if(age === null||age=== undefined||age===""||age==="null"){
   age = "0";
   this.validEditUAge="0";
 }
+console.log("this.validUAge",this.validUAge)
+if(countryCode == null&&countryCode == undefined){
+  ccUser = this.validccUser;
+  countryCode = this.validccUser;
+}
+else{
+  ccUser = this.selectedCountryCode;
+}
     let formObj = {
       id: id,
       email: email,
@@ -1054,7 +1096,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
       userTypeId: userTypeId,
       name: name,
       age:parseInt(age),
-      ccUser:this.selectedCountryCode,
+      ccUser:ccUser,
       userPhone: userPhone,
       parentId: this.parentId,
       grade: grade,
@@ -1071,14 +1113,16 @@ if(age === null||age=== undefined||age===""||age==="null"){
     };
 
     console.log("schoolId",schoolId);
+    console.log("deriverdriveer",this.driverDropDown);
     // console.log("agee",agee);
     if(schoolId==null){
       alert("Please selecte State to add School in order to save.");
     }
-    if(gender==undefined){
+    if(this.userTypeId===1&&gender==undefined){
+      genderPass = false;
         alert("Please Enter gender.");
     }
-    if(countryCode==undefined){
+    if(countryCode==undefined&&this.validccUser==undefined){
       alert("Please Enter Country Code.");
   }
     if(this.userTypeId===1&&(age===0||age==="0")){
@@ -1092,7 +1136,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
     // console.log("age",agee);
     console.log("this.validUAge",this.validEditUAge)
 
-    if ((name != "" && name != undefined)&&(gender=="M"||gender=="F")&&(schoolId!=null)&&(validAge === true)&&(countryCode=="+1"||countryCode=="+91")) {
+    if ((name != "" && name != undefined)&&(genderPass === true)&&(schoolId!=null)&&(validAge === true)&&(countryCode=="+1"||countryCode=="+91")) {
       console.log("User", formObj);
       this.http
         .post(this.url + "bully-buddy/user/update_user", formObj)
@@ -1739,11 +1783,14 @@ if(age === null||age=== undefined||age===""||age==="null"){
           if (res.status == "200") {
             length = res.result.length;
             userType = res.result;
-            // this.userTypeList = res.result;
+            this.userTypeList = res.result;
             for (let i = 0; i < length; i++) {
-              if (res.result[i].id !== 3) {
-            this.userTypeList.push(userType[i]);
-              }
+            //   if (res.result[i].id !== 3) {
+            // this.userTypeList.push(userType[i]);
+            //   }
+              if (res.result[i].id !== 3 && res.result[i].id !== 5) {
+                this.userTypeList2.push(userType[i]);
+                  }
             }
             console.log("USER", this.userTypeList);
           } else {
@@ -1785,7 +1832,7 @@ if(age === null||age=== undefined||age===""||age==="null"){
             if(this.driverUniqueName.length === 0){
 
               // debugger;
-              this.busRouteList.map((item)=>{debugger;
+              this.busRouteList.map((item)=>{
                 if((item.driverId === this.validBDId)&&(item.driverId !== this.editDriverDummy.id))
                 {
                   this.editDriverDummy.push({"name":item.name,"id":item.driverId});
@@ -1925,8 +1972,16 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null||this.zipCodesrch==="")
               this.dropSchoolName= this.allSchoolList[0].schoolName
               if(this.userInfo.schoolid !== 0){
               this.schoolId = this.allSchoolList[0].id;
+              if(this.dropSchoolName === "Others"){
+                this.schoolId = 0;
+                this.editSchoolId = 0;
+              }
             }
-            // console.log("DATALIST", this.dataList);
+            if(this.dropSchoolName === "Others"){
+              this.schoolId = 0;
+              this.editSchoolId = 0;
+            }
+            console.log("dropSchoolName", this.allSchoolList);
           } else {
             alert(res.message + " : " + res.result);
           }
