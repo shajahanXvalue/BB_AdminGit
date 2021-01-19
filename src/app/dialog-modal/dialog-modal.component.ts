@@ -36,6 +36,7 @@ export interface DialogData {
   admin_statename:any;
   admin_school_dist: any;
   admin_name: string;
+  admin_userid:any;
   admin_username: string;
   admin_email: string;
   admin_password: string;
@@ -181,6 +182,8 @@ export class DialogModalComponent implements OnInit {
   validPPhone1="";
   validAdminId="";
   validAName="";
+  validAUName="";
+  validAUId:any;
   validAPassword="";
   validAPhone ="";
   validccAdmin ="";
@@ -342,6 +345,7 @@ export class DialogModalComponent implements OnInit {
     this.validAName = this.data.admin_username;
     this.validAPassword = this.data.admin_password;
     this.validAPhone = this.data.admin_phone;
+    this.validAUName = this.data.admin_name;
     this.validccAdmin = this.data.admin_ccUser;
     this.validTUName = this.data.teacher_name;
     this.validTSchool = this.data.school_id;
@@ -354,7 +358,7 @@ export class DialogModalComponent implements OnInit {
     this.validBDId = this.data.driver_id;
     this.validBDSchool = this.data.school_id;
     this.validccUser = this.data.ccUser;
-
+    this.validAUId = this.data.admin_userid;
     // end ///
     console.log("this.validAPhone",this.validAPhone);
     console.log("this.validccUser",this.validccUser);
@@ -421,9 +425,8 @@ export class DialogModalComponent implements OnInit {
       admin_school_id: [this.data.admin_school_id],
       admin_school_dist: [this.data.admin_school_dist],
       admin_phone:[this.data.admin_phone],
-      // admin_name: [""],
+      admin_name: [this.data.admin_name],
       admin_username: [this.data.admin_username],
-      // admin_email: [],
       admin_password: [this.data.admin_password],
       admin_id: [this.data.admin_id],
       admin_zipCode:[]
@@ -704,6 +707,7 @@ getDriver(eve){
 
     let formObj = {
       schoolid: this.schoolId,
+      name: this.validAUName,
       username: admin_username,
       password: admin_password,
       stateName:state,
@@ -729,7 +733,7 @@ getDriver(eve){
         });
     }
   }
-  editAdmin() {
+  editAdmin() {debugger;
     let school_id = this.adminEditForm.get("admin_school_id").value;
     let admin_username = this.adminEditForm.get("admin_username").value;
     let admin_password = this.adminEditForm.get("admin_password").value;
@@ -747,6 +751,8 @@ getDriver(eve){
     let formData = {
       id: this.data.admin_id,
       schoolid: this.schoolId,
+      userId: this.validAUId,
+      name: this.validAUName,
       username: admin_username,
       password: admin_password,
       stateName: stateName,

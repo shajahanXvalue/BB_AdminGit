@@ -180,6 +180,8 @@ clearResult(){
         title: "Edit Admin",
         divType: "editAdmin",
         admin_id: list.id,
+        admin_name:list.name,
+        admin_userid:list.userId,
         admin_school_id: list.schoolid,
         admin_statename: list.stateName,
         // admin_school_dist: list.schooldist,
