@@ -420,7 +420,7 @@
             <select *ngIf="userTypeId==='1'" class="form-control"
               (change)="busRouteDropDown($event.target.value)">
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
-              <option *ngFor="let opt of busRouteList" value={{opt.busRoute}}>{{opt.busRoute}}</option>
+              <option *ngFor="let opt of driverUniqueName" value={{opt.busRoute}}>{{opt.busRoute}}</option>
             </select>
             <!-- <label>IsSocialUse</label> -->
             <!-- <input type="text" class="form-control" formControlName="isSocialUser" placeholder="Enter isSocialUse"> -->

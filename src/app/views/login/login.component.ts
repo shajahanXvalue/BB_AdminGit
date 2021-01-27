@@ -39,7 +39,7 @@ export class LoginComponent {
     localStorage.removeItem("GroupChatUserCount");
     localStorage.removeItem("OneChatUserLength");
   }
-  login() {
+  login() {debugger;
     if (this.username !== "" && this.password !== "") {
       // localStorage.setItem("SuperAdmin", this.userid);
       // this.router.navigateByUrl("/dash");
@@ -62,15 +62,15 @@ export class LoginComponent {
             localStorage.setItem("UserInfo", resData);
             this.router.navigateByUrl("/dash");
           }
-          else {
-            this.dialog.open(SuccessComponent, {
-              width: "20%",
-              data: {
-                value: "NetWork Error or Service Unavailable",
-                type: false,
-              },
-            });
-          }
+          // else {
+          //   this.dialog.open(SuccessComponent, {
+          //     width: "20%",
+          //     data: {
+          //       value: "NetWork Error or Service Unavailable",
+          //       type: false,
+          //     },
+          //   });
+          // }
           if (res.message === "School Id Not Found") {
             alert(
               res.message + " Please Enter the Correct UserName and Password!."

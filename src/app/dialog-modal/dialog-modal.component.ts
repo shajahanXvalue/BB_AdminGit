@@ -45,6 +45,7 @@ export interface DialogData {
   //User fields
   email: any;
   schoolId: any;
+  schoolId2:any;
   userSchoolName: any;
   userTypeId: any;
   name: any;
@@ -155,6 +156,7 @@ export class DialogModalComponent implements OnInit {
   // adminSchoolId:any;
   teacherSchool:any;
   schoolId: any;
+  schoolId2:any;
   adminSchoolid=[];
   userInfo = JSON.parse(localStorage.getItem("UserInfo"));
   busRoute: any;
@@ -205,6 +207,7 @@ export class DialogModalComponent implements OnInit {
   dropSchoolName:any;
   driverName:any;
   uniqueDriver:any;
+  driverUniqueName2:[];
   driverUniqueName:any;
   editDriverDummy:any=[{"name":"Dummy Driver","id":0}];
   showNoDriver:boolean= false;
@@ -305,6 +308,7 @@ export class DialogModalComponent implements OnInit {
     }
     console.log("this.data.school",this.data.school);
     this.schoolId = this.data.school_id;
+    this.schoolId2 = parseInt(this.data.school_id);
     console.log("SchoolId", this.schoolId);
     if(this.schoolId !==""&&this.schoolId !==undefined){
       this.getDriver(this.schoolId)
@@ -1807,7 +1811,7 @@ else{
     });
   }
 
-  getAllBusRoute() {
+  getAllBusRoute() {debugger;
     let formObj = {
       schoolId: this.userInfo.schoolid,
     };
@@ -1823,7 +1827,7 @@ else{
             console.log("BUS1", this.busRouteList);
             // this.data = res.result;
 
-            // this.uniqueDriver = this.busRouteList.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
+            // this.UniqueName = this.busRouteList.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
             this.uniqueDriver = this.driverName.filter(({name:id1}) => !this.busRouteList.some(({name:id2 }) => id2 === id1))
             console.log("this.uniqueDriver",this.uniqueDriver);
             this.driverUniqueName = this.uniqueDriver;

@@ -490,20 +490,29 @@ dayFilter(eve) {
   }
 
   deleteUser(list) {
-    let message= "Are you want to delete this User!";
+    let confirmResult;
+    let message=list.id===this.schoolId.userId?"Can't delete this admin as you currently Signed-In.":"Are you want to delete this User!";
     if(list.type==="Student"||list.type === "Parent"){
       message= "Are you want to delete this User?, After deleting this user your parent-child relationship will be removed.";
     }
     // if(list.type === "Bus Driver"){
     //   message= "Are you want to delete this User?, After deleting this user bus-route associated with this user will be removed.";
     // }
-    let confirmResult = this.dialog.open(DeleteDialogComponent, {
+    if(list.id===this.schoolId.userId){
+      this.alertDialog.open(SuccessComponent, {
+        width: "30%",
+        data: { value: message, type: false },
+      });
+    }
+    else{
+    confirmResult = this.dialog.open(DeleteDialogComponent, {
       width: "22%",
       data: {
         title: "Delete User",
         message: message,
       },
     });
+  }
     confirmResult.afterClosed().subscribe((result: boolean) => {
       if (result) {
         const formObj = {
