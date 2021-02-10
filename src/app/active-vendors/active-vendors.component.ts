@@ -8,6 +8,8 @@ import { PropertyServiceService } from "../property-service.service";
 import { Router } from "@angular/router";
 import { CookieService } from "ngx-cookie-service";
 import { SuccessComponent } from '../success/success.component';
+import * as moment from 'moment';
+import {IMyDpOptions} from 'mydatepicker';
 @Component({
   selector: "app-active-vendors",
   templateUrl: "./active-vendors.component.html",
@@ -18,10 +20,30 @@ export class ActiveVendorsComponent implements OnInit {
   data: Array<any>;
   totalRecords: Number;
   page: Number = 1;
-
+  orderByd: string = 'schoolName';
+  reverse: boolean = false;
+  visibleClear: boolean = false;
   //Search
   searchText: any;
+  fromDate:any;
+  toDate:any;
+  public myDatePickerOptions: IMyDpOptions = {
+    // other options...
+    dateFormat: 'mm.dd.yyyy',
+    width:'11%',
+    height:'21px',
+    inline:false,
 
+
+};
+public myDatePickerOptions2: IMyDpOptions = {
+  // other options...
+  dateFormat: 'mm.dd.yyyy',
+  width:'11%',
+  height:'21px',
+  inline:false,
+
+};
   constructor(
     private http: HttpClient,
     public dialog: MatDialog,
@@ -60,25 +82,118 @@ export class ActiveVendorsComponent implements OnInit {
       this.router.navigateByUrl("/login");
     }
     // console.log(this.userInfo);
-
-    // if (this.userInfo.schoolid === 0) {
-    //   this.showSuperAdmin = true;
     this.getAllBusRoute();
-    // } else {
+    if (this.userInfo.schoolid === 0) {
+      this.showSuperAdmin = true;
+
+    }
+    //  else {
     //   this.getBusRouteById();
     // }
   }
+  searchTeacher(eve){
+    if(eve === ""){
+      this.searchText = eve;
+    }
+
+  }
+
+    showClear(eve){
+    if(eve !==""){
+        this.visibleClear = true;
+    }
+    else{
+      this.visibleClear = false;
+      this.getAllBusRoute();
+    }
+
+  }
+
+clearResult(){
+  // alert("HIT");
+  this.visibleClear = false;
+  this.searchText="";
+  // this.searchWord="";
+  this.getAllBusRoute();
+}
+dateChanged(event,id){
+  console.log("FromDate",event.formatted)
+  let date =  moment(event.formatted).format("YYYY-MM-DD")
+  if(event.formatted !== undefined &&event.formatted !==""&&event.formatted !==" "){
+    this.fromDate= date+' 00:00:00';
+  }else{
+    this.fromDate ="null"
+  }
+
+  // console.log("date", date);
+  // console.log("id",);
+  // console.log("date", this.fromDate);
+  // if(event.target.id === "from" && event.target.value !== ""){
+  //   console.log("From",event.target.value)
+  //   this.fromDate = event.target.value+' 00:00:00'
+  //   this.fromDateBind = event.target.value;
+  // }
+  // else if(event.target.id === "from" && event.target.value === ""){
+  //   this.fromDate = "null"
+  // }
+  // else if(event.target.id === "to"&& event.target.value !== ""){
+  //   this.toDate = event.target.value+' 00:00:00'
+  //   this.toDateBind = event.target.value;
+  // }
+  // else if(event.target.id === "to" && event.target.value === ""){
+  //   this.toDate = "null"
+  // }
+
+  console.log("from date", this.fromDate);
+  console.log("to date", this.toDate);
+}
+dateChanged2(event,id){
+  console.log("ToDAte",event.formatted)
+  let date =  moment(event.formatted).format("YYYY-MM-DD")
+  if(event.formatted !== undefined && event.formatted !==""){
+    this.toDate = date+' 00:00:00';
+  }else{
+    this.toDate ="null"
+  }
+
+  // console.log("id",);
+  // console.log("date", this.toDate);
+  // if(event.target.id === "from" && event.target.value !== ""){
+  //   console.log("From",event.target.value)
+  //   this.fromDate = event.target.value+' 00:00:00'
+  //   this.fromDateBind = event.target.value;
+  // }
+  // else if(event.target.id === "from" && event.target.value === ""){
+  //   this.fromDate = "null"
+  // }
+  // else if(event.target.id === "to"&& event.target.value !== ""){
+  //   this.toDate = event.target.value+' 00:00:00'
+  //   this.toDateBind = event.target.value;
+  // }
+  // else if(event.target.id === "to" && event.target.value === ""){
+  //   this.toDate = "null"
+  // }
+
+  console.log("from date", this.fromDate);
+  console.log("to date", this.toDate);
+}
+
   getAllBusRoute() {
     let formObj = {
       schoolId: this.userInfo.schoolid,
     };
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .post(this.uri + "bully-buddy/busroute/get_all_busroute", formObj)
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
             this.data = res.result;
+            console.log("this.data",this.data);
+            // let unique = this.data.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
+
+            // console.log("Unique_name",unique);
+
             this.totalRecords = res.result.length;
             if (this.totalRecords === 0) {
               this.showNoRecord = true;
@@ -99,7 +214,7 @@ export class ActiveVendorsComponent implements OnInit {
     let formObj = {
       id: this.userInfo.schoolid,
     };
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .post(this.uri + "bully-buddy/busroute/get_busroute_by_id", formObj)
         .subscribe((res: any) => {
@@ -143,6 +258,7 @@ export class ActiveVendorsComponent implements OnInit {
         busRoute: list.busRoute,
         driver_id: list.driverId,
         school_id: list.schoolId,
+        createdDateTime: list.createdDateTime
       },
     });
   }
@@ -152,7 +268,7 @@ export class ActiveVendorsComponent implements OnInit {
       width: "20%",
       data: {
         title: "Delete BusRoute",
-        message: "Are you want to delete this BusRoute!",
+        message: "Are you want to delete this BusRoute?",
       },
     });
     confirmResult.afterClosed().subscribe((result: boolean) => {
@@ -198,8 +314,16 @@ export class ActiveVendorsComponent implements OnInit {
     });
   }
   excelDownload() {
-    let url = "http://3.128.136.18:5001/api/excel/download_busroute";
-    this.http.get(url, { responseType: "blob" }).subscribe((data) => {
+    let from = null;
+    let to = null;
+    if(this.fromDate !== undefined && this.toDate !== null){
+      from = this.fromDate
+    }
+    if(this.toDate !== undefined && this.toDate !== null){
+      to = this.toDate
+    }
+    let url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download_busroute"+  "?schoolId=" + this.userInfo.schoolid+ "&from=" + from+ "&to=" + to;
+    this.http.post(url,"", { responseType: "blob" }).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
@@ -221,5 +345,13 @@ export class ActiveVendorsComponent implements OnInit {
       });
     }
     this.orderFlag = !this.orderFlag;
+  }
+
+  setOrder(value: string) {
+    if (this.orderByd === value) {
+      this.reverse = !this.reverse;
+    }
+
+    this.orderByd = value;
   }
 }

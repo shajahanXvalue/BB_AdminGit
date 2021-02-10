@@ -8,6 +8,10 @@ import { saveAs } from "file-saver";
 import { Router } from "@angular/router";
 import { CookieService } from "ngx-cookie-service";
 import { SuccessComponent } from '../success/success.component';
+import { OrderPipe } from 'ngx-order-pipe';
+import * as moment from 'moment';
+import {IMyDpOptions} from 'mydatepicker';
+
 @Component({
   selector: "app-sub-category",
   templateUrl: "./sub-category.component.html",
@@ -15,30 +19,55 @@ import { SuccessComponent } from '../success/success.component';
 })
 export class SubCategoryComponent implements OnInit {
   // Pagination
+  orderByd: string = 'schoolName';
+  reverse: boolean = false;
+  alphaSort:boolean =false;
+  sortedCollection: any[];
   userData: Array<any>;
   totalUserRecords: Number;
   page: Number = 1;
-  itemPerPage = 100;
+  itemPerPage = 50;
   // getCookies: string = this.cookieService.get("LoginStatus");
   // Search
   searchText: any;
   // Day Filter
-  selectedValue: any;
-
+  selectedValue= null;
+  fromDate:any;
+  toDate:any;
   optionItems = [
+    { id: "0", value: "All", text: "All" },
     { id: "1", value: "Daily", text: "Daily" },
     { id: "2", value: "Weekly", text: "Weekly" },
     { id: "3", value: "Monthly", text: "Monthly" },
     { id: "4", value: "Yearly", text: "Yearly" },
   ];
+  public myDatePickerOptions: IMyDpOptions = {
+    // other options...
+    dateFormat: 'mm.dd.yyyy',
+    width:'11%',
+    height:'21px',
+    inline:false,
+
+
+};
+public myDatePickerOptions2: IMyDpOptions = {
+  // other options...
+  dateFormat: 'mm.dd.yyyy',
+  width:'11%',
+  height:'21px',
+  inline:false,
+
+};
   constructor(
     private http: HttpClient,
     public dialog: MatDialog,
     public alertDialog: MatDialog,
     private property: PropertyServiceService,
     private router: Router,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private orderPipe: OrderPipe
   ) {
+    this.sortedCollection = orderPipe.transform(this.dataList, 'list.schoolName');
     this.userData = new Array<any>();
 
     dialog.afterAllClosed.subscribe(() => {
@@ -69,17 +98,18 @@ export class SubCategoryComponent implements OnInit {
     if (this.getCookies === "") {
       localStorage.removeItem("userInfo");
       // this.router.navigateByUrl("/login");
-      // window.location.href = "/login";
-      window.location.href="http://3.128.136.18/admin/#/login";
+      // window.location.href = this.url+"admin/#/login";
+      window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.schoolId === null || this.schoolId === undefined) {
       alert("You Have been LogOut, Kindly LogIn to Continue!");
       // this.router.navigateByUrl("/login");
       // window.location.href = "/login";
-      window.location.href="http://3.128.136.18/admin/#/login";
+      window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
-    // if (this.schoolId.schoolid === 0) {
-    //   this.isSuperAdmin = true;
+    if (this.schoolId.schoolid === 0) {
+      this.isSuperAdmin = true;
+    }
     console.log("this.searchText",this.searchText);
     if(this.searchText === "" || this.searchText === undefined)
     {
@@ -104,12 +134,73 @@ export class SubCategoryComponent implements OnInit {
       if(event > this.totalPages){
         this.page = 1
       }
-    if(this.searchText === ""||this.searchText === undefined){
+    if((this.searchText === ""||this.searchText === undefined)&&(this.fromDate === ""||this.fromDate === undefined)){
     this.getAllUser();
     }
   }
   }
 
+  dateChanged(event,id){
+    console.log("FromDate",event.formatted)
+    let date =  moment(event.formatted).format("YYYY-MM-DD")
+    if(event.formatted !== undefined &&event.formatted !==""&&event.formatted !==" "){
+      this.fromDate= date+' 00:00:00';
+    }else{
+      this.fromDate ="null"
+    }
+
+    // console.log("date", date);
+    // console.log("id",);
+    // console.log("date", this.fromDate);
+    // if(event.target.id === "from" && event.target.value !== ""){
+    //   console.log("From",event.target.value)
+    //   this.fromDate = event.target.value+' 00:00:00'
+    //   this.fromDateBind = event.target.value;
+    // }
+    // else if(event.target.id === "from" && event.target.value === ""){
+    //   this.fromDate = "null"
+    // }
+    // else if(event.target.id === "to"&& event.target.value !== ""){
+    //   this.toDate = event.target.value+' 00:00:00'
+    //   this.toDateBind = event.target.value;
+    // }
+    // else if(event.target.id === "to" && event.target.value === ""){
+    //   this.toDate = "null"
+    // }
+    this.search();
+    console.log("from date", this.fromDate);
+    console.log("to date", this.toDate);
+  }
+  dateChanged2(event,id){
+    console.log("ToDAte",event.formatted)
+    let date =  moment(event.formatted).format("YYYY-MM-DD")
+    if(event.formatted !== undefined && event.formatted !==""){
+      this.toDate = date+' 00:00:00';
+    }else{
+      this.toDate ="null"
+    }
+
+    // console.log("id",);
+    // console.log("date", this.toDate);
+    // if(event.target.id === "from" && event.target.value !== ""){
+    //   console.log("From",event.target.value)
+    //   this.fromDate = event.target.value+' 00:00:00'
+    //   this.fromDateBind = event.target.value;
+    // }
+    // else if(event.target.id === "from" && event.target.value === ""){
+    //   this.fromDate = "null"
+    // }
+    // else if(event.target.id === "to"&& event.target.value !== ""){
+    //   this.toDate = event.target.value+' 00:00:00'
+    //   this.toDateBind = event.target.value;
+    // }
+    // else if(event.target.id === "to" && event.target.value === ""){
+    //   this.toDate = "null"
+    // }
+    this.search();
+    console.log("from date", this.fromDate);
+    console.log("to date", this.toDate);
+  }
  showClear(eve){
     if(eve !==""){
         this.visibleClear = true;
@@ -127,6 +218,55 @@ clearResult(){
   this.searchText="";
   this.searchWord="";
   this.getAllUser();
+}
+dayFilter(eve) {
+  var today = moment();
+  // const from_date = today.startOf("week");
+  // const to_date = today.endOf("week");
+  console.log("EVEnt", eve);
+  if (eve === "1: All") {
+    // this.searchText = "";
+    // this.dataList = this.data;
+    // this.totalRecords = this.dataList.length;
+    this.getAllUser();
+  }
+  if (eve === "2: Daily") {
+    // let arrayList = [];
+    // this.dataList = this.data;
+    let date = moment(today).format("YYYY-MM-DD");
+    this.fromDate = date+" 00:00:00"
+    this.toDate = date+" 00:00:00"
+    this.search();
+    console.log("Today", date.toString());
+  }
+  if (eve === "3: Weekly") {
+    const from_date = today.startOf("isoWeek").format("YYYY-MM-DD");
+    const to_date = today.endOf("isoWeek").format("YYYY-MM-DD");
+    this.fromDate = from_date+ " 00:00:00";
+    this.toDate = to_date+ " 00:00:00";
+    this.search();
+  }
+  if (eve === "4: Monthly") {
+    // let arrayList = [];
+    this.dataList = this.userData;
+    const from_date = today.startOf("month").format("YYYY-MM-DD");
+    const to_date = today.endOf("month").format("YYYY-MM-DD");
+    this.fromDate = from_date+" 00:00:00"
+    this.toDate = to_date+ " 00:00:00";
+    this.search();
+  }
+  if (eve === "5: Yearly") {
+    let arrayList = [];
+    this.dataList = this.userData;
+    const from_date = today.startOf("year").format("YYYY-MM-DD");
+    const to_date = today.endOf("year").format("YYYY-MM-DD");
+    this.fromDate = from_date+" 00:00:00"
+    this.toDate = to_date+ " 00:00:00";
+    this.search();
+    console.log("Search", this.searchText);
+  }
+
+  // console.log("DATE", fromDate);
 }
 
   getAllUser() {
@@ -170,7 +310,7 @@ clearResult(){
 
             this.showPagination=true;
           }
-          if(this.totalUserRecords<0){
+          if(this.totalUserRecords<=0){
             this.showNoRecord=true;
           }
         }else if(res.status == "400"){
@@ -182,7 +322,7 @@ clearResult(){
   getUserById() {
     const arrLen: any = [];
     const formObj = {
-      id: this.schoolId.id,
+      id: this.schoolId.schoolid,
     };
     this.http
       .post(this.url + "bully-buddy/user/get_user_by_id", formObj)
@@ -219,8 +359,17 @@ clearResult(){
   }
 
   excelDownload() {
-    const url = "http://3.128.136.18:5001/api/excel/download";
-    this.http.get(url, { responseType: "blob" }).subscribe((data) => {
+    let from = "null";
+    let to = "null";
+    if(this.fromDate !== undefined && this.fromDate !== null){
+      from = this.fromDate
+    }
+    if(this.toDate !== undefined && this.toDate !== null){
+      to = this.toDate
+    }
+
+    const url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download" +  "?schoolId=" + this.schoolId.schoolid+ "&from=" + from+ "&to=" + to;
+    this.http.post(url,"", { responseType: "blob" }).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
@@ -242,6 +391,7 @@ clearResult(){
     });
   }
   editUser(list) {
+    console.log("CreatedData:",list.createdDateTime)
     this.dialog.open(DialogModalComponent, {
       width: "50%",
       data: {
@@ -253,6 +403,8 @@ clearResult(){
         userSchoolName: list.schoolName,
         userTypeId: list.userTypeId,
         name: list.name,
+        age:list.age,
+        ccUser:list.ccUser,
         userPhone: list.userPhone,
         parentId: list.parentId,
         grade: list.grade,
@@ -266,21 +418,105 @@ clearResult(){
         city: list.city,
         state: list.state,
         busRoute: list.busRoute,
+        createdDateTime: list.createdDateTime
       },
     });
   }
-  deleteUser(id) {
-    let confirmResult = this.dialog.open(DeleteDialogComponent, {
+  deleteDriver(id)
+  {
+
+    const formObj = {
+      id:id,
+    };
+    this.http
+    .post(this.url + "bully-buddy/user/delete_driver", formObj)
+    .subscribe((res: any) => {
+      if (res.status == "200") {
+        // if (this.schoolId.schoolid === 0) {
+        //   this.isSuperAdmin = true;
+        let confirmdelResult = this.dialog.open(DeleteDialogComponent, {
+          width: "22%",
+          data: {
+            title: "Delete User",
+            message: res.message,
+          },
+        });
+        confirmdelResult.afterClosed().subscribe((result: boolean) => {
+          if (result) {
+            const formObj = {
+              id: id,
+            };
+            this.http
+              .post(this.url + "bully-buddy/user/delete_user", formObj)
+              .subscribe((res: any) => {
+                if (res.status == "200") {
+                  // if (this.schoolId.schoolid === 0) {
+                  //   this.isSuperAdmin = true;
+                   this.alertDialog.open(SuccessComponent, {
+                width: "30%",
+                data: { value: "User Deleted", type: true },
+              });
+                  if(this.searchText ===" " || this.searchText === undefined){
+                      this.getAllUser();
+                  }
+                  else{
+                    this.searchUser(this.searchWord);
+                  }
+
+                }else{
+                   this.alertDialog.open(SuccessComponent, {
+                width: "30%",
+                data: { value: "User Deleted Failed", type: false },
+              });
+                }
+              });
+          }
+        });
+
+        if(this.searchText ===" " || this.searchText === undefined){
+            this.getAllUser();
+        }
+        else{
+          this.searchUser(this.searchWord);
+        }
+
+      }else{
+        this.alertDialog.open(SuccessComponent, {
+          width: "30%",
+          data: { value: res.message, type: false },
+        });
+      }
+    });
+  }
+
+  deleteUser(list) {
+    let confirmResult;
+    let message=list.id===this.schoolId.userId?"Can't delete this admin as you currently Signed-In.":"Are you want to delete this User!";
+    if(list.type==="Student"||list.type === "Parent"){
+      message= "Are you want to delete this User?, After deleting this user your parent-child relationship will be removed.";
+    }
+    // if(list.type === "Bus Driver"){
+    //   message= "Are you want to delete this User?, After deleting this user bus-route associated with this user will be removed.";
+    // }
+    if(list.id===this.schoolId.userId){
+      this.alertDialog.open(SuccessComponent, {
+        width: "30%",
+        data: { value: message, type: false },
+      });
+    }
+    else{
+    confirmResult = this.dialog.open(DeleteDialogComponent, {
       width: "22%",
       data: {
         title: "Delete User",
-        message: "Are you want to delete this User!",
+        message: message,
       },
     });
+  }
     confirmResult.afterClosed().subscribe((result: boolean) => {
       if (result) {
         const formObj = {
-          id: id,
+          id: list.id,
         };
         this.http
           .post(this.url + "bully-buddy/user/delete_user", formObj)
@@ -309,9 +545,84 @@ clearResult(){
       }
     });
   }
+
+  search(){
+    return new Promise<void>((resolve, reject) => {
+      let from;
+      let to;
+      let search;
+      if(this.fromDate === undefined){
+        from="null"
+    }
+    else{
+      from = this.fromDate;
+    }
+      if(this.toDate === undefined){
+          to="null"
+      }
+      else{
+        to = this.toDate;
+      }
+      if(this.searchWord === undefined || this.searchWord === null|| this.searchWord === ""){
+        search = "null"
+      }
+      else{
+        search = this.searchWord
+      }
+      let formObj={
+        searchword:search,
+        from:from,
+        to:to
+      }
+      if(search==="null"&&from==="null"&&to==="null"){
+        this.getAllUser();
+      }
+      else{
+      this.http
+        .post(
+          this.url + "bully-buddy/user/search_user"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to+"&schoolId="+this.schoolId.schoolid,"")
+        .subscribe((res: any) => {
+          if (res.status == "200") {
+            this.dataList = res.result;
+            this.userData = res.result;
+            this.totalUserRecords = res.result.length
+
+            console.log("Report",res.result);
+           }
+           if(this.totalUserRecords===0){
+            this.showNoRecord=true;
+            this.showPagination=true;
+          }
+          else{
+            this.showNoRecord=false;
+          }
+          //  else {
+          //   alert(res.message + " : " + res.result);
+          // }
+          resolve();
+        });
+      }
+    });
+  }
+
   searchUser(eve) {
     const arrLen: any = [];
     let searchWord = eve;
+    let to;
+    let from;
+
+    if(this.toDate === undefined){
+        to="null"
+    }
+    else{
+      to = this.toDate;
+    }
+    if(this.fromDate === undefined){
+      from="null"
+  }
+  else{
+    from = this.fromDate;
+  }
     // console.log("searchWord",this.searchWord);
     if(this.searchWord === "" || this.searchWord === undefined){
       this.searchText = eve;
@@ -332,7 +643,7 @@ clearResult(){
           this.url +
             "bully-buddy/user/search_user" +
             "?searchword=" +
-            searchWord,
+            searchWord+ "&from=" + from+ "&to=" + to+"&schoolId="+this.schoolId.schoolid,
           ""
         )
         .subscribe((res: any) => {
@@ -350,15 +661,22 @@ clearResult(){
             this.totalUserRecords = res.result.length;
             // }
           }
+          if(this.totalUserRecords>0){
+
+            this.showPagination=true;
+          }
+          if(this.totalUserRecords<0){
+            this.showNoRecord=true;
+          }
         });
     }
     // console.log("this.datalisttt",this.dataList);
-    if(this.dataList === ""){
-      this.showNoRecord = true;
-    }
-    else{
-      this.showNoRecord = false;
-    }
+    // if(this.dataList === ""){
+    //   this.showNoRecord = true;
+    // }
+    // else{
+    //   this.showNoRecord = false;
+    // }
   }
   }
   order() {
@@ -372,5 +690,15 @@ clearResult(){
       });
     }
     this.orderFlag = !this.orderFlag;
+  }
+
+  setOrder(value: string) {
+
+    if (this.orderByd === value) {
+      this.reverse = !this.reverse;
+
+    }
+this.alphaSort=!this.alphaSort;
+    this.orderByd = value;
   }
 }

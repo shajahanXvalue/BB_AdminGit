@@ -4,20 +4,32 @@
       <div class="card">
         <div class="card-header">Users
 
-          <label   style="margin-left:700px;font-weight: bold;">Jump To </label>
-             <input  style="width: 65px;border-radius: 5;" type="number" max={{totalPages}} name="search"
+          <label style="margin-left:60%;font-size: medium;">Go To </label>
+             <input  style="width: 65px;border-radius: 5;font-size: medium;" type="number" max={{totalPages}} name="search"
               [(ngModel)]="page"  autocomplete="off" placeholder="Page No" (ngModelChange)="pageChanged($event)">
-               <label   style="font-weight: bold;">limit: {{totalPages}} </label>
+               <label style="font-size: medium;">Page: {{totalPages}} </label>
+               <label style="font-size: medium;padding-left: 20px;">Total Users: {{totalUserRecords}} </label>
         </div>
-        <div style="padding: 7px 20px 0 0">
+        <div style="padding: 7px 20px 0 0;width: 100%;height: 100%;">
 
            <form (ngSubmit)="searchUser(searchText)" >
               <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
-              [(ngModel)]="searchText"  autocomplete="off" placeholder="Start searching" [ngModelOptions]="{standalone: true}"
+              [(ngModel)]="searchText"  autocomplete="off" placeholder="Search" [ngModelOptions]="{standalone: true}"
               (ngModelChange)="showClear($event)" >
               <span *ngIf="visibleClear" class="fa fa-close" style="margin-left:-47px" (click)="clearResult()" ></span>
               <button *ngIf="visibleClear" type="submit"  style="margin-left:1px"><i class="fa fa-search"></i></button>
               <button *ngIf="!visibleClear" type="submit"  style="margin-left:-31px"><i class="fa fa-search"></i></button>
+              <select style="height: 27px; width: 130px; color: #405065" (change)="dayFilter($event.target.value)"
+              [(ngModel)]="selectedValue" [ngModelOptions]="{standalone: true}">
+              <option [ngValue]="null" [disabled]="true" hidden>
+                Daily Filter
+              </option>
+              <option *ngFor="let opt of optionItems" [ngValue]="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+              <!-- <input type="text"onfocus="(this.type='date')" placeholder="From" id="from"  (change)="dateChanged($event)">
+              <input type="text"onfocus="(this.type='date')" placeholder="To" id="to"  (change)="dateChanged($event)"> -->
               <!-- <select *ngIf="showSuperAdmin" style="height:27px;width: 130px;color: #405065;" (change)="stateFilter($event.target.value)"
               [(ngModel)]="selectedState" [ngModelOptions]="{standalone: true}"  >
               <option [ngValue]="null" [disabled]="true" hidden>State Filter</option>
@@ -25,11 +37,20 @@
               <option *ngFor="let opt of stateItems" value={{opt.statename}}>
                 {{opt.statename}}</option>
             </select> -->
-            <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelDownload()">Excel
-            Download</span>
-          <span class="btn-add" style="margin-left: 10px; background-color: seagreen" (click)="excelUpload()">Excel
-            Upload</span>
-          <span class="btn-add" (click)="addUser()">Add</span>
+            <!-- <span class="btn-add" style="margin-left: 10px;background-color: #5050503b" > -->
+              <!-- <span style="margin-top:10px !important">   -->
+                <my-date-picker class="my-date-picker"name="mydate1" id="from" placeholder="From" [options]="myDatePickerOptions"
+                          (dateChanged)="dateChanged($event)" style="margin-bottom: -8px !important;margin-left: 10%;" required></my-date-picker>
+                          <my-date-picker class="my-date-picker"name="mydate" id="to" placeholder="To" [options]="myDatePickerOptions2"
+                          (dateChanged)="dateChanged2($event)" style="margin-bottom: -8px !important;" required></my-date-picker>
+                        <!-- </span> -->
+            <span class="btn-add" style="margin-left: 1%; background-color: seagreen" (click)="excelDownload()">Excel
+            Export</span>
+           <!-- </span> -->
+           <span class="btn-add" style="margin-left: 1%; background-color: seagreen" (click)="excelUpload()" *ngIf="!isSuperAdmin">Excel
+            Import</span>
+
+           <span class="btn-add" style="margin-left: 1%;" (click)="addUser()">Add</span>
 </form>
 <!--
           <input style="width: 425px; margin-left: 20px; border-radius: 5; height: 28px;
@@ -48,33 +69,39 @@
             <thead>
               <tr>
                 <!-- <th>S.No</th> -->
-                <th (click)="order()" style="cursor: pointer">
+                <!-- <th (click)="order()" style="cursor: pointer">
                   User Id&nbsp;<i *ngIf="!orderFlag" class="fa fa-caret-down"></i>
                   <i *ngIf="orderFlag" class="fa fa-caret-up"></i>
-                </th>
-                <th>User Name</th>
+                </th> -->
+                <th>Name</th>
                 <th>User Type</th>
-                <th>User Phone</th>
-                <th>School</th>
-                <th>User Email</th>
+                <th>Phone No</th>
+                <th
+                (click)="setOrder('list.schoolName')"
+                class="mdl-data-table__cell--non-numeric">School<span [hidden]="alphaSort">▼</span
+                  ><span [hidden]="!alphaSort">▲[A-Z]</span></th>
+                <th>Username/Email</th>
                 <!-- <th>User Password</th> -->
                 <!-- <td>User Address</td>
                 <td>User City</td> -->
                 <th>Options</th>
               </tr>
             </thead>
-            <tbody>
-              <tr *ngFor="let list of dataList| paginate
+            <tbody *ngIf="alphaSort">
+              <tr
+              *ngFor="let list of dataList | orderBy:'schoolName':reverse:reverse | paginate
                       : {
                           id: 'list_pagination',
                           itemsPerPage:itemPerPage,
                           currentPage: page,
                           totalItems: totalUserRecords
                         };
+
                   let i = index
                 ">
+
                 <!-- <td>{{ i + 1 }}</td> -->
-                <td>{{ list.id }}</td>
+                <!-- <td>{{ list.id }}</td> -->
                 <td>{{ list.name }}</td>
                 <td>{{ list.type }}</td>
                  <td>{{ list.userPhone }}</td>
@@ -89,6 +116,40 @@
                     <span class="fa fa-pencil fa-options" (click)="editUser(list)"></span>
                     &nbsp;&nbsp;
                     <span class="fa fa-trash-o fa-options" (click)="deleteUser(list.id)"></span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="!alphaSort">
+              <tr
+              *ngFor="let list of dataList | paginate
+                      : {
+                          id: 'list_pagination',
+                          itemsPerPage:itemPerPage,
+                          currentPage: page,
+                          totalItems: totalUserRecords
+                        };
+
+                  let i = index
+                ">
+
+                <!-- <td>{{ i + 1 }}</td> -->
+                <!-- <td>{{ list.id }}</td> -->
+                <td>{{ list.name }}</td>
+                <td>{{ list.type }}</td>
+                 <td>{{ list.userPhone }}</td>
+                <td>{{ list.schoolName }}</td>
+                <td>{{ list.email }}</td>
+                <!-- <td>{{ list.password }}</td> -->
+                <!-- <td>{{list.address}}</td>
+                <td>{{list.city}}</td> -->
+                <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
+                <td>
+                  <div>
+                    <span class="fa fa-pencil fa-options" (click)="editUser(list)"></span>
+                    &nbsp;&nbsp;
+                    <span *ngIf="list.type!=='Bus Driver'&&!isSuperAdmin" class="fa fa-trash-o fa-options" (click)="deleteUser(list)"></span>
+                    <span *ngIf="list.type==='Bus Driver'&&!isSuperAdmin"  class="fa fa-trash-o fa-options" (click)="deleteDriver(list.id)"></span>
                   </div>
                 </td>
               </tr>

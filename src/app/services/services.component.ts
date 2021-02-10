@@ -18,10 +18,15 @@ export class ServicesComponent implements OnInit {
   //Pagination
   data: Array<any>;
   totalRecords: Number;
+  totalUserRecords: Number;
   page: Number = 1;
+  itemPerPage = 50;
   //Search
+  alphaSort:boolean=false;
+  showNoRecord:boolean = false;
   searchText: any;
-
+  orderByd: string = 'schoolName';
+  reverse: boolean = false;
   constructor(
     private http: HttpClient,
     public dialog: MatDialog,
@@ -43,23 +48,28 @@ export class ServicesComponent implements OnInit {
       // }
     });
   }
+  totalResult: any;
+  totalPages:any;
   isSuperAdmin: boolean = false;
   userInfo = JSON.parse(localStorage.getItem("UserInfo"));
   adminList: any = [];
   dataList: any;
+  adminSchool:any = [];
   orderAdminFlag: boolean = false;
+  searchWord:any;
+  visibleClear:boolean = false;
   url = this.property.uri;
   getCookies: string = this.cookieService.get("LoginStatus");
   ngOnInit() {
     if (this.getCookies !== "login") {
       localStorage.removeItem("userInfo");
       // this.router.navigateByUrl("/login");
-      window.location.href = "http://3.128.136.18/admin/#/login";
+      window.location.href = "https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.userInfo === null || this.userInfo === undefined) {
       alert("You Have been LogOut, Kindly LogIn to Continue!");
       // this.router.navigateByUrl("/login");
-      window.location.href = "http://3.128.136.18/admin/#/login";
+      window.location.href = "https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.userInfo.schoolid === 0) {
       this.isSuperAdmin = true;
@@ -68,23 +78,63 @@ export class ServicesComponent implements OnInit {
       this.getAdmin();
     }
   }
+  pageChanged(event) {
+    // this.page = event;
+    console.log("pagination", event);
+     if(event!==""){
+        this.page = event;
+      if(event > this.totalPages){
+        this.page = 1
+      }
+    if(this.searchText === ""||this.searchText === undefined){
+    this.getAllAdmin();
+    }
+  }
+  }
+  showClear(eve){
+    if(eve !==""){
+        this.visibleClear = true;
+    }
+    else{
+      this.visibleClear = false;
+      this.getAllAdmin();
+    }
 
+  }
+
+clearResult(){
+  // alert("HIT");
+  this.visibleClear = false;
+  this.searchText="";
+  this.searchWord="";
+  this.getAllAdmin();
+}
   getAllAdmin() {
     let arrLen: any = [];
-    this.http.get(this.url + "bully-buddy/admin/list").subscribe((res: any) => {
+    let page = this.page.toString();
+    let pageNo: number = +page;
+    pageNo = pageNo - 1;
+    console.log("Page", pageNo);
+    this.http.get(this.url + "bully-buddy/admin/list"+ "?pageno=" + pageNo,).subscribe((res: any) => {
       if (res.status == "200") {
         // console.log("RESSSSS", res);
         arrLen.push(res.result);
         // console.log("RESsss", arrLen[0].length);
         if (arrLen[0].length === 1) {
           this.adminList = [];
-          this.adminList.push(res.result);
+          this.adminList.push(res.result.content);
           this.data = res.result;
-          this.totalRecords = res.result.length;
+          this.totalRecords = res.result.totalElements;
+          this.totalResult = res.result.totalelements;
+          this.itemPerPage = res.result.pageable.pageSize;
+          this.totalPages = res.result.totalPages;
         } else {
-          this.adminList = res.result;
-          this.data = res.result;
-          this.totalRecords = res.result.length;
+          this.adminList = res.result.content;
+          this.data = res.result.content;
+          this.totalRecords = res.result.totalElements;
+          this.totalResult = res.result.totalElements;
+          this.itemPerPage = res.result.pageable.pageSize;
+          this.totalPages = res.result.totalPages;
         }
       }
     });
@@ -106,7 +156,8 @@ export class ServicesComponent implements OnInit {
             this.adminList = [];
             this.adminList.push(res.result);
             this.data = res.result;
-            this.totalRecords = res.result.length;
+            this.totalPages=arrLen.length;
+            this.totalRecords = arrLen.length;
           } else {
             this.adminList = res.result;
             this.data = res.result;
@@ -129,12 +180,62 @@ export class ServicesComponent implements OnInit {
         title: "Edit Admin",
         divType: "editAdmin",
         admin_id: list.id,
+        admin_name:list.name,
+        admin_userid:list.userId,
         admin_school_id: list.schoolid,
+        admin_statename: list.stateName,
+        // admin_school_dist: list.schooldist,
         admin_username: list.username,
         admin_password: list.password,
+        admin_phone: list.userPhone,
+        admin_ccUser: list.ccUser
+        // createdDate:list.
       },
     });
   }
+  search(eve){
+    return new Promise<void>((resolve, reject) => {
+     console.log("eve",eve)
+      let search = eve;
+
+      if(search === undefined || search === null|| search === ""){
+        search = "null"
+      }
+      else{
+        search = eve
+      }
+
+      if(search==="null"){
+        this.getAllAdmin();
+      }
+      else{
+      this.http
+        .post(
+          this.url + "bully-buddy/admin/search_admin"+ "?searchword=" + search + "&schoolId=" +this.userInfo.schoolid,"")
+        .subscribe((res: any) => {
+          if (res.status == "200") {
+            this.adminList  = res.result;
+            this.data = res.result;
+            this.totalUserRecords = res.result.length
+
+            console.log("Report",res.result);
+           }
+           if(this.totalUserRecords>0){
+
+            this.showNoRecord=false;
+          }
+          if(this.totalUserRecords<=0){
+            this.showNoRecord=true;
+          }
+          //  else {
+          //   alert(res.message + " : " + res.result);
+          // }
+          resolve();
+        });
+      }
+    });
+  }
+
   deleteAdmin(id) {
     var confirmResult = this.dialog.open(DeleteDialogComponent, {
       width: "20%",
@@ -184,5 +285,12 @@ export class ServicesComponent implements OnInit {
       });
     }
     this.orderAdminFlag = !this.orderAdminFlag;
+  }
+  setOrder(value: string) {
+    if (this.orderByd === value) {
+      this.reverse = !this.reverse;
+    }
+this.alphaSort=!this.alphaSort;
+    this.orderByd = value;
   }
 }

@@ -1,0 +1,133 @@
+<div class="animated fadeIn" style="padding-top: 10px;">
+  <div class="container">
+    <div *ngIf="newMessage!==0" class="alert alert-success" role="alert">
+     You Have a New Unread Message!
+    </div>
+    <!-- <h3 class=" text-center">Messaging</h3> -->
+    <div class="messaging">
+      <div class="inbox_msg">
+        <div class="inbox_people">
+          <div class="headind_srch">
+            <div class="recent_heading">
+              <h4>Chats </h4>
+            </div>
+            <div class="srch_bar">
+              <div class="stylish-input-group">
+                <input type="text" class="search-bar" placeholder="Search" [(ngModel)]="searchText">
+                <span class="input-group-addon">
+                  <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                </span>
+                <button type="button" (click)="this.refresh()" style="margin-left: 10px;margin-right: -20px;"> <i class="fa fa-refresh" aria-hidden="true"></i> </button>
+              </div>
+            </div>
+            <h5>Users :  <span class="badge badge-light" style="font-size: small;">{{sortData.length}}</span>
+                  Unread :  <span class="badge badge-light" style="font-size: small;">{{newMessage<0?"0":newMessage}}</span></h5>
+            <h5></h5>
+
+            <!-- <div> -->
+              <!-- <button type="button" class="btn btn-secondary p-0">
+                Count <span class="badge badge-light">{{sortData.length}}</span>
+                <span class="sr-only">unread messages</span>
+              </button> -->
+              <!-- <span class="badge badge-secondary">Count {{sortData.length}}</span> -->
+
+            <!-- </div> -->
+          </div>
+          <div *ngIf="sortData.length!==0" class="inbox_chat">
+            <div *ngFor="let chat of sortData | filter:searchText ; let i = index;"
+              (click)="setRow({index:i,chatId: chat.Id,userType:chat.userType,docId:chat.docId, name: chat.Name , ref: chat.ref, chatCountNo: chat.chatCount, grp: chat.groupParId,User_Type_Id:chat.User_Type_Id})"
+              [ngClass]="{'active_chat': selectedIndex === i}" class="chat_list">
+              <div class="chat_people">
+                <div class="chat_img"> <img src="assets/img/{{chat.userImg}}" alt="bb"> </div>
+                <div class="chat_ib">
+                  <h5>{{chat.Name}}
+                    <span class="chat_date badge badge-success" *ngIf="chat.chatCount !== '0'">{{chat.chatCount}}</span>
+                  </h5>
+                  <div>
+                  <span *ngIf="chat.chatGroupType!=='Driver'&&chat.chatGroupType!=='Parent'" class="time_date userTypecolor">{{chat.chatGroupType}} | Grade: {{chat.Grade}}
+                   </span>
+                   <span *ngIf="chat.chatGroupType==='Driver'||chat.chatGroupType ==='Parent'" class="time_date userTypecolor">{{chat.chatGroupType}}
+                  </span>
+                </div>
+                  <h5>
+                    <span class="chat_date">{{chat.chatDate | date}},{{chat.chatDate | date: 'shortTime'}}</span>
+                  </h5>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="chat_list">
+              <div class="chat_people">
+                <div class="no_chat_img" style="height: 45px;background-color: darkblue;">
+                   <span class="fa fa-plus" style="font-size:20px"></span>
+                  </div>
+              </div>
+            </div> -->
+
+          </div>
+          <div *ngIf="showNoChat" class="inbox_chat">
+            <div class="chat_list">
+              <div class="chat_people">
+                <div class="no_chat-img"> <img src="assets/img/bb-logo2.png" alt="bb"> </div>
+                <div class="chat_ib">
+                  <h6>Kindly Login to the Mobile App in order to generate a Chat List.
+                  </h6>
+                </div>
+              </div>
+            </div>
+            </div>
+            <!-- <div *ngIf="!showNoChat" class="inbox_chat">
+              <div class="chat_list">
+                <div class="chat_people">
+                  <div class="no_chat-img"> <img src="assets/img/bb-logo2.png" alt="bb"> </div>
+                  <div class="chat_ib">
+                    <h6>Chat List refreshing....
+                    </h6>
+                  </div>
+                </div>
+              </div>
+              </div> -->
+
+        </div>
+        <div class="mesgs" #scrollBottom>
+          <div class="msg_history" >
+            <div *ngFor="let m of userMessage;">
+              <div class="incoming_msg" *ngIf="m.currentUserId != userId.userId">
+                <!-- <div class="incoming_msg_img"> <img src="assets/img/bb-logo2.png" alt="bb">
+                </div> -->
+                <div class="received_msg">
+                  <div class="received_withd_msg">
+                    <h5 *ngIf="m.currentUserType!==undefined">{{m.currentUserType=='5'?"Admin":m.currentUserType=='1'?"Student":m.currentUserType=='2'?"Teacher":m.currentUserType=='3'?"Parent":""}}</h5>
+                    <h5 *ngIf="m.currentUserType===undefined">{{chatName}}</h5>
+                    <p>{{m.text}}</p>
+                    <span class="time_date">{{m.date | date: 'shortTime' }} | {{m.date | date: 'mediumDate' }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="outgoing_msg" *ngIf="m.currentUserId == userId.userId">
+                <div class="sent_msg">
+                  <h5 *ngIf="m.currentUserType!==undefined">{{m.currentUserType=='5'?"Admin":m.currentUserType=='1'?"Student":m.currentUserType=='2'?"Teacher":m.currentUserType=='3'?"Parent":""}}</h5>
+                  <h5 *ngIf="m.currentUserType===undefined">You</h5>
+                  <p>{{m.text}}</p>
+                  <span class="time_date">{{m.date | date: 'shortTime' }} | {{m.date | date: 'mediumDate' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="type_msg" *ngIf="show == true">
+            <form [formGroup]="messageForm" (ngSubmit)="onSubmit()">
+              <div class="input_msg_write">
+                <input formControlName="message" type="text" class="write_msg" placeholder="Type a message"
+                  [ngClass]="{ 'is-invalid': submitted && f.message.errors }" />
+                <button class="msg_send_btn"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+</div>
+<notifier-container></notifier-container>

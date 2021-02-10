@@ -35,8 +35,13 @@ export class SchoolsComponent implements OnInit {
   selectedZipCode = null;
   stateItems = [];
   zipCodeItem = [];
+  alphaSort:boolean=false;
   visibleClear:boolean = false;
-  constructor(
+  orderByd: string = 'schoolName';
+  reverse: boolean = false;
+  fromDate:any;
+  toDate:any;
+   constructor(
     private http: HttpClient,
     public dialog: MatDialog,
     private property: PropertyServiceService,
@@ -133,6 +138,26 @@ export class SchoolsComponent implements OnInit {
      }
 
   }
+
+  dateChanged(event){
+    if(event.target.id === "from" && event.target.value !== ""){
+      console.log("From",event.target.value)
+      this.fromDate = event.target.value+' 00:00:00'
+    }
+    else if(event.target.id === "from" && event.target.value === ""){
+      this.fromDate = "null"
+    }
+    else if(event.target.id === "to"&& event.target.value !== ""){
+      this.toDate = event.target.value+' 00:00:00'
+    }
+    else if(event.target.id === "to" && event.target.value === ""){
+      this.toDate = "null"
+    }
+    this.search();
+    console.log("from date", this.fromDate);
+    console.log("to date", this.toDate);
+  }
+
   setPage(eve){
     console.log("PageSizeCHange",eve)
   }
@@ -146,7 +171,7 @@ export class SchoolsComponent implements OnInit {
 // let formObj={
 //   pageno:pageNo
 // }
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .post(this.uri + "bully-buddy/school/get_all_school"+ "?pageno=" + pageNo, "")
         .subscribe((res: any) => {
@@ -161,7 +186,6 @@ export class SchoolsComponent implements OnInit {
             }else{
               this.showNoRecord = false;
             }
-
 
           } else {
             alert(res.message + " : " + res.result);
@@ -179,7 +203,7 @@ export class SchoolsComponent implements OnInit {
     let formObj = {
       id: this.userInfo.schoolid,
     };
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .post(this.uri + "bully-buddy/school/get_school_by_id", formObj)
         .subscribe((res: any) => {
@@ -193,7 +217,8 @@ export class SchoolsComponent implements OnInit {
               this.dataList = [];
               this.dataList.push(res.result);
               this.data = res.result;
-              this.totalRecords = res.result.length;
+              this.totalRecords = arrLen.length;
+              this.totalPages = arrLen.length;
               this.getAllState();
             } else {
               this.dataList = res.result;
@@ -217,10 +242,81 @@ export class SchoolsComponent implements OnInit {
     this.searchText = eve;
   }
 
+  search(){
+    return new Promise<void>((resolve, reject) => {
+      let from;
+      let to;
+      let search;
+      if(this.fromDate === undefined){
+        from="null"
+    }
+    else{
+      from = this.fromDate;
+    }
+      if(this.toDate === undefined){
+          to="null"
+      }
+      else{
+        to = this.toDate;
+      }
+      if(this.searchWord === undefined || this.searchWord === null|| this.searchWord === ""){
+        search = "null"
+      }
+      else{
+        search = this.searchWord
+      }
+      let formObj={
+        searchword:search,
+        from:from,
+        to:to
+      }
+      if(search==="null"&&from==="null"&&to==="null"){
+        this.getAllSchools();
+      }
+      else{
+      this.http
+        .post(
+          this.uri + "bully-buddy/school/search_school"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to +"&schoolId=" +this.userInfo.schoolid,"")
+        .subscribe((res: any) => {
+          if (res.status == "200") {
+            this.dataList = res.result;
+            // this.userData = res.result;
+            this.totalRecords = res.result.length
+
+            console.log("Report",res.result);
+           }
+           if(this.totalRecords === 0){
+            this.showNoRecord =true;
+          }
+          else{
+            this.showNoRecord = false
+          }
+
+          resolve();
+        });
+      }
+    });
+  }
+
 schoolSearch(eve){
   const arrLen: any = [];
-    let searchWord = eve;
     this.searchText = eve;
+    let searchWord = eve;
+    let to;
+    let from;
+
+    if(this.toDate === undefined){
+        to="null"
+    }
+    else{
+      to = this.toDate;
+    }
+    if(this.fromDate === undefined){
+      from="null"
+  }
+  else{
+    from = this.fromDate;
+  }
     //  console.log("searchWord",this.searchWord);
     if(this.searchWord === "" || this.searchWord === undefined){
       this.searchText = eve;
@@ -239,10 +335,7 @@ schoolSearch(eve){
       this.http
         .post(
           this.uri +
-            "bully-buddy/school/search_school" +
-            "?searchword=" +
-            searchWord,
-          ""
+            "bully-buddy/school/search_school" +"?searchword=" + searchWord+ "&from=" + from+ "&to=" + to+"&schoolId="+this.userInfo.schoolid,""
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -268,7 +361,7 @@ schoolSearch(eve){
    let formObj = {
       zipCode: "",
     };
-     return new Promise((resolve, reject) => {
+     return new Promise<void>((resolve, reject) => {
       this.http
         .post(
           this.uri +
@@ -309,7 +402,7 @@ schoolSearch(eve){
     // let formObj = {
     //   schoolId: this.userInfo.schoolid,
     // };
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .get(this.uri + "bully-buddy/state/get_all_state")
         .subscribe((res: any) => {
@@ -377,6 +470,7 @@ clearResult(){
         school_address: list.schoolAddress,
         school_state: list.stateId,
         zipCode: list.zipCode,
+        createdDateTime: list.createdDateTime
       },
     });
   }
@@ -386,7 +480,7 @@ clearResult(){
       width: "20%",
       data: {
         title: "Delete School",
-        message: "Are you want to delete this school!",
+        message: "Are you want to delete this school?",
       },
     });
     confirmResult.afterClosed().subscribe((result: boolean) => {
@@ -423,8 +517,27 @@ clearResult(){
     });
   }
   excelDownload() {
-    let url = "http://3.128.136.18:5001/api/excel/download_school";
-    this.http.get(url, { responseType: "blob" }).subscribe((data) => {
+    let from = "null";
+    let to = "null";
+    let state = "null";
+    let stateList:any;
+    stateList= localStorage.getItem("States")
+    // if(this.fromDate !== undefined && this.fromDate !== null){
+    //   from = this.fromDate
+    // }
+    // if(this.toDate !== undefined && this.toDate !== null){
+    //   to = this.toDate
+    // }
+    // console.log("STATELI",stateList)
+    if(this.selectedState !== null&& this.selectedState !==""){
+      for(let i=0;i<this.stateItems.length;i++){
+        if(this.stateItems[i].statename == this.selectedState){
+          state = this.stateItems[i].id;
+          state = state.toString();
+        }
+      }console.log("STATEID",state)
+    const url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download_school" + "?from=" + from+ "&to=" + to+"&stateId=" + state;
+    this.http.post(url,"", { responseType: "blob" }).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
@@ -435,6 +548,14 @@ clearResult(){
       saveAs(file);
     });
   }
+  else{
+    this.alertDialog.open(SuccessComponent, {
+      width: "30%",
+      data: { value: "Please Select a state to Export Excel!", type: false },
+    });
+  }
+  }
+
   order() {
     if (!this.orderFlag) {
       this.dataList.sort((a, b) => {
@@ -447,7 +568,13 @@ clearResult(){
     }
     this.orderFlag = !this.orderFlag;
   }
-
+  setOrder(value: string) {
+    if (this.orderByd === value) {
+      this.reverse = !this.reverse;
+    }
+    this.alphaSort = !this.alphaSort;
+    this.orderByd = value;
+  }
   doLogOut() {
     localStorage.removeItem("SuperAdmin");
     localStorage.removeItem("UserInfo");

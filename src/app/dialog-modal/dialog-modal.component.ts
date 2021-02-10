@@ -12,14 +12,17 @@ import { SuccessComponent } from "../success/success.component";
 import { DeleteDialogComponent } from "../delete-dialog/delete-dialog.component";
 import { DatePipe } from "@angular/common";
 import * as XLSX from "xlsx";
-import { throwError } from "rxjs";
+import { of, throwError } from "rxjs";
+import { DriverProvider } from "protractor/built/driverProviders";
+import { _countGroupLabelsBeforeOption } from "@angular/material/core";
 // import { FileToUpload } from "./file-to-upload";
 // import { FileUploadService } from "./file-upload.service";
 // import { FileToUpload } from "./file-to-upload";
+// var parser = require('simple-excel-to-json')
 
 export interface DialogData {
   // imgPath: string;
-
+  defaultImage:string;
   title: string;
   fileName: string;
   divType: string;
@@ -30,13 +33,19 @@ export interface DialogData {
   school_id: any;
   admin_id: any;
   admin_school_id: any;
+  admin_statename:any;
+  admin_school_dist: any;
   admin_name: string;
+  admin_userid:any;
   admin_username: string;
   admin_email: string;
   admin_password: string;
+  admin_phone: string;
+  admin_ccUser: string;
   //User fields
   email: any;
   schoolId: any;
+  schoolId2:any;
   userSchoolName: any;
   userTypeId: any;
   name: any;
@@ -54,16 +63,18 @@ export interface DialogData {
   state: any;
   busRoute: any;
   password: any;
-
+  createdDateTime:any;
   isSocialUser: any;
   socialMediaId: any;
   fbCyber: any;
   instaCyber: any;
   snapShotCyber: any;
-
+  userid:any;
+  ccUser:any;
   //incident
   id: any;
   age: any;
+  studentage:any;
   userId: any;
   bullyName: any;
   incidentPlace: any;
@@ -83,11 +94,17 @@ export interface DialogData {
 
   //Report Form
   fileURL: any;
+  // defaultImage: any;
   latitude: any;
   langitude: any;
   type: any;
   // sub_ser_id: any;
 
+  //Bereavement
+  stateName:any;
+  story:any;
+  school:any;
+  schoolDistrict:any;
   //Excel Upload
 }
 
@@ -97,11 +114,15 @@ export interface DialogData {
   styleUrls: ["./dialog-modal.component.css"],
 })
 export class DialogModalComponent implements OnInit {
+  xlsToJson = [];
+  excelValidationErrors = [];
+  validationEmail:boolean= false;
   allSchoolList=[];
   schoolList = [];
   searchSchoolId:any;
   adminSchoolList = [];
   userTypeList = [];
+  userTypeList2 = [];
   busRouteList = [];
   stateId: any;
   stateList: any;
@@ -123,6 +144,7 @@ export class DialogModalComponent implements OnInit {
   selectedState: any;
   selectedSchool: any;
   selectedGenderValue: any;
+  selectedCountryCode: any;
   selectedBullyGender: any;
   selectedBullyClass: any;
   selectedBullyStatus: any;
@@ -134,19 +156,26 @@ export class DialogModalComponent implements OnInit {
   // adminSchoolId:any;
   teacherSchool:any;
   schoolId: any;
+  schoolId2:any;
   adminSchoolid=[];
   userInfo = JSON.parse(localStorage.getItem("UserInfo"));
   busRoute: any;
   parentId: any;
   fileUrl: any;
+  defaultImage: any;
   fileformat: any;
   zipCodesrch: any;
   userEditBusRoute: any;
   editUserZipCode: any;
-//variables for input validation
+  createdDate:any;
+  //variables for input validation
+  validAState="";
+  validccUser="";
   validEmail="";
   validPassword="";
   validUName="";
+  validUAge="";
+  validEditUAge="";
   validState="";
   validSchool=""
   validGender="";
@@ -155,7 +184,11 @@ export class DialogModalComponent implements OnInit {
   validPPhone1="";
   validAdminId="";
   validAName="";
+  validAUName="";
+  validAUId:any;
   validAPassword="";
+  validAPhone ="";
+  validccAdmin ="";
   validSName="";
   validSAddress="";
   validSState="";
@@ -163,10 +196,25 @@ export class DialogModalComponent implements OnInit {
   validTSchool="";
   validTUName="";
   validTGrade="";
+  validTPhone="";
+  validTGender="";
+  validTPassword="";
+  validTAge="";
+  validTEmail="";
   validBRoute="";
   validBDId="";
   validBDSchool="";
   dropSchoolName:any;
+  driverName:any;
+  uniqueDriver:any;
+  driverUniqueName2:[];
+  driverUniqueName:any;
+  editDriverDummy:any=[{"name":"Dummy Driver","id":0}];
+  showNoDriver:boolean= false;
+  driverId:any;
+  editDriverId:any;
+  bereavementId:any;
+  showLoading:boolean =false;
 //  config = {
 //             displayKey:"description", //if objects array passed which key to be displayed defaults to description
 //             search:true, //true/false for the search functionlity defaults to false,
@@ -189,7 +237,8 @@ export class DialogModalComponent implements OnInit {
     public dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private http: HttpClient,
-    private property: PropertyServiceService
+    private property: PropertyServiceService,
+
   ) {}
 
   editForm: FormGroup;
@@ -207,6 +256,7 @@ export class DialogModalComponent implements OnInit {
   editReportForm: FormGroup;
   excelUploadForm: FormGroup;
   ebbFileForm: FormGroup;
+  editBereavementForm: FormGroup;
   url = this.property.uri;
 
   ngOnInit() {
@@ -216,7 +266,7 @@ export class DialogModalComponent implements OnInit {
 
     this.stateList = localStorage.getItem("States");
     this.stateList = JSON.parse(this.stateList);
-      // console.log("AdminState",this.stateList);
+
     // let stateArray:any;
     // stateArray= localStorage.getItem("States");
     // stateArray = JSON.parse(stateArray);
@@ -243,16 +293,26 @@ export class DialogModalComponent implements OnInit {
     this.title = this.data.title;
     this.divType = this.data.divType;
     this.fileUrl = this.data.fileURL;
+    this.defaultImage = this.data.defaultImage;
     this.fileformat = this.data.type;
     this.fileName = this.data.fileName;
     this.adminSchoolId = this.data.admin_school_id;
+    this.createdDate = this.data.createdDateTime;
+    this.bereavementId = this.data.id;
+    this.editDriverId = this.data.id;
+    console.log("this.data",this.data.createdDateTime);
     console.log("TYPe",this.fileformat);
     console.log("ADMinID",this.adminSchoolId)
     if(this.adminSchoolId !== ""&& this.adminSchoolId !== undefined){
       this.getSchoolById(this.adminSchoolId);
     }
-    // console.log("adminSchoolId", this.adminSchoolId);
+    console.log("this.data.school",this.data.school);
     this.schoolId = this.data.school_id;
+    this.schoolId2 = parseInt(this.data.school_id);
+    console.log("SchoolId", this.schoolId);
+    if(this.schoolId !==""&&this.schoolId !==undefined){
+      this.getDriver(this.schoolId)
+    }
     this.teacherSchool=this.data.school_id;
     if(this.teacherSchool !==""&&this.teacherSchool !==undefined){
       this.getSchoolById(this.teacherSchool)
@@ -269,6 +329,7 @@ export class DialogModalComponent implements OnInit {
     this.userEditBusRoute = this.data.busRoute;
     this.editUserZipCode = this.data.zipCode;
     console.log("EDITSchool",this.data.schoolId);
+    console.log("editUserZipCode",this.editUserZipCode)
     // this.userIds = this.data.userTypeId;
     // console.log("userIds", this.userEditBusRoute);
     this.selectedBullyClass = this.data.isBullyClassmate;
@@ -277,6 +338,7 @@ export class DialogModalComponent implements OnInit {
     // Valid Form Fields
     this.validEmail = this.data.email;
     this.validUName = this.data.name;
+    this.validEditUAge = this.data.age;
     this.validSchool = this.data.schoolId;
     this.validState = this.data.state;
     this.validGrade = this.data.grade;
@@ -286,6 +348,9 @@ export class DialogModalComponent implements OnInit {
     this.validAdminId = this.data.admin_id;
     this.validAName = this.data.admin_username;
     this.validAPassword = this.data.admin_password;
+    this.validAPhone = this.data.admin_phone;
+    this.validAUName = this.data.admin_name;
+    this.validccAdmin = this.data.admin_ccUser;
     this.validTUName = this.data.teacher_name;
     this.validTSchool = this.data.school_id;
     this.validTGrade = this.data.grade;
@@ -296,19 +361,34 @@ export class DialogModalComponent implements OnInit {
     this.validBRoute = this.data.busRoute;
     this.validBDId = this.data.driver_id;
     this.validBDSchool = this.data.school_id;
+    this.validccUser = this.data.ccUser;
+    this.validAUId = this.data.admin_userid;
     // end ///
-
+    console.log("this.validAPhone",this.validAPhone);
+    console.log("this.validccUser",this.validccUser);
     this.selectedValue = this.data.school_state;
     this.selectedState = this.data.state;
     this.selectedGenderValue = this.data.gender;
     this.repAddress = this.data.address;
+    this.validState = this.userInfo.stateName;
+    if(this.selectedState === null||this.selectedState===undefined)
+    {this.selectedState = this.userInfo.stateName;}
     console.log("selectedValue", this.selectedState);
     if (this.userInfo.schoolid === 0) {
       this.isSuperAdmin = true;
+      this.validAState = this.data.admin_statename;
+      this.validState = this.userInfo.stateName;
       // console.log("SDF", this.isSuperAdmin);
     }else{
+      this.schoolId = this.userInfo.schoolid;
       this.isSuperAdmin = false;
       this.getSchoolById(this.userInfo.schoolid)
+      this.validAState = this.userInfo.stateName;
+      // this.selectedState = this.userInfo.stateName;
+      // this.getSchoolByStateZip();
+
+      console.log("this.validAState",this.validAState);
+      console.log("this.userInfo.stateName", this.userInfo.stateName);
     }
 
     if (
@@ -340,18 +420,21 @@ export class DialogModalComponent implements OnInit {
     // this.ebbFileForm = this.formBuilder.group({});
     this.adminSaveForm = this.formBuilder.group({
       admin_school_id: [],
+      admin_school_dist: [],
       admin_name: [""],
       admin_username: [],
       admin_email: [],
       admin_password: [],
-      admin_zipCode:[]
+      admin_zipCode:[],
+      admin_phone:[]
     });
 
     this.adminEditForm = this.formBuilder.group({
       admin_school_id: [this.data.admin_school_id],
-      // admin_name: [""],
+      admin_school_dist: [this.data.admin_school_dist],
+      admin_phone:[this.data.admin_phone],
+      admin_name: [this.data.admin_name],
       admin_username: [this.data.admin_username],
-      // admin_email: [],
       admin_password: [this.data.admin_password],
       admin_id: [this.data.admin_id],
       admin_zipCode:[]
@@ -362,6 +445,7 @@ export class DialogModalComponent implements OnInit {
       schoolId: [],
       userTypeId: [],
       name: [],
+      age:[],
       userPhone: [],
       parentId: [],
       password: [],
@@ -385,11 +469,13 @@ export class DialogModalComponent implements OnInit {
     });
 
     this.editUserForm = this.formBuilder.group({
-      id: [this.data.id],
+
+      id: [this.data.userid],
       email: [this.data.email],
       schoolId: [this.data.schoolId],
       userTypeId: [this.data.userTypeId],
       name: [this.data.name],
+      age:[this.data.age],
       userPhone: [this.data.userPhone],
       parentId: [this.data.parentId],
       grade: [this.data.grade],
@@ -403,6 +489,7 @@ export class DialogModalComponent implements OnInit {
       city: [this.data.city],
       // state: [this.data.state],
       busRoute: [this.data.busRoute],
+      // createdDateTime:[this.data.createdDateTime]
     });
     this.editIncident = this.formBuilder.group({
       id: [this.data.id],
@@ -424,6 +511,11 @@ export class DialogModalComponent implements OnInit {
     });
     this.saveTeacherForm = this.formBuilder.group({
       teacher_name: [],
+      teacher_email:[],
+      teacher_password:[],
+      teacher_age:[],
+      teacher_Phone:[],
+      teacher_gender:[],
       school_id: [],
       grade: [],
       teacher_zipCode:[]
@@ -438,6 +530,12 @@ export class DialogModalComponent implements OnInit {
       teacher_name: [this.data.teacher_name],
       school_id: [this.data.school_id],
       grade: [this.data.grade],
+      teacher_email:[],
+      teacher_password:[],
+      teacher_age:[],
+      teacher_Phone:[],
+      teacher_gender:[],
+      teacher_zipCode:[]
     });
 
     this.saveBusRouteForm = this.formBuilder.group({
@@ -471,6 +569,16 @@ export class DialogModalComponent implements OnInit {
       latitude: [this.data.latitude],
       langitude: [this.data.langitude],
     });
+    this.editBereavementForm = this.formBuilder.group({
+      name: [this.data.name],
+      school_address: [this.data.address],
+      school: [this.data.school],
+      school_id: [this.data.id],
+      school_state: [this.data.school_state],
+      story: [this.data.story],
+      district:[this.data.schoolDistrict],
+      // createdDateTime: list.createdDateTime
+    })
   }
 
   close() {
@@ -482,15 +590,61 @@ export class DialogModalComponent implements OnInit {
   stateDropDown(eve) {
     this.stateId = eve;
   }
-
+  driverDropDown(eve){
+    this.driverId = eve
+  }
   userSchoolDropDown(eve) {
     this.schoolId = eve;
     this.editSchoolId = this.schoolId;
     this.validBDSchool = eve;
     this.validTSchool = eve;
     console.log("SelectSchool", this.schoolId);
+    this.getDriver(this.schoolId)
+    this.getAllBusRoute()
   }
 
+
+
+getDriver(eve){
+  let formObj;
+  if(eve !== undefined && eve !== null){
+    formObj = {
+      schoolId:eve
+    };
+  }
+  else{
+    formObj = {
+      schoolId:this.schoolId
+    };
+  }
+  if(this.schoolId !== null&&this.schoolId!==""){
+    this.http
+    .post(this.url + "bully-buddy/busroute/get_all_drivers_by_school_id", formObj)
+    .subscribe((res: any) => {
+      if (res.status == "200") {
+        console.log("DRivers",res)
+        this.driverName=res.result;
+        this.getAllBusRoute();
+        // for(let i=0;i<this.uniqueDriver.length;i++){
+        //   for(let j=0;j<this.driverName.length;j++){
+        //     if(this.uniqueDriver[i].name===this.driverName[i].name){
+        //       console.log("Unique List",this.driverName[i]);
+        //     }
+        //   }
+        // }
+        if(res.result.length === 1){
+          this.driverId = res.result[0].id;
+        }
+      }else{
+
+      }
+      console.log("DriverId",this.driverId);
+    },error => {
+      console.log('oops', error)
+    });
+  }
+
+}
   saveSchool() {
     let school_name = this.saveForm.get("school_name").value;
     let school_address = this.saveForm.get("school_address").value;
@@ -518,6 +672,8 @@ export class DialogModalComponent implements OnInit {
             data: { value: "School Adding Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
   }
@@ -548,20 +704,31 @@ export class DialogModalComponent implements OnInit {
             data: { value: "School Update Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
   }
 
   saveAdmin() {
+    this.validccUser = this.selectedCountryCode;
     let school_id = this.adminSaveForm.get("admin_school_id").value;
     let admin_username = this.adminSaveForm.get("admin_username").value;
     let admin_password = this.adminSaveForm.get("admin_password").value;
+    let userPhone = this.adminSaveForm.get("admin_phone").value;
+    let state = this.selectedState!==undefined?this.selectedState:this.userInfo.stateName;
+    console.log("this.validAPhone",this.validAPhone);
+
     let formObj = {
       schoolid: this.schoolId,
+      name: this.validAUName,
       username: admin_username,
       password: admin_password,
+      stateName:state,
+      ccUser: this.selectedCountryCode,
+      userPhone: userPhone,
     };
-    if (admin_username !== "" && admin_username !== undefined) {
+    if ((admin_username !== "" && admin_username !== undefined)&&(state != "" && state != undefined)) {
       this.http
         .post(this.url + "bully-buddy/admin/add_admin", formObj)
         .subscribe((res: any) => {
@@ -577,14 +744,19 @@ export class DialogModalComponent implements OnInit {
             data: { value: "Admin Adding Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
   }
-  editAdmin() {
+  editAdmin() {debugger;
     let school_id = this.adminEditForm.get("admin_school_id").value;
     let admin_username = this.adminEditForm.get("admin_username").value;
     let admin_password = this.adminEditForm.get("admin_password").value;
-
+    let stateName = this.selectedState === undefined?this.validAState:this.selectedState;
+    let userPhone = this.adminEditForm.get("admin_phone").value;
+    console.log("this.validAPhone",this.validAPhone);
+    console.log("this.selectedState",stateName)
     if (
       this.schoolId === "" ||
       this.schoolId === null ||
@@ -595,10 +767,15 @@ export class DialogModalComponent implements OnInit {
     let formData = {
       id: this.data.admin_id,
       schoolid: this.schoolId,
+      userId: this.validAUId,
+      name: this.validAUName,
       username: admin_username,
       password: admin_password,
+      stateName: stateName,
+      userPhone: userPhone,
+      ccUser: this.validccAdmin
     };
-    if (admin_username != "" && admin_username != undefined) {
+    if((admin_username != "" && admin_username != undefined)&&(stateName != "" && stateName != undefined)&&(this.validccAdmin != "" && this.validccAdmin != undefined)) {
       this.http
         .post(this.url + "bully-buddy/admin/update_admin", formData)
         .subscribe((res: any) => {
@@ -614,6 +791,8 @@ export class DialogModalComponent implements OnInit {
             data: { value: "Admin Update Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
   }
@@ -622,6 +801,10 @@ export class DialogModalComponent implements OnInit {
   }
   selectGender(eve) {
     this.selectedGenderValue = eve;
+  }
+  selectCountryCode(eve){
+    this.selectedCountryCode = eve;
+    this.validccAdmin =eve;
   }
   busRouteDropDown(eve) {
     // console.log("BUS", eve);
@@ -644,6 +827,7 @@ export class DialogModalComponent implements OnInit {
     console.log("state", eve);
     // console.log("opt", opt);
     this.selectedState = eve;
+    this.validSState = eve;
     // &&(this.zipCodesrch !== undefined || this.zipCodesrch !== "")
     if (
       (this.selectedState !== undefined || this.selectedState !== "")
@@ -716,7 +900,7 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
       this.selectedState = this.data.state;
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .post(
           this.url +
@@ -729,7 +913,7 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
           if (res.status == "200") {
             this.schoolList = res.result;
             this.allSchoolList = res.result;
-            // console.log("SChpols", this.schoolList);
+            console.log("SChpols", this.schoolList);
             if (this.schoolList.length === 1) {
               this.editSchoolId = this.schoolList[0].id;
             }
@@ -737,6 +921,8 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
             alert(res.message + " : " + res.result);
           }
           resolve();
+        },error => {
+          console.log('oops', error)
         });
     });
   }
@@ -752,10 +938,11 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
       this.validUName = this.saveUserForm.get("name").value;
       this.validUPhone = this.saveUserForm.get("userPhone").value;
       this.validState = this.selectedState;
-
-
+      this.validccUser = this.selectedCountryCode;
+    let age = this.validUAge;
     let parentPhone1;
     let busRoute;
+    let ccUser = this.validccUser;
     let email = this.saveUserForm.get("email").value;
     let password = this.saveUserForm.get("password").value;
     let schoolId = this.schoolId;
@@ -782,7 +969,7 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
     let city = this.saveUserForm.get("city").value;
     // let state = this.saveUserForm.get("state").value;
     let state = this.selectedState;
-    if (this.userTypeId === 1 || this.userTypeId === 4) {
+    if (this.userTypeId === "1" ) {
       busRoute = this.busRoute;
     } else {
       busRoute = null;
@@ -799,6 +986,8 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
       schoolId: schoolId,
       userTypeId: userTypeId,
       name: name,
+      age: age,
+      ccUser:this.selectedCountryCode,
       userPhone: userPhone,
       parentId: null,
       grade: grade,
@@ -829,13 +1018,16 @@ console.log("schoolId",schoolId);
     if(gender==undefined){
         alert("Please Enter gender.");
     }
+    if(ccUser==undefined){
+      alert("Please Enter Country Code.");
+   }
    if(schoolId==null){
       alert("Please selecte State to add School in order to save.");
     }
 
     // End ///
 console.log("SaveUSer",formObj);
-    if ((name != "" && name != undefined)&&(gender=="M"||gender=="F")&&(schoolId!=null)) {
+    if ((name != "" && name != undefined)&&(gender=="M"||gender=="F")&&(schoolId!=null)&&(ccUser=="+1"||ccUser=="+91")) {
       this.http
         .post(this.url + "bully-buddy/user/add_user", formObj)
         .subscribe((res: any) => {
@@ -845,22 +1037,54 @@ console.log("SaveUSer",formObj);
             width: "30%",
             data: { value: "User Added Successfuly", type: true },
           });
-          }else{
+          }else if(res.status == "302"){
+            // this.close();
+            this.alertDialog.open(SuccessComponent, {
+            width: "30%",
+            data: { value: res.message, type: false },
+          });
+          }
+          else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "User Adding Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
   }
+
+  userEmailChange(eve){
+ let pattern=/^([_a-zA-Z0-9]+(\.[_a-zA-Z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,5}))|(\d+$)$/;
+//  var phoneValidation= /^([\s\(\)\-]*\d[\s\(\)\-]*){8}$/;
+//  var mailValidation= /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+ if(eve.match(pattern)){
+   this.validationEmail = false;
+   console.log("match")
+ }
+ else{
+  this.validationEmail = true;
+   console.log("not match")
+ }
+  }
+
+  editUSerAge(eve){
+    this.validEditUAge = eve;
+    console.log("Edit",this.validEditUAge)
+  }
   editUser() {
+    let validAge=true;
+    let ccUser;
+    let genderPass = true;
     // let school_name = this.saveForm.get("school_name").value;
     // let school_address = this.saveForm.get("school_address").value;
     let id = this.data.id;
     let email = this.editUserForm.get("email").value;
     // let password = this.editUserForm.get("password").value;
-
+    let age =this.editUserForm.get("age").value;
+    // let agee =this.validEditUAge;
     let schoolId = this.editSchoolId;
     let userTypeId = this.userTypeId;
     let name = this.editUserForm.get("name").value;
@@ -872,12 +1096,26 @@ console.log("SaveUSer",formObj);
     let driverPhone = this.editUserForm.get("driverPhone").value;
     let schoolPhone = this.editUserForm.get("schoolPhone").value;
     let gender =this.selectedGenderValue;
+    let countryCode = this.selectedCountryCode;
     let address = this.editUserForm.get("address").value;
     let zipCode = this.editUserForm.get("zipCode").value;
     let city = this.editUserForm.get("city").value;
     // let state = this.editUserForm.get("state").value;
     let busRoute = this.editUserForm.get("busRoute").value;
-
+    // console.log("AGE",agee)
+    // console.log("this.validUAge",this.validUAge)
+if(age === null||age=== undefined||age===""||age==="null"){
+  age = "0";
+  this.validEditUAge="0";
+}
+console.log("this.validUAge",this.validUAge)
+if(countryCode == null&&countryCode == undefined){
+  ccUser = this.validccUser;
+  countryCode = this.validccUser;
+}
+else{
+  ccUser = this.selectedCountryCode;
+}
     let formObj = {
       id: id,
       email: email,
@@ -885,6 +1123,8 @@ console.log("SaveUSer",formObj);
       schoolId: schoolId,
       userTypeId: userTypeId,
       name: name,
+      age:parseInt(age),
+      ccUser:ccUser,
       userPhone: userPhone,
       parentId: this.parentId,
       grade: grade,
@@ -899,15 +1139,33 @@ console.log("SaveUSer",formObj);
       state: this.selectedState,
       busRoute: this.busRoute,
     };
-    console.log("User", formObj);
+
     console.log("schoolId",schoolId);
+    console.log("deriverdriveer",this.driverDropDown);
+    // console.log("agee",agee);
     if(schoolId==null){
       alert("Please selecte State to add School in order to save.");
     }
-    if(gender==undefined){
+    if(this.userTypeId===1&&gender==undefined){
+      genderPass = false;
         alert("Please Enter gender.");
     }
-    if ((name != "" && name != undefined)&&(gender=="M"||gender=="F")&&(schoolId!=null)) {
+    if(countryCode==undefined&&this.validccUser==undefined){
+      alert("Please Enter Country Code.");
+  }
+    if(this.userTypeId===1&&(age===0||age==="0")){
+      validAge =false
+      alert("Please Enter age.");
+    }
+    // if(this.userTypeId===1&&age===0)
+    // {
+    //   validAge =true;
+    // }
+    // console.log("age",agee);
+    console.log("this.validUAge",this.validEditUAge)
+
+    if ((name != "" && name != undefined)&&(genderPass === true)&&(schoolId!=null)&&(validAge === true)&&(countryCode=="+1"||countryCode=="+91")) {
+      console.log("User", formObj);
       this.http
         .post(this.url + "bully-buddy/user/update_user", formObj)
         .subscribe((res: any) => {
@@ -923,6 +1181,8 @@ console.log("SaveUSer",formObj);
             data: { value: "User Update Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
   }
@@ -981,6 +1241,8 @@ console.log("SaveUSer",formObj);
           if (res.status == "200") {
             this.close();
           }
+        },error => {
+          console.log('oops', error)
         });
     }
   }
@@ -988,11 +1250,22 @@ console.log("SaveUSer",formObj);
     let teacher_name = this.saveTeacherForm.get("teacher_name").value;
     // let school_id = this.saveTeacherForm.get("school_id").value;
     let school_id = this.schoolId;
+    let email = this.saveTeacherForm.get("teacher_email").value;
+    let password = this.saveTeacherForm.get("teacher_password").value;
+    let age = this.saveTeacherForm.get("teacher_age").value;
+    let userPhone = this.saveTeacherForm.get("teacher_Phone").value;
     let grade = this.saveTeacherForm.get("grade").value;
+    let gender = this.selectedGenderValue;
     let formObj = {
-      teacherName: teacher_name,
+      email:email,
       schoolId: school_id,
+      name: teacher_name,
+      password:password,
+      age:age,
+      userPhone:userPhone,
+      gender:gender,
       grade: grade,
+
     };
     if ((teacher_name != "" && teacher_name != undefined) && (school_id != undefined && school_id != "" && school_id != null)) {
       this.http
@@ -1010,6 +1283,8 @@ console.log("SaveUSer",formObj);
             data: { value: "Teacher Adding Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
     else{
@@ -1022,10 +1297,21 @@ console.log("SaveUSer",formObj);
     // let school_id = this.editTeacherForm.get("school_id").value;
     let school_id = this.schoolId;
     let grade = this.editTeacherForm.get("grade").value;
+    let email = this.saveTeacherForm.get("teacher_email").value;
+    let password = this.saveTeacherForm.get("teacher_password").value;
+    let age = this.saveTeacherForm.get("teacher_age").value;
+    let userPhone = this.saveTeacherForm.get("teacher_Phone").value;
+
+    let gender = this.selectedGenderValue;
     let formObj = {
       id: this.data.id,
-      teacherName: teacher_name,
+      name: teacher_name,
       schoolId: school_id,
+      email:email,
+      password:password,
+      age:age,
+      userPhone:userPhone,
+      gender:gender,
       grade: grade,
     };
     if ((teacher_name != "" && teacher_name != undefined )&& (school_id != undefined && school_id != "" && school_id != null)) {
@@ -1044,6 +1330,8 @@ console.log("SaveUSer",formObj);
             data: { value: "Teacher Update Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
     else{
@@ -1057,7 +1345,7 @@ console.log("SaveUSer",formObj);
     let driver_id = this.saveBusRouteForm.get("driver_id").value;
     let formObj = {
       busRoute: busRoute,
-      driverId: driver_id,
+      driverId: this.driverId,
       schoolId: school_id,
     };
     // if(this.schoolId != undefined || this.schoolId != ""){
@@ -1079,6 +1367,8 @@ console.log("SaveUSer",formObj);
             data: { value: "BusRoute Adding Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
     else{
@@ -1087,13 +1377,14 @@ console.log("SaveUSer",formObj);
   }
 
   editBusRoute() {
+    console.log("this.data.id",this.editDriverId);
     let busRoute = this.editBusRouteForm.get("busRoute").value;
     let school_id = this.schoolId;
     let driver_id = this.editBusRouteForm.get("driver_id").value;
     let formObj = {
-      id: this.data.id,
+      id: this.editDriverId,
       busRoute: busRoute,
-      driverId: driver_id,
+      driverId: parseInt(this.driverId),
       schoolId: school_id,
     };
     //  if(this.schoolId!== undefined || this.schoolId !== ""){
@@ -1105,16 +1396,20 @@ console.log("SaveUSer",formObj);
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
+            this.driverUniqueName = [];
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "BusRoute Updated Successfully", type: true },
           });
           }else{
+            this.driverUniqueName = [];
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "BusRoute Update Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
      else{
@@ -1156,8 +1451,40 @@ console.log("SaveUSer",formObj);
             data: { value: "Report Adding Failed", type: false },
           });
           }
+        },error => {
+          console.log('oops', error)
         });
     }
+  }
+
+  editBereavement(){
+    let schoolDistrict = this.editBereavementForm.get("district").value;
+    let formObj = {
+      id: this.data.id,
+      schoolDistrict:schoolDistrict
+    };
+    this.http
+        .post(
+          this.url + "bully-buddy/bereavement/update_bereavement",
+          formObj
+        )
+        .subscribe((res: any) => {
+          if (res.status == "200") {
+            this.close();
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: "School District Updated Sucessfully", type: true },
+            });
+          }else{
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: "School District Updated Failled", type: false },
+            });
+          }
+        },error => {
+          console.log('oops', error)
+        });
+
   }
 
   editReport() {
@@ -1187,36 +1514,387 @@ console.log("SaveUSer",formObj);
           if (res.status == "200") {
             this.close();
           }
+        },error => {
+          console.log('oops', error)
         });
     }
   }
 
   onFileChange(event: any) {
+
+    let pattern=/^([_a-zA-Z0-9]+(\.[_a-zA-Z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,5}))|(\d+$)$/;
+    let mobilePattern ="?[7-9][0-9]{9}";
+
+/// Convert Excel To Json Format......
     this.excel_file = event.target.files[0];
     console.log("Excel", this.excel_file);
+    let worksheet;
+    let workBook = null;
+    let jsonData = [];
+    let jsonData2 = [];
+    let prexlsToJson = [];
+    let prexlsToJson2 = [];
+    const reader = new FileReader();
+    const file =  event.target.files[0];
+    reader.onload = (event) => {
+      const data = reader.result;
+      this.excelValidationErrors = [];
+      workBook =null;
+      jsonData = [];
+      jsonData2 = [];
+      this.xlsToJson =[];
+      workBook = XLSX.read(data, { type: 'binary' });
+      // workBook.Strings.forEach((element,indx) => {
+      //   if(indx<=21)
+      //  { var str1 = new String(element.h);
+      //   var index = str1.indexOf( "(Mandatory)" );
+      //   var slicedStr = str1.slice(0,index)
+      //   console.log("in",slicedStr)
+      //   console.log("indexindex",index)
+      //   if((element.h.includes("(Mandatory)")||element.h.includes("(Mandatory for student and Teacher)")))
+      //   {
+      //     workBook.Strings[indx]= {"h": slicedStr,
+      //     "r": "<t>"+slicedStr+"</t>",
+      //     "t": slicedStr}
+      //   }}
+      // });
+
+  //     workBook.SheetNames.forEach((elem,ndx)=>{
+  //       var sheetname = elem;
+  //       workBook.Sheets.foreach((element11,index1) => {
+  //         console.log("SHEEEEE",element11)
+  //         element11[index1].forEach((element1,ind)=>{
+  //           element1.forEach((element,indx) => {
+  //             if(element !=="States"){
+  //               element.forEach((element2,idx) => {
+  //                 if(element2!=="!margins"&&element2!=="!!ref")
+  //              {
+  //             if(indx<=21)
+  //            { var str1 = new String(element.h);
+  //             var index = str1.indexOf( "(Mandatory)" );
+  //             var slicedStr = str1.slice(0,index)
+  //             console.log("in",slicedStr)
+  //             console.log("indexindex",index)
+  //             if((element2.h.includes("(Mandatory)")||element2.h.includes("(Mandatory for student and Teacher)")))
+  //             {
+  //               workBook.Sheets[indx]= {"h": slicedStr,
+  //               "r": "<t>"+slicedStr+"</t>",
+  //               "t": slicedStr}
+  //             }}}
+  //           });
+            
+  //         }
+  //       });
+  //         })
+          
+  // });
+  //     });
+
+var arrsheet =[];
+var prexlsToJson3 = [];
+
+//// To Replace the Header of the XLSX File before pushing in to the JSON.//////
+  jsonData2 = workBook.SheetNames.reduce((initial, name) => {
+    if(name !== "States"){
+      var sht =workBook.Sheets[name]
+      const sheet = workBook.Sheets[name];
+     
+      var range = XLSX.utils.decode_range(sheet['!ref']);
+    var C, R = range.s.r; /* start in the first row */
+    /* walk every column in the range */
+    for(C = range.s.c; C <= range.e.c; ++C) {
+        var cell = sheet[XLSX.utils.encode_cell({c:C, r:R})] /* find the cell in the first row */
+
+        var hdr = "UNKNOWN " + C; // <-- replace with your desired default 
+        if(cell && cell.t) hdr = XLSX.utils.format_cell(cell);
+        var str1 = new String(hdr);
+          var index = str1.indexOf( "(" );
+          var slicedStr = str1.slice(0,index)
+          console.log("in",slicedStr)
+          console.log("indexindex",index)
+          var str2 = new String(hdr);
+          // var index2 = str2.split(" ").join('');
+          var slicedStr2 = str2.slice(0,index);
+          slicedStr2 = slicedStr2.split(" ").join('');
+          console.log("slicedStr2",slicedStr2);
+          if((hdr.includes("(Mandatory)")||hdr.includes("(Mandatory_for_student_and_Teacher)")))
+          {
+            sheet[XLSX.utils.encode_cell({c:C, r:R})]= {"h": slicedStr2,
+            "r": "<t>"+slicedStr2+"</t>",
+            "t": "s",
+            "v": slicedStr2,
+            "w": slicedStr2}
+          }
+          else{
+            sheet[XLSX.utils.encode_cell({c:C, r:R})]= {"h": slicedStr2,
+            "r": "<t>"+slicedStr2+"</t>",
+            "t": "s",
+            "v": slicedStr2,
+            "w": slicedStr2}
+          }
+         
+        // headers.push(hdr);
+    }
+     
+     }
+     return initial;
+     }, {});
+
+
+
+      jsonData = workBook.SheetNames.reduce((initial, name) => {
+      if(name !== "States"){
+        const sheet = workBook.Sheets[name];
+        // console.log("SHEETS",name)
+       prexlsToJson.push(initial[name] = XLSX.utils.sheet_to_json(sheet));
+       }
+       return initial;
+       }, {});
+
+      /// Removing the First Row From the Each Sheet
+      let SheetName= "";
+      prexlsToJson.map((item,index)=>{
+        SheetName = "Sheet"+(index+1);
+        item.map((item2,index2)=>{
+        if(index2 !== 0){
+          var values = item2;
+          // var tempName = "email(Mandatory)"
+          // console.log("values",values.email_Mandatory)
+          // if(values.email(Mandatory))
+          // var val
+
+         this.xlsToJson.push(item2)
+
+        }
+        })
+      })
+      /// end here ///
+
+      // xlsToJson = xlsToJson[0].splice(0)
+
+      // Replacing UserTypeId from String to Int
+      this.xlsToJson.map((item2,index2)=>{
+      
+        // replace Json Key Names
+          item2.email = item2.Email;
+          delete item2.Email;
+          item2.age = item2.Age;
+          delete item2.Age;
+          item2.ccUser = item2.CountryCode;
+          delete item2.CountryCode;
+          item2.gender = item2.Gender;
+          delete item2.Gender;
+          item2.grade = item2.Grade;
+          delete item2.Grade;
+          item2.name = item2.Name;
+          delete item2.Name;
+          item2.parentPhone1 = item2.ParentPhone1;
+          delete item2.ParentPhone1;
+          item2.password = item2.Password;
+          delete item2.Password;
+          item2.schoolId = item2.SchoolId;
+          delete item2.SchoolId;
+          item2.state = item2.State;
+          delete item2.State;
+          item2.userPhone = item2.UserPhone;
+          delete item2.UserPhone;
+          item2.userTypeId = item2.UserType;
+          delete item2.UserType;
+          if(item2.ParentPhone2)
+          {
+            item2.parentPhone2 = item2.ParentPhone2;
+            delete item2.ParentPhone2;
+          }
+          if(item2.DriverPhone){
+            item2.driverPhone = item2.DriverPhone;
+            delete item2.DriverPhone; 
+          }
+          if(item2.SchoolPhone){
+            item2.schoolPhone = item2.SchoolPhone;
+            delete item2.SchoolPhone;
+          }
+          if(item2.Address){
+            item2.address = item2.Address;
+            delete item2.Address;
+          }
+          if(item2.ZipCode){
+            item2.zipCode = item2.ZipCode;
+            delete item2.ZipCode;
+          }
+          if(item2.City){
+            item2.city = item2.City;
+            delete item2.City;
+          }
+          if(item2.BusRoute){
+            item2.busRoute = item2.BusRoute;
+            delete item2.BusRoute;
+          }
+          if(item2.ProfileImage){
+            item2.profileImage = item2.ProfileImage;
+            delete item2.ProfileImage;
+          }
+          if(item2.SocialUser){
+            item2.isSocialUser = item2.SocialUser;
+            delete item2.SocialUser;
+          }
+        // };
+
+        if(item2.ccUser === 1){
+          item2.ccUser = "+1"
+        }
+        if(item2.isSocialUser === "Yes"){
+          item2.isSocialUser = 1;
+        }
+        else{
+          item2.isSocialUser = 0;
+        }
+        if(item2.ccUser === 91){
+          item2.ccUser = "+91"
+        }
+        if(item2.userTypeId === "Student"){
+          item2.userTypeId = 1;
+        }
+        else if(item2.userTypeId === "Teacher"){
+          item2.userTypeId = 2;
+        }
+        else if(item2.userTypeId === "BusDriver"){
+          item2.userTypeId = 4;
+        }
+        else{
+          item2.userTypeId = 5;
+        }
+
+      });
+      /// end here ///
+
+      console.log("xlsToJson",this.xlsToJson);
+      console.log("prexlsToJson",prexlsToJson);
+     
+      /// Validation of the Columns
+     
+      if(prexlsToJson[0].length <= 1){
+        this.excelValidationErrors.push("Sheet is Empty" );
+      }
+      prexlsToJson.map((item,index)=>{
+        // console.log("item",item);
+          item.map((item2,index2)=>{
+            if(index2+2 !== 2){
+            if(!item2.email){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Email is missing");
+            }
+            // if(item2.email !== pattern.){
+            //   this.excelValidationErrors.push("Row "+ (index2+2) +" Enter a Valid Email");
+            // }
+            if(!item2.password){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Password is missing");
+            }
+            if(!item2.schoolId){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" schoolId is missing");
+            }
+            if(item2.schoolId&&(this.userInfo.schoolid !== item2.schoolId)){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Enter Valid schoolId");
+            }
+            if(!item2.userTypeId){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" userTypeId is missing");
+            }
+            if(!item2.name){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Name is missing");
+            }
+            if(!item2.gender){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Gender is missing");
+            }
+            if(!item2.userPhone){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" User PhoneNo is missing");
+            }
+            if(!item2.state){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" state is missing");
+            }
+            if(item2.state&&(this.userInfo.stateName !== item2.state)){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Enter Valid state");
+            }
+            if(!item2.ccUser){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Country Code is missing");
+            }
+            console.log("item2.ccUseritem2.ccUser",item2.ccUser)
+            if(item2.ccUser&&(item2.ccUser !=="+1"&&item2.ccUser !=="+91")){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Enter Valid Country Code");
+            }
+            // if(item2.userPhone.matches(mobilePattern)){
+            //   this.excelValidationErrors.push("Row "+ (index2+2) +" Enter Valid User PhoneNO");
+            // }
+            if(item2.userTypeId === 1){
+              // item2.userTypeId = 1;
+              if(!item2.age){
+                this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" AGE is missing");
+              }
+              if(!item2.parentPhone1){
+                this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Parent PhoneNo is missing");
+              }
+              if(!item2.grade){
+                this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Grade is missing");
+              }
+              // if(item2.parentPhone1 < 0){
+              //   this.excelValidationErrors.push("Row "+ (index2+2) +" Enter Valid Parent PhoneNO");
+              // }
+            }
+            if(item2.userTypeId === 2){
+              // item2.userTypeId = 2;
+              if(!item2.grade){
+                this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Grade is missing");
+              }
+            }
+            // else if(item2.userTypeId === "Bus Driver"){
+            //   item2.userTypeId = 4;
+            // }
+            // else{
+            //   item2.userTypeId = 5;
+            // }
+            }
+          })
+      })
+      /// End ///
+      
+      const dataString = JSON.stringify(jsonData);
+     
+    }
+    reader.readAsBinaryString(file);
+    event.srcElement.value = null;
   }
+
   saveExcel() {
+    // this.showLoading = true;
+    let url;
     let formObj: FormData = new FormData();
     formObj.set("file", this.excel_file);
     formObj.set("filename", this.data.fileName);
-    formObj.set("adminid", this.userInfo.schoolid);
+    formObj.set("adminid", this.userInfo.id);
     let message = "Uploaded the file successfully: " + this.excel_file.name;
     // console.log("Name", message);
-    let url = "http://3.128.136.18:5001/api/excel/upload_excel";
-    console.log("ExcelUpload", formObj);
+    if(this.title === "Upload BusRoute Excel"|| this.title === "Upload School Excel")
+   {
+    // console.log("ExcelUpload", formObj);
+    this.excelValidationErrors = [];
+     url = this.url+"api/excel/upload_excel";
+
+    if(this.excelValidationErrors.length === 0){
+      this.showLoading = true;
     this.http.post(url, formObj).subscribe(
       (res: any) => {
         console.log("RESS", res);
+        // this.showLoading = true;
         if (res.message == message) {
+          this.showLoading = false;
           this.close();
           this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "Excel Uploaded", type: true },
           });
         }
+
       },
       (error) => {
         console.log("ERR", error);
+        this.showLoading = false;
         // if (error instanceof HttpErroResponse) {
         this.alertDialog.open(SuccessComponent, {
           width: "30%",
@@ -1225,6 +1903,55 @@ console.log("SaveUSer",formObj);
         // }
       }
     );
+    }
+    }
+    if(this.title === "Upload User Excel")
+    {
+      url = this.url+"bully-buddy/user/upload_excel";
+      console.log("UserExcelUpload", this.xlsToJson);
+      if(this.excelValidationErrors.length === 0){
+        this.showLoading = true;
+        this.http.post(url, this.xlsToJson).subscribe(
+          (res: any) => {
+            console.log("RESS", res);
+            // this.showLoading = true;
+            if (res.message == "File Uploaded Successfully") {
+              this.showLoading = false;
+              this.close();
+              this.alertDialog.open(SuccessComponent, {
+                width: "30%",
+                data: { value: "Excel Uploaded", type: true },
+              });
+            }
+            if(res.status === 302){
+              this.showLoading = false;
+              this.alertDialog.open(SuccessComponent, {
+                width: "30%",
+                data: { value:res.message, type: false },
+              });
+            }
+            if(res.status === 400){
+              this.showLoading = false;
+              this.alertDialog.open(SuccessComponent, {
+                width: "30%",
+                data: { value:res.message, type: false },
+              });
+            }
+          },
+          (error) => {
+            console.log("ERR", error);
+            this.showLoading = false;
+            // if (error instanceof HttpErroResponse) {
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: error.error.message, type: false },
+            });
+            // }
+          }
+        );
+        }
+     }
+
   }
 
   getAllSchools() {
@@ -1233,7 +1960,7 @@ console.log("SaveUSer",formObj);
     console.log("ALLSCHOOLLIST",this.allSchoolList.length)
     if(this.allSchoolList.length===0){
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .post(this.url + "bully-buddy/school/get_all_school", "")
         .subscribe((res: any) => {
@@ -1263,6 +1990,8 @@ console.log("SaveUSer",formObj);
             alert(res.message + " : " + res.result);
           }
           resolve();
+        },error => {
+          console.log('oops', error)
         });
     });
   }
@@ -1273,7 +2002,7 @@ console.log("SaveUSer",formObj);
     // };
     let length;
     let userType;
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .get(this.url + "bully-buddy/usertype/get_all_usertype")
         .subscribe((res: any) => {
@@ -1281,25 +2010,31 @@ console.log("SaveUSer",formObj);
             length = res.result.length;
             userType = res.result;
             this.userTypeList = res.result;
-            // for (let i = 0; i < length; i++) {
-            //   if (userType[i].id !== 5) {
+            for (let i = 0; i < length; i++) {
+            //   if (res.result[i].id !== 3) {
             // this.userTypeList.push(userType[i]);
             //   }
-            // }
+              if (res.result[i].id !== 3 && res.result[i].id !== 5) {
+                this.userTypeList2.push(userType[i]);
+                  }
+            }
             console.log("USER", this.userTypeList);
           } else {
             alert(res.message + " : " + res.result);
           }
           resolve();
+        },error => {
+          console.log('oops', error)
         });
     });
   }
 
-  getAllBusRoute() {
+  getAllBusRoute() {debugger;
     let formObj = {
       schoolId: this.userInfo.schoolid,
     };
-    return new Promise((resolve, reject) => {
+    if(this.schoolId!==null&&this.schoolId!=="null")
+  {  return new Promise<void>((resolve, reject) => {
       this.http
         .post(this.url + "bully-buddy/busroute/get_all_busroute", formObj)
         .subscribe((res: any) => {
@@ -1307,11 +2042,89 @@ console.log("SaveUSer",formObj);
             this.busRouteList = res.result;
             // this.data = res.result;
             // this.totalRecords = res.result.length;
-            console.log("BUS", this.busRouteList);
+            console.log("BUS1", this.busRouteList);
+            // this.data = res.result;
+
+            // this.UniqueName = this.busRouteList.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
+            this.uniqueDriver = this.driverName.filter(({name:id1}) => !this.busRouteList.some(({name:id2 }) => id2 === id1))
+            console.log("this.uniqueDriver",this.uniqueDriver);
+            this.driverUniqueName = this.uniqueDriver;
+            console.log("this.driverUniqueName",this.driverUniqueName);
+            if(this.driverUniqueName.length === 0){
+
+              this.showNoDriver = true;
+            }
+            else{
+              this.showNoDriver = false;
+            }
+            if(this.driverUniqueName.length === 0){
+
+              // debugger;
+              this.busRouteList.map((item)=>{
+                if((item.driverId === this.validBDId)&&(item.driverId !== this.editDriverDummy.id))
+                {
+                  this.editDriverDummy.push({"name":item.name,"id":item.driverId});
+                }
+              });
+              this.editDriverDummy = this.editDriverDummy.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
+              // console.log("selffilter",selffilter);
+              console.log("Dummy",this.editDriverDummy);
+            }
+            else{
+              this.driverUniqueName.map((item)=>{
+                console.log("Dummyyyyy",this.editDriverDummy);
+                this.editDriverDummy.push({"name":item.name,"id":item.id});
+              });
+              this.busRouteList.map((item)=>{
+                if((item.driverId === this.validBDId) &&(item.driverId !== this.editDriverDummy.id))
+                {
+                  this.editDriverDummy.push({"name":item.name,"id":item.driverId});
+                }
+              });
+              this.editDriverDummy = this.editDriverDummy.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
+            }
+
           } else {
             alert(res.message + " : " + res.result);
           }
           resolve();
+        },error => {
+          console.log('oops', error)
+        });
+    });
+  }
+  }
+  getBusRouteById() {
+    let arrLen: any = [];
+    let formObj = {
+      id: this.schoolId,
+    };
+    return new Promise<void>((resolve, reject) => {
+      this.http
+        .post(this.url + "bully-buddy/busroute/get_busroute_by_id", formObj)
+        .subscribe((res: any) => {
+          if (res.status == "200") {
+            // this.dataList.push(res.result);
+            // this.dataList.push(this.dataList);
+            arrLen.push(res.result);
+            // console.log("RESsss", arrLen);
+            if (arrLen.length === 1) {
+              // this.dataList = [];
+              // this.dataList.push(res.result);
+              this.data = res.result;
+              // this.totalRecords = res.result.length;
+            } else {
+              // this.dataList = res.result;
+              this.data = res.result;
+              // this.totalRecords = res.result.length;
+            }
+            console.log("DATALIST", this.data);
+          } else {
+            alert(res.message + " : " + res.result);
+          }
+          resolve();
+        },error => {
+          console.log('oops', error)
         });
     });
   }
@@ -1348,7 +2161,7 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null||this.zipCodesrch==="")
       zipCode: this.zipCodesrch,
       schoolName: school.term
     };
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .post(
           this.url +
@@ -1367,6 +2180,8 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null||this.zipCodesrch==="")
             alert(res.message + " : " + res.result);
           }
           resolve();
+        },error => {
+          console.log('oops', error)
         });
     });
   }
@@ -1377,7 +2192,7 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null||this.zipCodesrch==="")
       id: school,
     };
     if(school !== ""||school!==0||school!==undefined){
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .post(this.url + "bully-buddy/school/get_school_by_id", formObj)
         .subscribe((res: any) => {
@@ -1391,12 +2206,22 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null||this.zipCodesrch==="")
               this.dropSchoolName= this.allSchoolList[0].schoolName
               if(this.userInfo.schoolid !== 0){
               this.schoolId = this.allSchoolList[0].id;
+              if(this.dropSchoolName === "Others"){
+                this.schoolId = 0;
+                this.editSchoolId = 0;
+              }
             }
-            // console.log("DATALIST", this.dataList);
+            if(this.dropSchoolName === "Others"){
+              this.schoolId = 0;
+              this.editSchoolId = 0;
+            }
+            console.log("dropSchoolName", this.allSchoolList);
           } else {
             alert(res.message + " : " + res.result);
           }
           resolve();
+        },error => {
+          console.log('oops', error)
         });
     });
   }

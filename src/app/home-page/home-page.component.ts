@@ -8,7 +8,8 @@ import { DeleteDialogComponent } from "../delete-dialog/delete-dialog.component"
 import { PropertyServiceService } from "../property-service.service";
 import { Router } from "@angular/router";
 import { SuccessComponent } from '../success/success.component';
-
+import * as moment from 'moment';
+import {IMyDpOptions} from 'mydatepicker';
 @Component({
   selector: "app-home-page",
   templateUrl: "./home-page.component.html",
@@ -19,11 +20,33 @@ export class HomePageComponent implements OnInit {
   data: Array<any>;
   totalRecords: Number;
   page: Number = 1;
-
+  totalUserRecords: Number;
+  itemPerPage = 50;
+  orderByd: string = 'schoolName';
+  reverse: boolean = false;
   //Search
   searchText: any;
+  fromDate:any;
+  toDate:any;
+  totalPages:any;
+  grade:any;
+  public myDatePickerOptions: IMyDpOptions = {
+    // other options...
+    dateFormat: 'mm.dd.yyyy',
+    width:'11%',
+    height:'21px',
+    inline:false,
 
 
+};
+public myDatePickerOptions2: IMyDpOptions = {
+  // other options...
+  dateFormat: 'mm.dd.yyyy',
+  width:'11%',
+  height:'21px',
+  inline:false,
+
+};
   constructor(
     private http: HttpClient,
     public dialog: MatDialog,
@@ -35,22 +58,25 @@ export class HomePageComponent implements OnInit {
   ) {
     this.data = new Array<any>();
     dialog.afterAllClosed.subscribe(() => {
-      // if (this.userInfo.schoolid === 0) {
+
       if (this.getCookies !== "login") {
         // alert("HIT");
         localStorage.removeItem("userInfo");
         // this.router.navigateByUrl("/login");
         // window.location.href = "/login";
-        window.location.href="http://3.128.136.18/admin/#/login";
+        window.location.href="https://bullyingbuddyapp.com/admin/#/login";
       }
       // else {
       this.getAllTeacher();
       // }
-
+      if (this.userInfo.schoolid === 0) {
+            this.showSuperAdmin = true;
+      }
       // } else {
       //   this.getTeacherById();
       // }
     });
+
   }
   userInfo = JSON.parse(localStorage.getItem("UserInfo"));
 getCookies: string = this.cookieService.get("LoginStatus");
@@ -58,6 +84,7 @@ getCookies: string = this.cookieService.get("LoginStatus");
   // uri: string = "https://54.215.34.67:5001/bully-buddy/school/get_all_school";
   uri = this.property.uri;
   dataList: any = [];
+  alphaSort:boolean=false;
   showNoRecord: boolean = false;
   showSuperAdmin: boolean = false;
   orderFlag: boolean = false;
@@ -72,26 +99,110 @@ getCookies: string = this.cookieService.get("LoginStatus");
       // alert("HIT");
       localStorage.removeItem("userInfo");
       // this.router.navigateByUrl("/login");
-      window.location.href="http://3.128.136.18/admin/#/login";
+      window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.userInfo === null || this.userInfo === undefined) {
       alert("You Have been LogOut, Kindly LogIn to Continue!");
       // this.router.navigateByUrl("/login");
-      window.location.href="http://3.128.136.18/admin/#/login";
+      window.location.href="https://bullyingbuddyapp.com/admin/#/login";
+    }
+
+  }
+  pageChanged(event) {
+    // this.page = event;
+    console.log("pagination", event);
+     if(event!==""){
+        this.page = event;
+      if(event > this.totalPages){
+        this.page = 1
+      }
+    if((this.searchText === ""||this.searchText === undefined)&&(this.grade === ""||this.grade === undefined)&&(this.fromDate === ""||this.fromDate === undefined)){
+      this.getAllTeacher();
     }
   }
+  }
+  dateChanged(event,id){
+    console.log("FromDate",event.formatted)
+    let date =  moment(event.formatted).format("YYYY-MM-DD")
+    if(event.formatted !== undefined &&event.formatted !==""&&event.formatted !==" "){
+      this.fromDate= date+' 00:00:00';
+    }else{
+      this.fromDate ="null"
+    }
+
+    // console.log("date", date);
+    // console.log("id",);
+    // console.log("date", this.fromDate);
+    // if(event.target.id === "from" && event.target.value !== ""){
+    //   console.log("From",event.target.value)
+    //   this.fromDate = event.target.value+' 00:00:00'
+    //   this.fromDateBind = event.target.value;
+    // }
+    // else if(event.target.id === "from" && event.target.value === ""){
+    //   this.fromDate = "null"
+    // }
+    // else if(event.target.id === "to"&& event.target.value !== ""){
+    //   this.toDate = event.target.value+' 00:00:00'
+    //   this.toDateBind = event.target.value;
+    // }
+    // else if(event.target.id === "to" && event.target.value === ""){
+    //   this.toDate = "null"
+    // }
+
+    console.log("from date", this.fromDate);
+    console.log("to date", this.toDate);
+  }
+  dateChanged2(event,id){
+    console.log("ToDAte",event.formatted)
+    let date =  moment(event.formatted).format("YYYY-MM-DD")
+    if(event.formatted !== undefined && event.formatted !==""){
+      this.toDate = date+' 00:00:00';
+    }else{
+      this.toDate ="null"
+    }
+
+    // console.log("id",);
+    // console.log("date", this.toDate);
+    // if(event.target.id === "from" && event.target.value !== ""){
+    //   console.log("From",event.target.value)
+    //   this.fromDate = event.target.value+' 00:00:00'
+    //   this.fromDateBind = event.target.value;
+    // }
+    // else if(event.target.id === "from" && event.target.value === ""){
+    //   this.fromDate = "null"
+    // }
+    // else if(event.target.id === "to"&& event.target.value !== ""){
+    //   this.toDate = event.target.value+' 00:00:00'
+    //   this.toDateBind = event.target.value;
+    // }
+    // else if(event.target.id === "to" && event.target.value === ""){
+    //   this.toDate = "null"
+    // }
+
+    console.log("from date", this.fromDate);
+    console.log("to date", this.toDate);
+  }
+
   getAllTeacher() {
+    let page = this.page.toString();
+    let pageNo: number = +page;
+    pageNo = pageNo - 1;
+    console.log("Page", pageNo);
     let formObj = {
       schoolId: this.userInfo.schoolid,
     };
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.uri + "bully-buddy/teachers/get_all_teacher", formObj)
+        .post(this.uri + "bully-buddy/teachers/get_all_teacher" + "?pageno=" + pageNo, formObj)
         .subscribe((res: any) => {
           if (res.status == "200") {
-            this.dataList = res.result;
-            this.data = res.result;
-            this.totalRecords = res.result.length;
+            this.dataList = res.result.content;
+            this.data = res.result.content;
+            this.totalUserRecords = res.result.totalElements;
+            this.totalRecords = res.result.totalElements;
+            this.itemPerPage = res.result.pageable.pageSize;
+            this.totalPages = res.result.totalPages;
+            console.log(" this.dataList", this.dataList)
           } else {
             alert(res.message + " : " + res.result);
           }
@@ -105,12 +216,117 @@ getCookies: string = this.cookieService.get("LoginStatus");
         });
     });
   }
+  searchGrade(eve){
+    if(eve === undefined && eve === ""){
+      this.grade = "0";
+    }
+    else{
+      this.grade = eve;
+      this.grade = this.grade.toString();
+    }
+    if(this.grade >=13){
+      this.grade = "12";
+    }
+    return new Promise<void>((resolve, reject) => {
+
+      let search = this.searchText;
+     let grade;
+      if(search === undefined || search === null|| search === ""){
+        search = "null"
+      }
+      else{
+        search = search
+      }
+      if(this.grade === undefined || this.grade === ""){
+        grade = "0"
+      }
+      else{
+        grade = this.grade.toString();
+      }
+      if(search==="null"&&grade==="0"){
+        this.getAllTeacher();
+      }
+      else{
+      this.http
+        .post(
+          this.uri + "bully-buddy/teachers/search_teachers"+ "?searchword=" + search+ "&grade=" + grade+"&schoolId="+this.userInfo.schoolid,"")
+        .subscribe((res: any) => {
+          if (res.status == "200") {
+            this.dataList = res.result;
+            this.data = res.result;
+            this.totalUserRecords = res.result.length
+            this.totalRecords = res.result.length;
+            console.log("Report",res.result);
+           }
+           if(this.totalUserRecords>0){
+
+            this.showNoRecord=false;
+          }
+          if(this.totalUserRecords<=0){
+            this.showNoRecord=true;
+          }
+          //  else {
+          //   alert(res.message + " : " + res.result);
+          // }
+          resolve();
+        });
+      }
+    });
+  }
+  search(eve){
+    return new Promise<void>((resolve, reject) => {
+
+      let search = eve;
+     let grade;
+      if(search === undefined || search === null|| search === ""){
+        search = "null"
+      }
+      else{
+        search = search
+      }
+      if(this.grade === undefined || this.grade === ""){
+        grade = "0"
+      }
+      else{
+        grade = this.grade.toString();
+      }
+      if(search==="null"&&grade==="0"){
+        this.getAllTeacher();
+      }
+      else{
+      this.http
+        .post(
+          this.uri + "bully-buddy/teachers/search_teachers"+ "?searchword=" + search+ "&grade=" + grade+"&schoolId="+this.userInfo.schoolid,"")
+        .subscribe((res: any) => {
+          if (res.status == "200") {
+            this.dataList = res.result;
+            this.data = res.result;
+            this.totalUserRecords = res.result.length
+            this.totalRecords = res.result.length;
+            console.log("Report",res.result);
+           }
+           if(this.totalUserRecords>0){
+
+            this.showNoRecord=false;
+          }
+          if(this.totalUserRecords<=0){
+            this.showNoRecord=true;
+          }
+          //  else {
+          //   alert(res.message + " : " + res.result);
+          // }
+          resolve();
+        });
+      }
+    });
+  }
+
   getTeacherById() {
     let arrLen: any = [];
     let formObj = {
       id: this.userInfo.schoolid,
     };
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.http
         .post(this.uri + "bully-buddy/teachers/get_teacher_by_id", formObj)
         .subscribe((res: any) => {
@@ -185,8 +401,9 @@ clearResult(){
         divType: "editTeacher",
         id: list.id,
         school_id: list.schoolId,
-        teacher_name: list.teacherName,
+        teacher_name: list.name,
         grade: list.grade,
+        createdDateTime: list.createdDateTime,
       },
     });
   }
@@ -242,8 +459,16 @@ clearResult(){
     });
   }
   excelDownload() {
-    let url = "http://3.128.136.18:5001/api/excel/download_teacher";
-    this.http.get(url, { responseType: "blob" }).subscribe((data) => {
+    let from = null;
+    let to = null;
+    if(this.fromDate !== undefined && this.toDate !== null){
+      from = this.fromDate
+    }
+    if(this.toDate !== undefined && this.toDate !== null){
+      to = this.toDate
+    }
+    let url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download_teacher" + "?schoolId=" + this.userInfo.schoolid+  "&from=" + from+ "&to=" + to;
+    this.http.post(url,"", { responseType: "blob" }).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
@@ -265,5 +490,12 @@ clearResult(){
       });
     }
     this.orderFlag = !this.orderFlag;
+  }
+  setOrder(value: string) {
+    if (this.orderByd === value) {
+      this.reverse = !this.reverse;
+    }
+    this.alphaSort = !this.alphaSort;
+    this.orderByd = value;
   }
 }

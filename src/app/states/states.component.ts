@@ -80,7 +80,7 @@ export class StatesComponent implements OnInit {
     });
   }
   excelDownload() {
-    let url = "http://3.128.136.18:5001/api/excel/download_state";
+    let url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download_state";
     this.http.get(url, { responseType: "blob" }).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {

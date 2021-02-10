@@ -5,11 +5,26 @@
       <div class="card">
         <div class="card-header">
           Admin
+          <label style="margin-left:700px;font-size: medium;">Go To </label>
+          <input  style="width: 65px;border-radius: 5;font-size: medium;" type="number" max={{totalPages}} name="search"
+           [(ngModel)]="page"  autocomplete="off" placeholder="Page No" (ngModelChange)="pageChanged($event)">
+            <label style="font-size: medium;">Page: {{totalPages}} </label>
+            <label style="font-size: medium;padding-left: 20px;">Total Users: {{totalRecords}} </label>
         </div>
         <div style="padding: 7px 20px 0 0">
-          <input *ngIf="isSuperAdmin" style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
-            [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching">
-          <span class="btn-add" (click)="addAdmin()" *ngIf="isSuperAdmin">Add</span>
+          <!-- <input *ngIf="isSuperAdmin" style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+            [(ngModel)]="searchText" autocomplete="off" placeholder="Search"> -->
+            <form (ngSubmit)="search(searchText)" >
+              <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
+              [(ngModel)]="searchText"  autocomplete="off" placeholder="Search" [ngModelOptions]="{standalone: true}"
+              (ngModelChange)="showClear($event)" >
+              <span *ngIf="visibleClear" class="fa fa-close" style="margin-left:-47px" (click)="clearResult()" ></span>
+              <button *ngIf="visibleClear" type="submit"  style="margin-left:1px"><i class="fa fa-search"></i></button>
+              <button *ngIf="!visibleClear" type="submit"  style="margin-left:-31px"><i class="fa fa-search"></i></button>
+              <span class="btn-add" (click)="addAdmin()">Add</span>
+            </form>
+
+
 
         </div>
         <div class="card-body" style="padding-top: 7px;">
@@ -18,26 +33,34 @@
             <thead>
               <tr>
                 <!-- <th>S.No</th> -->
-                <th (click)="orderAdmin()" style="cursor: pointer;">Admin Id&nbsp;<i *ngIf="!orderAdminFlag"
+                <!-- <th (click)="orderAdmin()" style="cursor: pointer;">Admin Id&nbsp;<i *ngIf="!orderAdminFlag"
                     class="fa fa-caret-down"></i>
-                  <i *ngIf="orderAdminFlag" class="fa fa-caret-up"></i></th>
-                <!-- <th>Admin SchoolId</th> -->
-                <th>Admin Username</th>
+                  <i *ngIf="orderAdminFlag" class="fa fa-caret-up"></i></th> -->
+                <th [class.active]="orderByd === 'schoolName'"
+                (click)="setOrder('list.schoolName')"
+                class="mdl-data-table__cell--non-numeric">Admin School<span [hidden]="alphaSort">▼</span>
+                <span [hidden]="!alphaSort">▲[A-Z]</span></th>
+                <th>Admin State</th>
+                <th>Admin Name</th>
+                <th>Admin User Name/Email</th>
                 <th>Admin Password</th>
                 <th>Options</th>
               </tr>
             </thead>
-            <tbody>
-              <tr *ngFor="let list of adminList | filter:searchText | paginate
+            <tbody *ngIf="alphaSort">
+              <tr *ngFor="let list of adminList | orderBy:'schoolName':reverse:true  | paginate
                       : {
                           id: 'list_pagination',
-                          itemsPerPage: 10,
+                          itemsPerPage: itemPerPage,
                           currentPage: page,
                           totalItems: totalRecords
                         }; let i=index; ">
                 <!-- <td>{{i+1}}</td> -->
-                <td>{{list.id}}</td>
-                <!-- <td>{{list.schoolid}}</td> -->
+                <!-- <td>{{list.id}}</td> -->
+                <td  *ngIf="isSuperAdmin">{{list.schoolName}}</td>
+                <td  *ngIf="!isSuperAdmin">{{userInfo.schoolName}}</td>
+                <td>{{list.stateName!== null?list.stateName:" "}}</td>
+                <td>{{list.name}}</td>
                 <td>{{list.username}}</td>
                 <td>*********</td>
                 <td>
@@ -48,13 +71,37 @@
               </tr>
 
             </tbody>
+            <tbody *ngIf="!alphaSort">
+              <tr *ngFor="let list of adminList | paginate
+                      : {
+                          id: 'list_pagination',
+                          itemsPerPage: itemPerPage,
+                          currentPage: page,
+                          totalItems: totalRecords
+                        }; let i=index; ">
+                <!-- <td>{{i+1}}</td> -->
+                <!-- <td>{{list.id}}</td> -->
+                <td  *ngIf="isSuperAdmin">{{list.schoolName}}</td>
+                <td  *ngIf="!isSuperAdmin">{{userInfo.schoolName}}</td>
+                <td>{{list.stateName!== null?list.stateName:" "}}</td>
+                <td>{{list.name}}</td>
+                <td>{{list.username}}</td>
+                <td>*********</td>
+                <td>
+                  <div> <span class="fa fa-pencil fa-options" (click)="editAdmin(list)"></span>&nbsp;&nbsp;
+                    <span class="fa fa-trash-o fa-options" (click)="deleteAdmin(list.id)" *ngIf="isSuperAdmin&&list.username!=='SuperAdmin'"></span>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
           </table>
-          <!-- <h1 *ngIf="adminList.length===0" style="margin-left: 340px;">No results found..</h1> -->
+          <h1 *ngIf="showNoRecord" style="margin-left: 340px;">No results found..</h1>
           <div style="padding: 7px 20px 0 0;margin-left: 150px;">
-            <pagination-controls id="list_pagination" maxSize="10" directionLinks="true" (pageChange)="page = $event"
-              (pageBoundsCorrection)="page=$event" autoHide="true" responsive="true" previousLabel="Previous"
-              nextLabel="Next" screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
-              screenReaderCurrentLabel="You're on page">
+            <pagination-controls id="list_pagination" maxSize="10" directionLinks="true"
+              (pageChange)="pageChanged($event)" (pageBoundsCorrection)="page=$event" autoHide="true" responsive="true"
+              previousLabel="Previous" nextLabel="Next" screenReaderPaginationLabel="Pagination"
+              screenReaderPageLabel="page" screenReaderCurrentLabel="You're on page">
             </pagination-controls>
           </div>
         </div>
