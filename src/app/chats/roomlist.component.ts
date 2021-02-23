@@ -612,11 +612,18 @@ playAudioo(){
     this.messageForm.reset();
   }
 
+<<<<<<< HEAD
   public setRow(_index) {debugger;
     this.currentChat = _index;
     this.stopTimer();
     this.stoprefreshTimer();
     this.stoprefreshTimer2();
+=======
+  public setRow(_index) {
+    this.currentChat = _index;
+    this.stopTimer();
+    this.stoprefreshTimer()
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
     this.stopFirebaseTimer();
     this.stopChatCountTimer();
     console.log("indexxxxx",_index)
@@ -651,7 +658,11 @@ playAudioo(){
     this.chatCountNo = _index.chatCountNo;
     let rowchatcount=JSON.stringify( _index.chatCountNo)
     // console.log(" this.chatCountNo ", JSON.stringify( _index.chatCountNo));
+<<<<<<< HEAD
     if(rowchatcount !== '""0""'){
+=======
+    if(rowchatcount !== "0"){
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
     if(this.newMessage!== 0){
       this.newMessage = this.newMessage - parseInt(this.chatCountNo)
       localStorage.setItem("OneChatcount",this.newMessage.toString());
@@ -737,10 +748,16 @@ startrefreshTimer() {
   let data = JSON.parse(localStorage.getItem("doc"));
   this.timer = setInterval(() => {
     // this.allChatUser=[];
+<<<<<<< HEAD
     if(data.type !== null)
     {this.getMessage(data.type, data.id,data.userType);}
     this.getUnreadCount();
   }, 600);
+=======
+    this.getMessage(data.type, data.id,data.userType);
+    this.getUnreadCount();
+  }, 7500);
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
 }
 stoprefreshTimer() {
   if (this.timer) {
@@ -748,6 +765,7 @@ stoprefreshTimer() {
   }
 }
 
+<<<<<<< HEAD
 startrefreshTimer2() {
   this.stoprefreshTimer2();
   let data = JSON.parse(localStorage.getItem("doc"));
@@ -763,6 +781,9 @@ stoprefreshTimer2() {
     clearInterval(this.timer);
   }
 }
+=======
+
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
   getMessage(userType, docId,chatUserType) {
     let newCommonChatRoomIdd=docId+"@"+chatUserType+"+"+this.userId.userId+"@"+5;
     if (userType == "one") {
@@ -970,7 +991,11 @@ stoprefreshTimer2() {
 
   }
 getOnechatFirebase(){
+<<<<<<< HEAD
   this.allChatUser=[];
+=======
+  // this.allChatUser=[];
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
   let onechat
   this.OneChatUser.forEach((e) => {
     // e.Id
@@ -1080,6 +1105,7 @@ getOnechatFirebase(){
                             // this.refresh();
 
                             this.playAudio();
+<<<<<<< HEAD
                             console.log("this.currentChat",this.currentChat)
 
                               if(this.currentChat !== "")
@@ -1092,6 +1118,15 @@ getOnechatFirebase(){
 
                             // this.stopChatCountTimer();
 
+=======
+                            // this.setRow(this.currentChat)
+                            // this.startChatCountTimer();
+                            // this.getOnechatFirebase()
+                            // this.getGroupChatFireBase();
+                            // this.getUnreadCount();
+                            this.startrefreshTimer()
+                            // this.stopChatCountTimer();
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
                           }
 
                          }
@@ -1284,6 +1319,7 @@ getOnechatFirebase(){
                             this.playAudio();
                             // this.getUnreadCount();
                               console.log("startrefreshTimer");
+<<<<<<< HEAD
                               console.log("this.currentChat",this.currentChat)
 
                             //   if(this.currentChat !== "")
@@ -1301,6 +1337,11 @@ getOnechatFirebase(){
                             // this.startChatCountTimer();
                           }
                           // this.stoprefreshTimer2();
+=======
+                            this.startrefreshTimer();
+                            // this.startChatCountTimer();
+                          }
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
                           // this.starFirebasetTimer();
                         }
                       }

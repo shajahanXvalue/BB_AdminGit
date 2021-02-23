@@ -42,13 +42,44 @@
                 <span [hidden]="!alphaSort">▲[A-Z]</span></th>
                 <th>Admin State</th>
                 <th>Admin Name</th>
+<<<<<<< HEAD
                 <th>Admin User Name/Email</th>
+=======
+                <th>Admin Username</th>
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
                 <th>Admin Password</th>
                 <th>Options</th>
               </tr>
             </thead>
             <tbody *ngIf="alphaSort">
               <tr *ngFor="let list of adminList | orderBy:'schoolName':reverse:true  | paginate
+<<<<<<< HEAD
+=======
+                      : {
+                          id: 'list_pagination',
+                          itemsPerPage: itemPerPage,
+                          currentPage: page,
+                          totalItems: totalRecords
+                        }; let i=index; ">
+                <!-- <td>{{i+1}}</td> -->
+                <!-- <td>{{list.id}}</td> -->
+                <td  *ngIf="isSuperAdmin">{{list.schoolName}}</td>
+                <td  *ngIf="!isSuperAdmin">{{userInfo.schoolName}}</td>
+                <td>{{list.stateName!== null?list.stateName:" "}}</td>
+                <td>{{list.name}}</td>
+                <td>{{list.username}}</td>
+                <td>*********</td>
+                <td>
+                  <div> <span class="fa fa-pencil fa-options" (click)="editAdmin(list)"></span>&nbsp;&nbsp;
+                    <span class="fa fa-trash-o fa-options" (click)="deleteAdmin(list.id)" *ngIf="isSuperAdmin"></span>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+            <tbody *ngIf="!alphaSort">
+              <tr *ngFor="let list of adminList | paginate
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
                       : {
                           id: 'list_pagination',
                           itemsPerPage: itemPerPage,

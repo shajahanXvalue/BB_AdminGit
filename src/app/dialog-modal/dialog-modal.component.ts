@@ -377,7 +377,10 @@ export class DialogModalComponent implements OnInit {
     if (this.userInfo.schoolid === 0) {
       this.isSuperAdmin = true;
       this.validAState = this.data.admin_statename;
+<<<<<<< HEAD
       this.validState = this.userInfo.stateName;
+=======
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
       // console.log("SDF", this.isSuperAdmin);
     }else{
       this.schoolId = this.userInfo.schoolid;
@@ -639,8 +642,11 @@ getDriver(eve){
 
       }
       console.log("DriverId",this.driverId);
+<<<<<<< HEAD
     },error => {
       console.log('oops', error)
+=======
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
     });
   }
 
@@ -1481,8 +1487,11 @@ else{
               data: { value: "School District Updated Failled", type: false },
             });
           }
+<<<<<<< HEAD
         },error => {
           console.log('oops', error)
+=======
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
         });
 
   }
@@ -1528,12 +1537,20 @@ else{
 /// Convert Excel To Json Format......
     this.excel_file = event.target.files[0];
     console.log("Excel", this.excel_file);
+<<<<<<< HEAD
     let worksheet;
     let workBook = null;
     let jsonData = [];
     let jsonData2 = [];
     let prexlsToJson = [];
     let prexlsToJson2 = [];
+=======
+
+    let workBook = null;
+    let jsonData = [];
+    let prexlsToJson = [];
+
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
     const reader = new FileReader();
     const file =  event.target.files[0];
     reader.onload = (event) => {
@@ -1541,6 +1558,7 @@ else{
       this.excelValidationErrors = [];
       workBook =null;
       jsonData = [];
+<<<<<<< HEAD
       jsonData2 = [];
       this.xlsToJson =[];
       workBook = XLSX.read(data, { type: 'binary' });
@@ -1642,6 +1660,10 @@ var prexlsToJson3 = [];
 
 
 
+=======
+      this.xlsToJson =[];
+      workBook = XLSX.read(data, { type: 'binary' });
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
       jsonData = workBook.SheetNames.reduce((initial, name) => {
       if(name !== "States"){
         const sheet = workBook.Sheets[name];
@@ -1657,6 +1679,7 @@ var prexlsToJson3 = [];
         SheetName = "Sheet"+(index+1);
         item.map((item2,index2)=>{
         if(index2 !== 0){
+<<<<<<< HEAD
           var values = item2;
           // var tempName = "email(Mandatory)"
           // console.log("values",values.email_Mandatory)
@@ -1665,6 +1688,9 @@ var prexlsToJson3 = [];
 
          this.xlsToJson.push(item2)
 
+=======
+         this.xlsToJson.push(item2)
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
         }
         })
       })
@@ -1674,6 +1700,7 @@ var prexlsToJson3 = [];
 
       // Replacing UserTypeId from String to Int
       this.xlsToJson.map((item2,index2)=>{
+<<<<<<< HEAD
       
         // replace Json Key Names
           item2.email = item2.Email;
@@ -1748,6 +1775,11 @@ var prexlsToJson3 = [];
         else{
           item2.isSocialUser = 0;
         }
+=======
+        if(item2.ccUser === 1){
+          item2.ccUser = "+1"
+        }
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
         if(item2.ccUser === 91){
           item2.ccUser = "+91"
         }
@@ -1763,6 +1795,7 @@ var prexlsToJson3 = [];
         else{
           item2.userTypeId = 5;
         }
+<<<<<<< HEAD
 
       });
       /// end here ///
@@ -1772,6 +1805,16 @@ var prexlsToJson3 = [];
      
       /// Validation of the Columns
      
+=======
+      });
+      /// end here ///
+
+      // console.log("xlsToJson",this.xlsToJson);
+      // console.log("prexlsToJson",prexlsToJson);
+      // console.log("this.userInfo.schoolid",this.userInfo.schoolid)
+      /// Validation of the Columns
+      // console.log("prexlsToJson[0].length",prexlsToJson[0].length);
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
       if(prexlsToJson[0].length <= 1){
         this.excelValidationErrors.push("Sheet is Empty" );
       }
@@ -1853,9 +1896,16 @@ var prexlsToJson3 = [];
           })
       })
       /// End ///
+<<<<<<< HEAD
       
       const dataString = JSON.stringify(jsonData);
      
+=======
+      // console.log("this.excelValidationErrors",this.excelValidationErrors);
+      // console.log("xlsToJson",this.xlsToJson);
+      const dataString = JSON.stringify(jsonData);
+      // console.log("dataString",jsonData);
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
     }
     reader.readAsBinaryString(file);
     event.srcElement.value = null;
@@ -2084,6 +2134,42 @@ var prexlsToJson3 = [];
               this.editDriverDummy = this.editDriverDummy.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
             }
 
+<<<<<<< HEAD
+=======
+          } else {
+            alert(res.message + " : " + res.result);
+          }
+          resolve();
+        });
+    });
+  }
+  }
+  getBusRouteById() {
+    let arrLen: any = [];
+    let formObj = {
+      id: this.schoolId,
+    };
+    return new Promise<void>((resolve, reject) => {
+      this.http
+        .post(this.url + "bully-buddy/busroute/get_busroute_by_id", formObj)
+        .subscribe((res: any) => {
+          if (res.status == "200") {
+            // this.dataList.push(res.result);
+            // this.dataList.push(this.dataList);
+            arrLen.push(res.result);
+            // console.log("RESsss", arrLen);
+            if (arrLen.length === 1) {
+              // this.dataList = [];
+              // this.dataList.push(res.result);
+              this.data = res.result;
+              // this.totalRecords = res.result.length;
+            } else {
+              // this.dataList = res.result;
+              this.data = res.result;
+              // this.totalRecords = res.result.length;
+            }
+            console.log("DATALIST", this.data);
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
           } else {
             alert(res.message + " : " + res.result);
           }

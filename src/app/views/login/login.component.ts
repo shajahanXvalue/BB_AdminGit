@@ -81,7 +81,14 @@ export class LoginComponent {
             res.status == "401" ||
             res.message == "Invalid Credentials" || res.message =="Please enter valid details"
           ) {
+<<<<<<< HEAD
          
+=======
+          //   let resData = JSON.stringify(res.result);
+          //   this.cookieService.put("LoginStatus", "login");
+          // localStorage.setItem("UserInfo", resData);
+          // this.router.navigateByUrl("/dash");
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
             this.dialog.open(SuccessComponent, {
               width: "20%",
               data: {
@@ -90,6 +97,7 @@ export class LoginComponent {
               },
             });
           }
+<<<<<<< HEAD
           else if (res.status == 500)  {
          
             this.dialog.open(SuccessComponent, {
@@ -110,6 +118,9 @@ export class LoginComponent {
             value: error.error.error,
             type: false,
           },
+=======
+
+>>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
         });
       }
       );
