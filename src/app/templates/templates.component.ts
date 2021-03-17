@@ -32,6 +32,7 @@ export class TemplatesComponent implements OnInit {
 
   userExcelDownload() {
     let url =  "https://bullyingbuddyapp.com/admin/templates/user_upload.xlsx"
+    // let url ="http://3.139.131.172/admin/templates/user_upload.xlsx"
     // "https://bullyingbuddyapp.com/admin/templates/user_upload.xlsx";
     window.location.href = url;
     // window.open(url, "_blank");
@@ -51,6 +52,7 @@ export class TemplatesComponent implements OnInit {
   }
   teacherExcelDownload() {
     let url = "https://bullyingbuddyapp.com/admin/templates/teacher_upload.xlsx";
+    // let url ="http://3.139.131.172/admin/templates/teacher_upload.xlsx"
     window.location.href = url;
     // window.open(url, "_blank");
     // this.http.get(url, { responseType: "blob" }).subscribe((data) => {
@@ -66,6 +68,7 @@ export class TemplatesComponent implements OnInit {
   }
   busRouteExcelDownload() {
     let url = "https://bullyingbuddyapp.com/admin/templates/busroute_upload.xlsx";
+    // let url ="http://3.139.131.172/admin/templates/busroute_upload.xlsx"
     // window.open(url, "_blank");
     window.location.href = url;
     // this.http.get(url, { responseType: "blob" }).subscribe((data) => {

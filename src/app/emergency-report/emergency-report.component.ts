@@ -150,7 +150,8 @@ clearResult(){
   this.searchWord="";
   this.getAllReport();
 }
-dateChanged(event,id){
+// dateChanged(event,id){
+dateChanged(event){
   console.log("FromDate",event.formatted)
   let date =  moment(event.formatted).format("YYYY-MM-DD")
   if(event.formatted !== undefined &&event.formatted !==""&&event.formatted !==" "){
@@ -181,7 +182,8 @@ dateChanged(event,id){
   console.log("from date", this.fromDate);
   console.log("to date", this.toDate);
 }
-dateChanged2(event,id){
+// dateChanged2(event,id){
+dateChanged2(event){
   console.log("ToDAte",event.formatted)
   let date =  moment(event.formatted).format("YYYY-MM-DD")
   if(event.formatted !== undefined && event.formatted !==""){
@@ -707,11 +709,7 @@ dateChanged2(event,id){
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
       });
-<<<<<<< HEAD
-      const file = new File([blob], "EmergencyReport" + ".xlsx", {
-=======
       const file = new File([blob], "user" + ".xlsx", {
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
         type: "application/vnd.ms.excel",
       });
       saveAs(file);

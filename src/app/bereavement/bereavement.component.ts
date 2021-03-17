@@ -134,7 +134,8 @@ public myDatePickerOptions2: IMyDpOptions = {
       this.searchUser(this.searchText)
     }
   }
-  dateChanged(event,id){
+  // dateChanged(event,id){
+  dateChanged(event){
     console.log("FromDate",event.formatted)
     let date =  moment(event.formatted).format("YYYY-MM-DD")
     if(event.formatted !== undefined &&event.formatted !==""&&event.formatted !==" "){
@@ -165,7 +166,8 @@ public myDatePickerOptions2: IMyDpOptions = {
     console.log("from date", this.fromDate);
     console.log("to date", this.toDate);
   }
-  dateChanged2(event,id){
+  // dateChanged2(event,id){
+  dateChanged2(event){
     console.log("ToDAte",event.formatted)
     let date =  moment(event.formatted).format("YYYY-MM-DD")
     if(event.formatted !== undefined && event.formatted !==""){

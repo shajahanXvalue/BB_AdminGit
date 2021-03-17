@@ -7,7 +7,7 @@ export class PropertyServiceService {
 
   // uri= "https://www.bullyingbuddyapp.com/java-service-admin/";
    uri = "https://bullyingbuddyapp.com/java-service-admin/";
-
+    // uri = "http://3.139.131.172:5001/";
   //  uri = "http://3.128.136.18:5001/";
   // uri = "https://service-admin-api.bullyingbuddyapp.com/";
 

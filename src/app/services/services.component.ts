@@ -188,7 +188,8 @@ clearResult(){
         admin_username: list.username,
         admin_password: list.password,
         admin_phone: list.userPhone,
-        admin_ccUser: list.ccUser
+        admin_ccUser: list.ccUser,
+        userLang: list.userLang
         // createdDate:list.
       },
     });

@@ -470,6 +470,7 @@ clearResult(){
         school_address: list.schoolAddress,
         school_state: list.stateId,
         zipCode: list.zipCode,
+        isBoarding: list.isBoarding,
         createdDateTime: list.createdDateTime
       },
     });

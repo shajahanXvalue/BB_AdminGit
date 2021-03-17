@@ -24,6 +24,14 @@
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of stateList" [ngValue]="opt.id">{{opt.statename}}</option>
             </select>
+            <label>Boarding School</label>&nbsp;<span style="color: red;">*</span>
+            <select class="form-control" [(ngModel)]="validBoarding" [ngStyle]="validBoarding==''|| validBoarding==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            (change)="boardingDropDown($event.target.value)" [(ngModel)]="isBoarding"
+              formControlName="school_boarding">
+              <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+              <option value="YES">Yes</option>
+                 <option value="NO">No</option>
+            </select>
             <label>School ZipCode</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validSZipCode" [ngStyle]="validSZipCode==''|| validSZipCode==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
             class="form-control" formControlName="school_ZipCode"
@@ -68,6 +76,19 @@
               [ngModelOptions]="{standalone: true}" [(ngModel)]=" selectedValue" disabled>
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of stateList" [ngValue]="opt.id">{{opt.statename}}</option>
+            </select>
+            <label>Boarding School</label>&nbsp;<span style="color: red;">*</span>
+            <select *ngIf='isSuperAdmin' class="form-control" [(ngModel)]="validBoarding" [ngStyle]="validBoarding==''|| validBoarding==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            (change)="boardingDropDown($event.target.value)"
+              formControlName="school_boarding" disabled>
+              <option value="YES">Yes</option>
+              <option value="NO">No</option>
+            </select>
+            <select *ngIf='!isSuperAdmin' class="form-control" [(ngModel)]="validBoarding" [ngStyle]="validBoarding==''|| validBoarding==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            (change)="boardingDropDown($event.target.value)"
+              formControlName="school_boarding">
+              <option value="YES">Yes</option>
+              <option value="NO">No</option>
             </select>
             <label>School ZipCode</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validSZipCode" [ngStyle]="validSZipCode==''|| validSZipCode==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
@@ -153,6 +174,15 @@
             <label>Admin Password</label>&nbsp;<span style="color: red;">*</span>
             <input type="password" [(ngModel)]="validPassword" [ngStyle]="validPassword=='' || validPassword==undefined?{'border-color':'#ef8575'}:{'border-color':''}"class="form-control" formControlName="admin_password"
               required>
+              <label>User Language</label>
+              <div>
+                <select  name="language" [(ngModel)]="validULang" [ngStyle]="validULang=='' || validULang==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+                [ngModelOptions]="{standalone: true}" class="form-control" style="width: 100%;display: inline;padding: 5px;" (change)="selectLanguage($event.target.value)" required >
+                 <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+                 <option value="English">English</option>
+                 <option value="Spanish">Spanish</option>
+                </select>
+              </div>
           </div>
         </div>
       </div>
@@ -272,6 +302,15 @@
             <label>Admin Password</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validAPassword" [ngStyle]="validAPassword=='' || validAPassword==undefined?{'border-color':'#ef8575'}:{'border-color':''}" class="form-control" formControlName="admin_password"
               required disabled>
+              <label>User Language</label>
+              <div>
+                <select  name="language" [(ngModel)]="validULang" [ngStyle]="validULang=='' || validULang==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+                [ngModelOptions]="{standalone: true}" class="form-control" style="width: 100%;display: inline;padding: 5px;" (change)="selectLanguage($event.target.value)" required >
+                 <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+                 <option value="English">English</option>
+                 <option value="Spanish">Spanish</option>
+                </select>
+              </div>
           </div>
         </div>
       </div>
@@ -298,15 +337,11 @@
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of userTypeList2" value={{opt.id}}>{{opt.type}}</option>
             </select>
-<<<<<<< HEAD
-            <label *ngIf="showFields" >UserName/Email</label>&nbsp;<span style="color: red;" *ngIf="showFields">*</span>
-=======
             <label *ngIf="showFields" >User Email</label>&nbsp;<span style="color: red;" *ngIf="showFields">*</span>
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
             <input *ngIf="showFields" [(ngModel)]="validEmail" type="email" class="form-control" formControlName="email"
              [ngStyle]="validEmail==''||validEmail==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
               (ngModelChange)="userEmailChange($event)" required>
-              <span *ngIf="validationEmail" class="help-block text-danger">Please Enter valid Email</span><br>
+              <!-- <span *ngIf="validationEmail" class="help-block text-danger">Please Enter valid Email</span><br> -->
                 <label *ngIf="showFields">User Password</label>&nbsp;<span style="color: red;" *ngIf="showFields">*</span>
             <input *ngIf="showFields" [(ngModel)]="validPassword" [ngStyle]="validPassword==''?{'border-color':'#ef8575'}:{'border-color':''}" type="text" class="form-control" formControlName="password"
               required>
@@ -424,8 +459,17 @@
             <select *ngIf="userTypeId==='1'" class="form-control"
               (change)="busRouteDropDown($event.target.value)">
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
-              <option *ngFor="let opt of driverUniqueName" value={{opt.busRoute}}>{{opt.busRoute}}</option>
+              <option *ngFor="let opt of busRouteList" value={{opt.busRoute}}>{{opt.busRoute}}</option>
             </select>
+            <label *ngIf="showFields" >User Language</label>
+            <!-- <div> -->
+              <select *ngIf="showFields"  name="language" [(ngModel)]="validULang"
+              [ngModelOptions]="{standalone: true}" class="form-control" style="width: 100%;display: inline;padding: 5px;" (change)="selectLanguage($event.target.value)" required >
+               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+               <option value="English">English</option>
+               <option value="Spanish">Spanish</option>
+              </select>
+            <!-- </div> -->
             <!-- <label>IsSocialUse</label> -->
             <!-- <input type="text" class="form-control" formControlName="isSocialUser" placeholder="Enter isSocialUse"> -->
             <!-- <select class="form-control" (change)="dayFilter($event.target.value)" [(ngModel)]="selectedValue"
@@ -463,14 +507,14 @@
           <div class="form-group">
             <label>User Type</label>&nbsp;<span style="color: red;">*</span>
             <select class="form-control" (change)="userTypeDropDown($event.target.value)" [(ngModel)]="userTypeId"
-              [ngModelOptions]="{standalone: true}" disabled>
+              [ngModelOptions]="{standalone: true}">
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of userTypeList" value={{opt.id}}>{{opt.type}}</option>
             </select>
-            <label>UserName/Email</label>&nbsp;<span style="color: red;">*</span>
+            <label>User Email</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validEmail" [ngStyle]="validEmail==''||validEmail==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
             class="form-control" formControlName="email" (ngModelChange)="userEmailChange($event)" required>
-            <span *ngIf="validationEmail" class="help-block text-danger">Please Enter valid Email</span><br>
+            <!-- <span *ngIf="validationEmail" class="help-block text-danger">Please Enter valid Email</span><br> -->
             <label>Name</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validUName" [ngStyle]="validUName==''||validUName==undefined?{'border-color':'#ef8575'}:{'border-color':''}"class="form-control" formControlName="name" required>
             <label>User Age</label>&nbsp;<span *ngIf="userIds=='1'" style="color: red;" >*</span>
@@ -588,6 +632,15 @@
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of busRouteList" value={{opt.busRoute}}>{{opt.busRoute}}</option>
             </select>
+            <label >User Language</label>
+            <!-- <div> -->
+              <select  name="language" [(ngModel)]="validULang"
+              [ngModelOptions]="{standalone: true}" class="form-control" style="width: 100%;display: inline;padding: 5px;" (change)="selectLanguage($event.target.value)" required >
+               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
+               <option value="English">English</option>
+               <option value="Spanish">Spanish</option>
+              </select>
+            <!-- </div> -->
           </div>
         </div>
       </div>

@@ -73,6 +73,7 @@
                   class="mdl-data-table__cell--non-numeric">School Name<span [hidden]="alphaSort">▼</span>
                   <span [hidden]="!alphaSort">▲[A-Z]</span></th>
                   <th>School Address</th>
+                  <th>Boarding School</th>
                   <th>School Zipcode</th>
                   <th>School State</th>
                   <th>Options</th>
@@ -90,6 +91,7 @@
                   <!-- <td>{{i+1}}</td> -->
                   <td>{{list.schoolName}}</td>
                   <td>{{list.schoolAddress}}</td>
+                  <td [style.color]="list.isBoarding === 'Yes'?'green':'red'">{{list.isBoarding}}</td>
                   <td>{{list.zipCode}}</td>
                   <td>{{list.statename}}</td>
                   <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
@@ -114,6 +116,7 @@
                   <!-- <td>{{i+1}}</td> -->
                   <td>{{list.schoolName}}</td>
                   <td>{{list.schoolAddress}}</td>
+                  <td  [style.color]="list.isBoarding === 'Yes'?'green':'red'">{{list.isBoarding}}</td>
                   <td>{{list.zipCode}}</td>
                   <td>{{list.statename}}</td>
                   <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->

@@ -1,0 +1,51 @@
+<div class="animated fadeIn" style="padding-top: 10px">
+    <div class="row">
+      
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            Settings
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-hover table-striped table-align-middle mb-0">
+              <!-- <thead>
+                <th>Size</th>
+                <th>Example</th>
+                <th>CSS Class</th>
+              </thead> -->
+              <tbody>
+                <tr>
+                  <td style="width: 120px;padding-bottom: 20px;">
+                    <!-- <label style="margin-left:20%;font-size: medium;"> -->
+                        Enable / Disable Ads
+                    <!-- </label> -->
+            <!-- &nbsp;&nbsp; *ngIf="isAdOn"-->
+           
+                  </td>
+                  <td>
+                    <label *ngIf="isAdOn" class="switch switch-label switch-pill switch-success">
+                        <input type="checkbox" class="switch-input" checked='isAdOn' (click)="enabled($event)">
+                        <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                      </label>
+                      <label *ngIf="!isAdOn" class="switch switch-label switch-pill switch-success">
+                        <input type="checkbox" class="switch-input" (click)="enabled($event)">
+                        <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                      </label>
+                      <!-- &nbsp;&nbsp;&nbsp; -->
+                  </td>
+                  <!-- <td>
+                    Add following class <code>.switch-lg</code>
+                  </td> -->
+                </tr>
+            
+              </tbody>
+            </table>
+          </div>
+          <div class="card-body">
+           
+            
+          </div>
+        </div>
+      </div>
+      </div>
+      </div>

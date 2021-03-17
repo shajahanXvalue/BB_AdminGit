@@ -31,6 +31,7 @@ export interface DialogData {
   school_state: string;
   school_ZipCode: string;
   school_id: any;
+  isBoarding:any;
   admin_id: any;
   admin_school_id: any;
   admin_statename:any;
@@ -71,6 +72,7 @@ export interface DialogData {
   snapShotCyber: any;
   userid:any;
   ccUser:any;
+  profileImage:any;
   //incident
   id: any;
   age: any;
@@ -85,7 +87,7 @@ export interface DialogData {
   bullyDescription: any;
   videoURL: any;
   bullyStatus: any;
-
+  userLang:any;
   //teachers table
   teacher_name: any;
 
@@ -204,6 +206,9 @@ export class DialogModalComponent implements OnInit {
   validBRoute="";
   validBDId="";
   validBDSchool="";
+  validBoarding = "";
+  validULang="";
+  profile_Image = "";
   dropSchoolName:any;
   driverName:any;
   uniqueDriver:any;
@@ -215,6 +220,7 @@ export class DialogModalComponent implements OnInit {
   editDriverId:any;
   bereavementId:any;
   showLoading:boolean =false;
+  isBoarding = "No";
 //  config = {
 //             displayKey:"description", //if objects array passed which key to be displayed defaults to description
 //             search:true, //true/false for the search functionlity defaults to false,
@@ -300,6 +306,9 @@ export class DialogModalComponent implements OnInit {
     this.createdDate = this.data.createdDateTime;
     this.bereavementId = this.data.id;
     this.editDriverId = this.data.id;
+    this.isBoarding = this.data.isBoarding;
+    this.validBoarding = this.data.isBoarding;
+    console.log("this.validBoarding",this.validBoarding);
     console.log("this.data",this.data.createdDateTime);
     console.log("TYPe",this.fileformat);
     console.log("ADMinID",this.adminSchoolId)
@@ -363,7 +372,11 @@ export class DialogModalComponent implements OnInit {
     this.validBDSchool = this.data.school_id;
     this.validccUser = this.data.ccUser;
     this.validAUId = this.data.admin_userid;
+    this.validULang = this.data.userLang;
+    this.profile_Image = this.data.profileImage;
     // end ///
+    console.log("this.profile_Image",this.profile_Image);
+    console.log("this.validULang",this.validULang);
     console.log("this.validAPhone",this.validAPhone);
     console.log("this.validccUser",this.validccUser);
     this.selectedValue = this.data.school_state;
@@ -377,10 +390,7 @@ export class DialogModalComponent implements OnInit {
     if (this.userInfo.schoolid === 0) {
       this.isSuperAdmin = true;
       this.validAState = this.data.admin_statename;
-<<<<<<< HEAD
       this.validState = this.userInfo.stateName;
-=======
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
       // console.log("SDF", this.isSuperAdmin);
     }else{
       this.schoolId = this.userInfo.schoolid;
@@ -410,6 +420,7 @@ export class DialogModalComponent implements OnInit {
       school_address: [this.data.school_address],
       school_state: [this.data.school_state],
       school_ZipCode: [this.data.zipCode],
+      school_boarding: [this.data.isBoarding]
       // this.selectedValue= [this.data.school_state],
     });
 
@@ -419,6 +430,7 @@ export class DialogModalComponent implements OnInit {
       school_id: [],
       school_state: [],
       school_ZipCode: [],
+      school_boarding: []
     });
     // this.ebbFileForm = this.formBuilder.group({});
     this.adminSaveForm = this.formBuilder.group({
@@ -593,6 +605,10 @@ export class DialogModalComponent implements OnInit {
   stateDropDown(eve) {
     this.stateId = eve;
   }
+  boardingDropDown(eve){
+    this.isBoarding = eve;
+    this.validBoarding = eve;
+  }
   driverDropDown(eve){
     this.driverId = eve
   }
@@ -642,11 +658,8 @@ getDriver(eve){
 
       }
       console.log("DriverId",this.driverId);
-<<<<<<< HEAD
     },error => {
       console.log('oops', error)
-=======
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
     });
   }
 
@@ -661,8 +674,9 @@ getDriver(eve){
       schoolAddress: school_address,
       stateId: stateId,
       zipCode: zipCode,
+      isBoarding: this.isBoarding
     };
-    if (school_name != "" && school_name != undefined) {
+    if ((school_name != "" && school_name != undefined) && (this.isBoarding !== "" && this.isBoarding !== undefined)) {
       this.http
         .post(this.url + "bully-buddy/school/add_school", formObj)
         .subscribe((res: any) => {
@@ -693,8 +707,9 @@ getDriver(eve){
       schoolAddress: school_address,
       stateId: this.selectedValue,
       zipCode: zipCode,
+      isBoarding: this.isBoarding
     };
-    if (school_name != "" && school_name != undefined) {
+    if ((school_name != "" && school_name != undefined) && (this.isBoarding !== "" && this.isBoarding !== undefined)) {
       this.http
         .post(this.url + "bully-buddy/school/update_school", formData)
         .subscribe((res: any) => {
@@ -755,7 +770,7 @@ getDriver(eve){
         });
     }
   }
-  editAdmin() {debugger;
+  editAdmin() {
     let school_id = this.adminEditForm.get("admin_school_id").value;
     let admin_username = this.adminEditForm.get("admin_username").value;
     let admin_password = this.adminEditForm.get("admin_password").value;
@@ -932,6 +947,13 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
         });
     });
   }
+
+
+  selectLanguage(eve){
+      console.log(" this.validULang this.validULang",eve);
+      this.validULang = eve;
+  }
+
   saveUser() {
     // let school_name = this.saveForm.get("school_name").value;
     // let school_address = this.saveForm.get("school_address").value;
@@ -1012,6 +1034,8 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
       fbCyber: "",
       instaCyber: "",
       snapShotCyber: "",
+      userLang:this.validULang,
+      profileImage: this.profile_Image
     };
 console.log("gender",gender);
 console.log("schoolId",schoolId);
@@ -1144,6 +1168,8 @@ else{
       city: city,
       state: this.selectedState,
       busRoute: this.busRoute,
+      userLang:this.validULang,
+      profileImage: this.profile_Image
     };
 
     console.log("schoolId",schoolId);
@@ -1487,11 +1513,8 @@ else{
               data: { value: "School District Updated Failled", type: false },
             });
           }
-<<<<<<< HEAD
         },error => {
           console.log('oops', error)
-=======
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
         });
 
   }
@@ -1537,20 +1560,12 @@ else{
 /// Convert Excel To Json Format......
     this.excel_file = event.target.files[0];
     console.log("Excel", this.excel_file);
-<<<<<<< HEAD
     let worksheet;
     let workBook = null;
     let jsonData = [];
     let jsonData2 = [];
     let prexlsToJson = [];
     let prexlsToJson2 = [];
-=======
-
-    let workBook = null;
-    let jsonData = [];
-    let prexlsToJson = [];
-
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
     const reader = new FileReader();
     const file =  event.target.files[0];
     reader.onload = (event) => {
@@ -1558,7 +1573,6 @@ else{
       this.excelValidationErrors = [];
       workBook =null;
       jsonData = [];
-<<<<<<< HEAD
       jsonData2 = [];
       this.xlsToJson =[];
       workBook = XLSX.read(data, { type: 'binary' });
@@ -1644,11 +1658,11 @@ var prexlsToJson3 = [];
             "w": slicedStr2}
           }
           else{
-            sheet[XLSX.utils.encode_cell({c:C, r:R})]= {"h": slicedStr2,
-            "r": "<t>"+slicedStr2+"</t>",
+            sheet[XLSX.utils.encode_cell({c:C, r:R})]= {"h": str2,
+            "r": "<t>"+str2+"</t>",
             "t": "s",
-            "v": slicedStr2,
-            "w": slicedStr2}
+            "v": str2,
+            "w": str2}
           }
          
         // headers.push(hdr);
@@ -1660,10 +1674,6 @@ var prexlsToJson3 = [];
 
 
 
-=======
-      this.xlsToJson =[];
-      workBook = XLSX.read(data, { type: 'binary' });
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
       jsonData = workBook.SheetNames.reduce((initial, name) => {
       if(name !== "States"){
         const sheet = workBook.Sheets[name];
@@ -1679,7 +1689,6 @@ var prexlsToJson3 = [];
         SheetName = "Sheet"+(index+1);
         item.map((item2,index2)=>{
         if(index2 !== 0){
-<<<<<<< HEAD
           var values = item2;
           // var tempName = "email(Mandatory)"
           // console.log("values",values.email_Mandatory)
@@ -1688,9 +1697,6 @@ var prexlsToJson3 = [];
 
          this.xlsToJson.push(item2)
 
-=======
-         this.xlsToJson.push(item2)
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
         }
         })
       })
@@ -1700,7 +1706,6 @@ var prexlsToJson3 = [];
 
       // Replacing UserTypeId from String to Int
       this.xlsToJson.map((item2,index2)=>{
-<<<<<<< HEAD
       
         // replace Json Key Names
           item2.email = item2.Email;
@@ -1727,6 +1732,8 @@ var prexlsToJson3 = [];
           delete item2.UserPhone;
           item2.userTypeId = item2.UserType;
           delete item2.UserType;
+          item2.isSocialUser = item2.SocialUser;
+          delete item2.SocialUser;
           if(item2.ParentPhone2)
           {
             item2.parentPhone2 = item2.ParentPhone2;
@@ -1764,6 +1771,10 @@ var prexlsToJson3 = [];
             item2.isSocialUser = item2.SocialUser;
             delete item2.SocialUser;
           }
+          if(item2.UserLanguage){
+            item2.userLang = item2.UserLanguage;
+            delete item2.UserLanguage;
+          }
         // };
 
         if(item2.ccUser === 1){
@@ -1775,11 +1786,6 @@ var prexlsToJson3 = [];
         else{
           item2.isSocialUser = 0;
         }
-=======
-        if(item2.ccUser === 1){
-          item2.ccUser = "+1"
-        }
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
         if(item2.ccUser === 91){
           item2.ccUser = "+91"
         }
@@ -1795,7 +1801,6 @@ var prexlsToJson3 = [];
         else{
           item2.userTypeId = 5;
         }
-<<<<<<< HEAD
 
       });
       /// end here ///
@@ -1805,16 +1810,6 @@ var prexlsToJson3 = [];
      
       /// Validation of the Columns
      
-=======
-      });
-      /// end here ///
-
-      // console.log("xlsToJson",this.xlsToJson);
-      // console.log("prexlsToJson",prexlsToJson);
-      // console.log("this.userInfo.schoolid",this.userInfo.schoolid)
-      /// Validation of the Columns
-      // console.log("prexlsToJson[0].length",prexlsToJson[0].length);
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
       if(prexlsToJson[0].length <= 1){
         this.excelValidationErrors.push("Sheet is Empty" );
       }
@@ -1896,16 +1891,9 @@ var prexlsToJson3 = [];
           })
       })
       /// End ///
-<<<<<<< HEAD
       
       const dataString = JSON.stringify(jsonData);
      
-=======
-      // console.log("this.excelValidationErrors",this.excelValidationErrors);
-      // console.log("xlsToJson",this.xlsToJson);
-      const dataString = JSON.stringify(jsonData);
-      // console.log("dataString",jsonData);
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
     }
     reader.readAsBinaryString(file);
     event.srcElement.value = null;
@@ -2079,7 +2067,7 @@ var prexlsToJson3 = [];
     });
   }
 
-  getAllBusRoute() {debugger;
+  getAllBusRoute() {
     let formObj = {
       schoolId: this.userInfo.schoolid,
     };
@@ -2134,42 +2122,6 @@ var prexlsToJson3 = [];
               this.editDriverDummy = this.editDriverDummy.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
             }
 
-<<<<<<< HEAD
-=======
-          } else {
-            alert(res.message + " : " + res.result);
-          }
-          resolve();
-        });
-    });
-  }
-  }
-  getBusRouteById() {
-    let arrLen: any = [];
-    let formObj = {
-      id: this.schoolId,
-    };
-    return new Promise<void>((resolve, reject) => {
-      this.http
-        .post(this.url + "bully-buddy/busroute/get_busroute_by_id", formObj)
-        .subscribe((res: any) => {
-          if (res.status == "200") {
-            // this.dataList.push(res.result);
-            // this.dataList.push(this.dataList);
-            arrLen.push(res.result);
-            // console.log("RESsss", arrLen);
-            if (arrLen.length === 1) {
-              // this.dataList = [];
-              // this.dataList.push(res.result);
-              this.data = res.result;
-              // this.totalRecords = res.result.length;
-            } else {
-              // this.dataList = res.result;
-              this.data = res.result;
-              // this.totalRecords = res.result.length;
-            }
-            console.log("DATALIST", this.data);
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
           } else {
             alert(res.message + " : " + res.result);
           }

@@ -16,7 +16,7 @@
           <div style="padding: 7px 20px 0 0">
             <!-- <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
               [(ngModel)]="searchText" autocomplete="off" placeholder="Start searching"> -->
-              <form (ngSubmit)="searchUser(searchText)" >
+              <form (ngSubmit)="searchTeacher(searchText)" >
                 <input style="width: 325px; margin-left:20px;border-radius: 5;" type="text" name="search"
                 [(ngModel)]="searchText"  autocomplete="off" placeholder="Search" [ngModelOptions]="{standalone: true}"
                 (ngModelChange)="showClear($event)" >
@@ -56,11 +56,7 @@
                   <!-- <th>Driver Id</th> -->
                   <th [class.active]="orderByd === 'schoolName'"
                   (click)="setOrder('schoolName')"
-<<<<<<< HEAD
-                  class="mdl-data-table__cell--non-numeric">School Name<span [hidden]="reverse">▼</span>
-=======
                   class="mdl-data-table__cell--non-numeric">SchoolName<span [hidden]="reverse">▼</span>
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
                   <span [hidden]="!reverse">▲[A-Z]</span></th>
                   <th *ngIf="!showSuperAdmin">Options</th>
                 </tr>

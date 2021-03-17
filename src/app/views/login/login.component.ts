@@ -3,12 +3,10 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { SuccessComponent } from "../../success/success.component";
-import { HttpClient, HttpParams, HttpHeaders,HttpErrorResponse } from "@angular/common/http";
+import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { PropertyServiceService } from "../../property-service.service";
 // import { CookieService } from "ngx-cookie-service";
 import { CookieService } from "angular2-cookie/core";
-import { catchError } from "rxjs/operators";
-import { error } from "@angular/compiler/src/util";
 // import { CookieService } from "ngx-cookie";
 @Component({
   selector: "app-dashboard",
@@ -81,14 +79,10 @@ export class LoginComponent {
             res.status == "401" ||
             res.message == "Invalid Credentials" || res.message =="Please enter valid details"
           ) {
-<<<<<<< HEAD
-         
-=======
           //   let resData = JSON.stringify(res.result);
           //   this.cookieService.put("LoginStatus", "login");
           // localStorage.setItem("UserInfo", resData);
           // this.router.navigateByUrl("/dash");
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
             this.dialog.open(SuccessComponent, {
               width: "20%",
               data: {
@@ -97,37 +91,18 @@ export class LoginComponent {
               },
             });
           }
-<<<<<<< HEAD
-          else if (res.status == 500)  {
-         
-            this.dialog.open(SuccessComponent, {
-              width: "20%",
-              data: {
-                value: res.error.error,
-                type: false,
-              },
-            });
-          }
-          // error => console.log('oops', error)
-          
-        },error => {
-        console.log('oops', error)
-        this.dialog.open(SuccessComponent, {
-          width: "20%",
-          data: {
-            value: error.error.error,
-            type: false,
-          },
-=======
 
->>>>>>> 102001482351c299b8c3a1445f0d9f0895565624
+        }
+        ,error => {
+          console.log('oops', error)
+          this.dialog.open(SuccessComponent, {
+            width: "20%",
+            data: {
+              value: error.error.error,
+              type: false,
+            },
+          });
         });
-      }
-      );
-        
-        // catchError((_error: HttpErrorResponse) => {
-
-        // })
     }
   }
   resetPassword() {

@@ -93,6 +93,7 @@ import {DpDatePickerModule} from 'ng2-date-picker';
 import { MyDatePickerModule } from 'mydatepicker';
 import { AngularMyDatePickerModule } from 'angular-mydatepicker';
 import { NotifierModule, NotifierOptions } from 'angular-notifier';
+import { SettingsComponent } from './settings/settings.component';
 
 const customNotifierOptions: NotifierOptions = {
   position: {
@@ -171,7 +172,6 @@ const customNotifierOptions: NotifierOptions = {
     // SelectDropDownModule,
     // NgModule,
     OrderModule,
-    Ng2AlphabetSortModule,
     DpDatePickerModule,
     // NgDatepickerModule,
     MyDatePickerModule,
@@ -211,7 +211,8 @@ const customNotifierOptions: NotifierOptions = {
     BereavementComponent,
     ApproveSchoolComponent,
     RoomlistComponent,
-    // DashboardComponent,
+    SettingsComponent,
+    DashboardComponent,
     // DefaultLayoutComponent
   ],
   providers: [

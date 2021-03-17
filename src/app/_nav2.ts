@@ -48,17 +48,17 @@ export const navItems2: INavData[] = [
     url: "/dash/emergencyreport",
     icon: "fa fa-warning",
   },
-  {
-    divider: true,
-  },
+  // {
+  //   divider: true,
+  // },
   {
     name: "Chats",
     url: "/dash/roomlist",
     icon: "fa fa-comments-o",
   },
-  {
-    divider: true,
-  },
+  // {
+  //   divider: true,
+  // },
   {
     name: "Templates",
     url: "/dash/template",
@@ -83,9 +83,14 @@ export const navItems2: INavData[] = [
     divider: true,
   },
 
-  // {
-  //   divider: true,
-  // },
+  {
+    divider: true,
+  },
+  {
+    name: "Settings",
+    url: "/dash/settings",
+    icon: "cui-settings",
+  },
   {
     name: "LogOut",
     url: "/login",
