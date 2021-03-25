@@ -709,7 +709,7 @@ dateChanged2(event){
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
       });
-      const file = new File([blob], "user" + ".xlsx", {
+      const file = new File([blob], "EmergencyReport" + ".xlsx", {
         type: "application/vnd.ms.excel",
       });
       saveAs(file);

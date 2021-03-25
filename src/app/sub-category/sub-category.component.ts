@@ -370,7 +370,7 @@ dayFilter(eve) {
       to = this.toDate
     }
 
-    const url = "http://bullyingbuddyapp.com/api/excel/download" +  "?schoolId=" + this.schoolId.schoolid+ "&from=" + from+ "&to=" + to;
+    const url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download" +  "?schoolId=" + this.schoolId.schoolid+ "&from=" + from+ "&to=" + to;
     this.http.post(url,"", { responseType: "blob" }).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {

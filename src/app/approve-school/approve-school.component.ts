@@ -84,7 +84,7 @@ export class ApproveSchoolComponent implements OnInit {
     });
   }
   getAllApprpveSchools(){
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       let formObj={
         isApproved:0
       }
@@ -120,13 +120,20 @@ export class ApproveSchoolComponent implements OnInit {
             this.showNoRecord = true;
           }
           resolve();
+        },(error) => {
+          console.log("ERR", error);
+          // if (error instanceof HttpErroResponse) {
+          this.alertDialog.open(SuccessComponent, {
+            width: "30%",
+            data: { value: error.error.message, type: false },
+          });
         });
     });
   }
 
   approveSchool(list)
   {
-     return new Promise((resolve, reject) => {
+     return new Promise<void>((resolve, reject) => {
       let formObj={
         id:list
       }
@@ -145,13 +152,20 @@ export class ApproveSchoolComponent implements OnInit {
            
           }
           resolve();
+        },(error) => {
+          console.log("ERR", error);
+          // if (error instanceof HttpErroResponse) {
+          this.alertDialog.open(SuccessComponent, {
+            width: "30%",
+            data: { value: error.error.message, type: false },
+          });
         });
     });
   }
 
 rejectSchool(list)
   {
-     return new Promise((resolve, reject) => {
+     return new Promise<void>((resolve, reject) => {
       let formObj={
         id:list
       }
@@ -170,6 +184,13 @@ rejectSchool(list)
            
           }
           resolve();
+        },(error) => {
+          console.log("ERR", error);
+          // if (error instanceof HttpErroResponse) {
+          this.alertDialog.open(SuccessComponent, {
+            width: "30%",
+            data: { value: error.error.message, type: false },
+          });
         });
     });
   }
