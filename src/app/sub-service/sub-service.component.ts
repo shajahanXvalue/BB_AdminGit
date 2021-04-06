@@ -117,13 +117,15 @@ myDpOptions: IAngularMyDpOptions = {
     if (this.getCookies === "") {
       console.log("NAVIGATE");
       localStorage.removeItem("userInfo");
-      // this.router.navigateByUrl("/login");
-      window.location.href = "https://bullyingbuddyapp.com/admin/#/login";
+      // this.router.navigateByUrl("#/login");
+      window.location.href = "#/login";
+      // window.location.href = "https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.schoolId === null || this.schoolId === undefined) {
       alert("You Have been LogOut, Kindly LogIn to Continue!");
-      // this.router.navigateByUrl("/login");
-      window.location.href = "https://bullyingbuddyapp.com/admin/#/login";
+      // this.router.navigateByUrl("#/login");
+      window.location.href = "#/login";
+      // window.location.href = "https://bullyingbuddyapp.com/admin/#/login";
     } else if (this.schoolId !== null) {
       this.getAllIncedents();
     }
@@ -255,12 +257,18 @@ dateChanged2(event){
     let page = this.page.toString();
     let pageNo: number = +page;
     pageNo = pageNo-1  ;
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       let formObj = {
         schoolId: this.schoolId.schoolid,
       };
       this.http
-        .post(this.url + "bully-buddy/incident/get_all_incident"+ "?pageno=" + pageNo, formObj)
+        .post(this.url + "bully-buddy/incident/get_all_incident"+ "?pageno=" + pageNo, formObj,{headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result.content;
@@ -283,10 +291,23 @@ dateChanged2(event){
             else {
               this.showNoRecord = false;
             }
+          }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
           } else {
             this.showNoRecord = false;
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -296,9 +317,15 @@ dateChanged2(event){
     let formObj = {
       id: this.schoolId.schoolid,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.url + "bully-buddy/incident/get_incident_by_id", formObj)
+        .post(this.url + "bully-buddy/incident/get_incident_by_id", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
@@ -316,8 +343,23 @@ dateChanged2(event){
               this.totalRecords = res.result.length;
               // console.log("INCITOTAL", this.totalRecords);
             }
+          }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          } else{
+
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -355,6 +397,12 @@ dateChanged2(event){
     });
   }
   deleteIncident(id) {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     var confirmResult = this.dialog.open(DeleteDialogComponent, {
       width: "22%",
       data: {
@@ -368,7 +416,7 @@ dateChanged2(event){
           id: id,
         };
         this.http
-          .post(this.url + "bully-buddy/incident/delete_incident", formObj)
+          .post(this.url + "bully-buddy/incident/delete_incident", formObj, {headers: config()})
           .subscribe((res: any) => {
             if (res.status == "200") {
               // if (this.schoolId.schoolid === 0) {
@@ -377,6 +425,21 @@ dateChanged2(event){
               // } else {
               //   this.getIncidentsById();
               // }
+            }else if (res.status === "504" || res.status === 504){
+              // this.alertDialog.open(SuccessComponent, {
+              //   width: "30%",
+              //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+              // });
+              alert(res.message + " : " + res.result+ "You have been logout");
+              this.router.navigateByUrl("/login");
+            } else{
+
+            }
+          },error => {
+            console.log('oops', error);
+            if (error.status === 504){
+            alert("You have been logout");
+              this.router.navigateByUrl("/login");
             }
           });
       }
@@ -400,6 +463,12 @@ dateChanged2(event){
     let to;
     let from;
     let age;
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if(this.toDate === undefined){
         to="null"
     }
@@ -438,7 +507,7 @@ dateChanged2(event){
           this.url +
             "bully-buddy/incident/search_incidents" +
             "?searchword=" +
-            searchWord+ "&from=" + from+ "&to=" + to+ "&age=" +age+ "&schoolId=" + this.schoolId.schoolid,""
+            searchWord+ "&from=" + from+ "&to=" + to+ "&age=" +age+ "&schoolId=" + this.schoolId.schoolid,"",{headers: config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -460,6 +529,21 @@ dateChanged2(event){
             else{
               this.showNoRecord = false;
             }
+          }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }else{
+
+          }
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
           }
         });
     }
@@ -468,6 +552,12 @@ dateChanged2(event){
   }
   }
   search(){
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       let from;
       let to;
@@ -508,7 +598,7 @@ dateChanged2(event){
       else{
       this.http
         .post(
-          this.url + "bully-buddy/incident/search_incidents"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to+ "&age=" +age+ "&schoolId=" + this.schoolId.schoolid,"")
+          this.url + "bully-buddy/incident/search_incidents"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to+ "&age=" +age+ "&schoolId=" + this.schoolId.schoolid,"", {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
@@ -521,11 +611,24 @@ dateChanged2(event){
             else{
               this.showNoRecord = false;
             }
-           } else {
+           }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          } else {
             this.showNoRecord = false;
             alert(res.message + " : " + res.result);
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
       }
     });
@@ -649,6 +752,12 @@ dateChanged2(event){
   excelDownload() {
     let from = null;
     let to = null;
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     // console.log("frommmmm",this.fromDate)
     if(this.fromDate !== undefined && this.fromDate !== null){
       from = this.fromDate
@@ -656,8 +765,8 @@ dateChanged2(event){
     if(this.toDate !== undefined && this.toDate !== null){
       to = this.toDate
     }
-    let url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download_incident"+ "?schoolId=" + this.schoolId.schoolid+  "&from=" + from+ "&to=" + to;
-    this.http.post(url,"" ,{ responseType: "blob" }).subscribe((data) => {
+    let url = this.url+"bully-buddy/excel/download_incident"+ "?schoolId=" + this.schoolId.schoolid+  "&from=" + from+ "&to=" + to;
+    this.http.post(url,"" ,{ responseType: "blob",headers: config() }).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
@@ -669,7 +778,7 @@ dateChanged2(event){
     });
   }
 
-fileOpen(list) {debugger
+fileOpen(list) {
     let fileURl;
     let file = list;
     let type;

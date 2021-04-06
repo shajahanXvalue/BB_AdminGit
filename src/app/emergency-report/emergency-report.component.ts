@@ -10,6 +10,7 @@ import { CookieService } from "ngx-cookie-service";
 // import { DatePipe } from "@angular/common";
 import * as moment from 'moment';
 import {IMyDpOptions} from 'mydatepicker';
+import { SuccessComponent } from '../success/success.component';
 @Component({
   selector: "app-emergency-report",
   templateUrl: "./emergency-report.component.html",
@@ -61,7 +62,8 @@ public myDatePickerOptions2: IMyDpOptions = {
     private property: PropertyServiceService,
     private router: Router,
     private datePipe: DatePipe,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    public alertDialog: MatDialog,
   ) {
     //Pagination
     this.data = new Array<any>();
@@ -98,14 +100,14 @@ public myDatePickerOptions2: IMyDpOptions = {
     if (this.getCookies !== "login") {
       localStorage.removeItem("userInfo");
       // this.router.navigateByUrl("/login");
-      // window.location.href = "/login";
-      window.location.href="https://bullyingbuddyapp.com/admin/#/login";
+      window.location.href = "#/login";
+      // window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.userInfo === null || this.userInfo === undefined) {
       alert("You Have been LogOut, Kindly LogIn to Continue!");
       // this.router.navigateByUrl("/login");
-      // window.location.href = "/login";
-      window.location.href="https://bullyingbuddyapp.com/admin/#/login";
+      window.location.href = "#/login";
+      // window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     // if (this.userInfo.schoolid === 0) {
     //   this.showSuperAdmin = true;
@@ -221,11 +223,17 @@ dateChanged2(event){
     let formObj = {
       schoolId: this.userInfo.schoolid,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
         .post(
           this.uri + "bully-buddy/emergencyreport/get_all_emergencyreport"+ "?pageno=" + pageNo,
-          formObj
+          formObj, {headers:config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -245,10 +253,28 @@ dateChanged2(event){
             }
 
             // this.getAllSchools();
+          }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
           } else {
-            alert(res.message + " : " + res.result);
+            this.showNoRecord = true;
+            // alert(res.message + " : " + res.result);
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result, type: false },
+            // });
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -257,11 +283,17 @@ dateChanged2(event){
     let formObj = {
       id: this.userInfo.schoolid,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
         .post(
           this.uri + "bully-buddy/emergencyreport/get_emergencyreport_by_id",
-          formObj
+          formObj, {headers: config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -286,10 +318,28 @@ dateChanged2(event){
               this.showNoRecord = false;
             }
             console.log("DATALIST", this.dataList);
-          } else {
-            alert(res.message + " : " + res.result);
+          } else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }else {
+            // alert(res.message + " : " + res.result);
+            this.showNoRecord = true
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result, type: false },
+            });
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -297,9 +347,15 @@ dateChanged2(event){
     // this.totalRecords = 0;
     // this.page = 1;
     let schoolName = [];
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.uri + "bully-buddy/school/get_all_school", "")
+        .post(this.uri + "bully-buddy/school/get_all_school", "", {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.schoolList = res.result;
@@ -338,10 +394,27 @@ dateChanged2(event){
             // });
             this.schoolName = schoolName;
             console.log("zipItem", this.data);
-          } else {
-            alert(res.message + " : " + res.result);
+          } else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }else {
+            // alert(res.message + " : " + res.result);
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result, type: false },
+            });
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -405,6 +478,12 @@ dateChanged2(event){
   }
 
   deleteReport(id) {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     var confirmResult = this.dialog.open(DeleteDialogComponent, {
       width: "30%",
       data: {
@@ -422,7 +501,7 @@ dateChanged2(event){
         this.http
           .post(
             this.uri + "bully-buddy/emergencyreport/delete_emergencyreport",
-            formObj
+            formObj, {headers: config()}
           )
           .subscribe((res: any) => {
             if (res.status == "200") {
@@ -432,6 +511,22 @@ dateChanged2(event){
               // } else {
               //   this.getTeacherById();
               // }
+            }else if (res.status === "504" || res.status === 504){
+              // this.alertDialog.open(SuccessComponent, {
+              //   width: "30%",
+              //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+              // });
+              alert(res.message + " : " + res.result+ "You have been logout");
+              this.router.navigateByUrl("/login");
+            }
+            else{
+
+            }
+          },error => {
+            console.log('oops', error);
+            if (error.status === 504){
+            alert("You have been logout");
+              this.router.navigateByUrl("/login");
             }
           });
       }
@@ -439,6 +534,12 @@ dateChanged2(event){
   }
 
   searchUser(eve) {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     const arrLen: any = [];
     let searchWord = eve;
     let to;
@@ -476,7 +577,7 @@ dateChanged2(event){
           this.uri +
             "bully-buddy/emergencyreport/search_emergency_report" +
             "?searchword=" +
-            searchWord+ "&from=" + from+ "&to=" + to+"&schoolId="+this.userInfo.schoolid,""
+            searchWord+ "&from=" + from+ "&to=" + to+"&schoolId="+this.userInfo.schoolid,"", {headers: config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -499,8 +600,22 @@ dateChanged2(event){
             }
             // }
           }
+          else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }
           else{
             this.showNoRecord = true;
+          }
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
           }
         });
     }
@@ -515,6 +630,12 @@ dateChanged2(event){
   }
 
   search(){
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       let from;
       let to;
@@ -548,7 +669,7 @@ dateChanged2(event){
       else{
       this.http
         .post(
-          this.uri + "bully-buddy/emergencyreport/search_emergency_report"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to+"&schoolId="+this.userInfo.schoolid,"")
+          this.uri + "bully-buddy/emergencyreport/search_emergency_report"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to+"&schoolId="+this.userInfo.schoolid,"", {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
@@ -561,10 +682,27 @@ dateChanged2(event){
             else{
               this.showNoRecord = false;
             }
-           } else {
-            alert(res.message + " : " + res.result);
+           } else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }else {
+            // alert(res.message + " : " + res.result);
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result, type: false },
+            });
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
       }
     });
@@ -703,7 +841,7 @@ dateChanged2(event){
       to = this.toDate
     }
 
-    const url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download_emergencyreport" + "?schoolId=" + this.userInfo.schoolid+ "&from=" + from+ "&to=" + to;
+    const url = this.uri+"api/excel/download_emergencyreport" + "?schoolId=" + this.userInfo.schoolid+ "&from=" + from+ "&to=" + to;
     this.http.post(url,"", { responseType: "blob" }).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {

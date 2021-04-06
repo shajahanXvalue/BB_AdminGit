@@ -105,14 +105,14 @@ public myDatePickerOptions2: IMyDpOptions = {
     if (this.getCookies !== "login") {
       localStorage.removeItem("userInfo");
       // this.router.navigateByUrl("/login");
-      // window.location.href = "/login";
-      window.location.href="https://bullyingbuddyapp.com/admin/#/login";
+      window.location.href = "#/login";
+      // window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.userInfo === null || this.userInfo === undefined) {
       alert("You Have been LogOut, Kindly LogIn to Continue!");
       // this.router.navigateByUrl("/login");
-      // window.location.href = "/login";
-      window.location.href="https://bullyingbuddyapp.com/admin/#/login";
+      window.location.href = "#/login";
+      // window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     this.getAllBereavement();
     if (this.userInfo.schoolid === 0) {
@@ -233,6 +233,12 @@ searchUser(eve) {
     let to;
     let from;
     let age;
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if(this.toDate === undefined){
         to="null"
     }
@@ -271,7 +277,7 @@ searchUser(eve) {
           this.uri +
             "bully-buddy/bereavement/search_bereavement" +
             "?searchword=" +
-            searchWord+ "&from=" + from+ "&to=" + to+ "&age=" +age,""
+            searchWord+ "&from=" + from+ "&to=" + to+ "&age=" +age,"", {headers: config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -294,9 +300,22 @@ searchUser(eve) {
               this.showNoRecord = false;
             }
             // }
+          }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
           }
           else{
             this.showNoRecord = false;
+          }
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
           }
         });
     }
@@ -316,6 +335,12 @@ searchUser(eve) {
       let to;
       let search;
       let age;
+      const config=()=>{
+        let token=localStorage.getItem("BBToken");
+        if(token!=""){
+        return {Authorization:`Bearer ${token}`}
+        }
+      }
       if(this.fromDate === undefined){
         from="null"
     }
@@ -352,7 +377,7 @@ searchUser(eve) {
       {
       this.http
         .post(
-          this.uri + "bully-buddy/bereavement/search_bereavement"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to+ "&age=" +age,"")
+          this.uri + "bully-buddy/bereavement/search_bereavement"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to+ "&age=" +age,"", {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
@@ -365,16 +390,35 @@ searchUser(eve) {
               this.showNoRecord = false;
             }
             console.log("Report",res.result);
-           } else {
+           }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          } else {
             this.showNoRecord = true;
             alert(res.message + " : " + res.result);
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
       }
     });
   }
    getAllBereavement() {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     let formObj = {
       schoolid: this.userInfo.schoolid,
     };
@@ -386,7 +430,7 @@ searchUser(eve) {
     return new Promise<void>((resolve, reject) => {
       this.http
         .post(
-          this.uri + "bully-buddy/bereavement/get_all_bereavement" + "?pageno=" + pageNo, formObj)
+          this.uri + "bully-buddy/bereavement/get_all_bereavement" + "?pageno=" + pageNo, formObj,{ headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result.content;
@@ -403,11 +447,24 @@ searchUser(eve) {
             else{
               this.showNoRecord = false;
             }
+          }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
           } else {
             this.showNoRecord = true;
             alert(res.message + " : " + res.result);
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -463,14 +520,20 @@ if(type === "peg"){
   excelDownload() {
     let from = "null";
     let to = "null";
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if(this.fromDate !== undefined && this.fromDate !== null){
       from = this.fromDate
     }
     if(this.toDate !== undefined && this.toDate !== null){
       to = this.toDate
     }
-    const url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download_bereavement" + "?from=" + from+ "&to=" + to;
-    this.http.post(url,"", { responseType: "blob" }).subscribe((data) => {
+    const url = this.uri+"bully-buddy/excel/download_bereavement" + "?from=" + from+ "&to=" + to;
+    this.http.post(url,"", { responseType: "blob" , headers: config()}).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",

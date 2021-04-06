@@ -210,14 +210,19 @@ playAudioo(){
     var apiData = [];
     var fireData = [];
     let length=0;
-
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     const formData = new FormData();
     formData.append("id", this.userId.userId);
     formData.append("userTypeId", "5");
 
     return new Promise((resolve, reject) => {
       this.http
-        .post(this.url + "/bully-buddy/user/get_chat_group_ids", formData)
+        .post(this.url + "bully-buddy/user/get_chat_group_ids", formData, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             // console.log("list data", res.result);
@@ -328,6 +333,22 @@ playAudioo(){
 
             //   }
             // });
+          }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          } 
+          else{
+            
+          }
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
           }
         });
     });
@@ -336,12 +357,18 @@ playAudioo(){
   addGroupList() {
     var apiData = [];
     var fireData = [];
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     const formData = new FormData();
     formData.append("id", this.userId.userId);
     formData.append("userTypeId", "5");
     return new Promise((resolve, reject) => {
       this.http
-        .post(this.url + "/bully-buddy/chat/get_group_chatId", formData)
+        .post(this.url + "bully-buddy/chat/get_group_chatId", formData)
         .subscribe((res: any) => {
           if (res.status == "200") {
             // console.log("res-> Group", res.result);
@@ -447,6 +474,22 @@ playAudioo(){
             //   });
             //   }
             // });
+          }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }
+          else{[
+
+          ]}
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
           }
         });
     });
@@ -845,13 +888,19 @@ stoprefreshTimer() {
 
   groupTypeApi(userType, userChatID) {
     if (userType == "one") {
+      const config=()=>{
+        let token=localStorage.getItem("BBToken");
+        if(token!=""){
+        return {Authorization:`Bearer ${token}`}
+        }
+      }
       const formData = new FormData();
       formData.append("userId", userChatID);
       return new Promise<void>((resolve, reject) => {
         this.http
           .post(
-            this.url + "/bully-buddy/push_config/get_device_token",
-            formData
+            this.url + "bully-buddy/push_config/get_device_token",
+            formData, {headers: config()}
           )
           .subscribe((res: any) => {
             this.oneToOneDeviceToken = [];
@@ -862,19 +911,42 @@ stoprefreshTimer() {
                 id: "",
                 userTypeId: "",
               });
+            }else if (res.status === "504" || res.status === 504){
+              // this.alertDialog.open(SuccessComponent, {
+              //   width: "30%",
+              //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+              // });
+              alert(res.message + " : " + res.result+ "You have been logout");
+              this.router.navigateByUrl("/login");
+            }
+            else{
+
             }
             console.log("this.oneToOneDeviceToken",this.oneToOneDeviceToken)
+          },error => {
+            console.log('oops', error);
+            if (error.status === 504){
+            alert('You have been logout');
+              this.router.navigateByUrl("/login");
+            }
           });
         resolve();
       });
-    } else {
+    }
+     else {
+      const config=()=>{
+        let token=localStorage.getItem("BBToken");
+        if(token!=""){
+        return {Authorization:`Bearer ${token}`}
+        }
+      }
       const formData = new FormData();
       formData.append("chatId", userChatID);
       return new Promise<void>((resolve, reject) => {
         this.http
           .post(
-            this.url + "/bully-buddy/chat/get_device_tokens_by_chatId",
-            formData
+            this.url + "bully-buddy/chat/get_device_tokens_by_chatId",
+            formData, {headers: config()}
           )
           .subscribe((res: any) => {
             // console.log("group 1", res);
@@ -893,9 +965,26 @@ stoprefreshTimer() {
                 // });
               });
               console.log("this.oneToOneDeviceToken",this.oneToOneDeviceToken);
+            }else if (res.status === "504" || res.status === 504){
+              // this.alertDialog.open(SuccessComponent, {
+              //   width: "30%",
+              //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+              // });
+              alert(res.message + " : " + res.result+ "You have been logout");
+              this.router.navigateByUrl("/login");
+            }
+            else{
+
+            }
+            resolve();
+          },error => {
+            console.log('oops', error);
+            if (error.status === 504){
+            alert("You have been logout");
+              this.router.navigateByUrl("/login");
             }
           });
-        resolve();
+       
       });
     }
   }
@@ -920,13 +1009,19 @@ stoprefreshTimer() {
     }
   }
   getOneChatUser() {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     const formData = new FormData();
     formData.append("id", this.userId.userId);
     formData.append("userTypeId", "5");
     let oneChatLength=parseInt(localStorage.getItem("OneChatUserLength"))
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.url + "/bully-buddy/user/get_chat_group_ids", formData)
+        .post(this.url + "bully-buddy/user/get_chat_group_ids", formData, {headers: config()})
         .subscribe(
           (res: any) => {
             if (res.status == "200") {
@@ -940,12 +1035,26 @@ stoprefreshTimer() {
           //  console.log("RES.Length", this.OneChatUser)
               // this.starFirebasetTimer();
               this.getOnechatFirebase();
+            }else if (res.status === "504" || res.status === 504){
+              // this.alertDialog.open(SuccessComponent, {
+              //   width: "30%",
+              //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+              // });
+              alert(res.message + " : " + res.result+ "You have been logout");
+              this.router.navigateByUrl("/login");
             }
             else{
               this.showNoChat = true;
             }
           },
-          (err) => console.log(err)
+          // (err) => console.log(err)
+          error => {
+            console.log('oops', error);
+            if (error.status === 504){
+            alert("You have been logout");
+              this.router.navigateByUrl("/login");
+            }
+          }
         );
 
       resolve();
@@ -1135,12 +1244,18 @@ getOnechatFirebase(){
 
   getGroupChatUser() {
     // this.allChatUser=[];
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     const formData = new FormData();
     formData.append("id", this.userId.userId);
     formData.append("userTypeId", "5");
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.url + "/bully-buddy/chat/get_group_chatId", formData)
+        .post(this.url + "bully-buddy/chat/get_group_chatId", formData, {headers: config()})
         .subscribe(
           (res: any) => {
             if (res.status == "200") {
@@ -1154,12 +1269,26 @@ getOnechatFirebase(){
               // console.log("res->", res.result);
               this.getGroupChatFireBase();
               // this.starFirebasetTimer();
+            }else if (res.status === "504" || res.status === 504){
+              // this.alertDialog.open(SuccessComponent, {
+              //   width: "30%",
+              //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+              // });
+              alert(res.message + " : " + res.result+ "You have been logout");
+              this.router.navigateByUrl("/login");
             }
             else{
               this.showNoChat = false;
              }
           },
-          (err) => console.log(err)
+          // (err) => console.log(err)
+          error => {
+            console.log('oops', error);
+            if (error.status === 504){
+            alert("You have been logout");
+              this.router.navigateByUrl("/login");
+            }
+          }
         );
       resolve();
     });

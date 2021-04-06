@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { LocationStrategy } from "@angular/common";
-import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from "@angular/common/http";
 import { MatDialog } from "@angular/material/dialog";
 import { DialogModalComponent } from "../dialog-modal/dialog-modal.component";
 import { DeleteDialogComponent } from "../delete-dialog/delete-dialog.component";
@@ -60,9 +60,15 @@ export class StatesComponent implements OnInit {
     // let formObj = {
     //   schoolId: this.userInfo.schoolid,
     // };
-    return new Promise((resolve, reject) => {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
+    return new Promise<void>((resolve, reject) => {
       this.http
-        .get(this.uri + "bully-buddy/state/get_all_state")
+        .post(this.uri + "bully-buddy/state/get_all_state",'',{headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
@@ -71,17 +77,36 @@ export class StatesComponent implements OnInit {
             if (this.totalRecords === 0) {
               this.showNoRecords = true;
             }
-          } else {
+          } else if (res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }else {
             alert(res.message + " : " + res.result);
             this.showNoRecords = true;
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
   excelDownload() {
-    let url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download_state";
-    this.http.get(url, { responseType: "blob" }).subscribe((data) => {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
+    let url = this.uri+"bully-buddy/excel/download_state";
+    this.http.post(url, '', { responseType: "blob" , headers: config()}).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
@@ -90,6 +115,12 @@ export class StatesComponent implements OnInit {
         type: "application/vnd.ms.excel",
       });
       saveAs(file);
+    },error => {
+      console.log('oops', error);
+      if (error.status === 504){
+      alert("You have been logout");
+        this.router.navigateByUrl("/login");
+      }
     });
   }
   order() {

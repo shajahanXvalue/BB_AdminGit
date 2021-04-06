@@ -35,12 +35,12 @@ export class SchoolsComponent implements OnInit {
   selectedZipCode = null;
   stateItems = [];
   zipCodeItem = [];
-  alphaSort:boolean=false;
-  visibleClear:boolean = false;
+  alphaSort: boolean = false;
+  visibleClear: boolean = false;
   orderByd: string = 'schoolName';
   reverse: boolean = false;
-  fromDate:any;
-  toDate:any;
+  fromDate: any;
+  toDate: any;
    constructor(
     private http: HttpClient,
     public dialog: MatDialog,
@@ -72,15 +72,15 @@ export class SchoolsComponent implements OnInit {
   dataList: any = [];
   imgList: any;
   structImgList: any;
-  totalPages:any;
+  totalPages: any;
   structCatList: any;
   showSuperAdmin: boolean = false;
   orderFlag: boolean = false;
   showNoRecord: boolean = false;
-  localschoolRec:any=[];
+  localschoolRec: any = [];
   // imgPath = this.property.url;
   stateList: any = [];
-  searchWord:any;
+  searchWord: any;
   getCookies: string = this.cookieService.get("LoginStatus");
   ngOnInit() {
     // console.log(this.userInfo);
@@ -98,7 +98,7 @@ export class SchoolsComponent implements OnInit {
     if (this.userInfo.schoolid === 0) {
       this.showSuperAdmin = true;
         //  console.log("this.searchText",this.searchText);
-        if(this.searchText === "" || this.searchText === undefined)
+        if (this.searchText === "" || this.searchText === undefined)
             {
               // alert("hiii")
               // console.log("this.searchTextt",this.searchText);
@@ -123,14 +123,14 @@ export class SchoolsComponent implements OnInit {
    pageChanged(event) {
 
     console.log("pagination", event);
-    console.log("SelectedPAgeState",this.selectedState)
-    console.log("SelectedPAgesearchText",this.searchText)
-     if(event!==""){
+    console.log("SelectedPAgeState", this.selectedState)
+    console.log("SelectedPAgesearchText", this.searchText)
+     if (event !== ""){
         this.page = event;
-        if(event > this.totalPages){
+        if (event > this.totalPages){
             this.page = 1
       }
-    if((this.selectedState === null || this.selectedState === "") && (this.searchText === ""||this.searchText === undefined)){
+    if ((this.selectedState === null || this.selectedState === "") && (this.searchText === "" || this.searchText === undefined)){
       // alert("PageCHange")
         this.getAllSchools();
     }
@@ -140,17 +140,17 @@ export class SchoolsComponent implements OnInit {
   }
 
   dateChanged(event){
-    if(event.target.id === "from" && event.target.value !== ""){
-      console.log("From",event.target.value)
-      this.fromDate = event.target.value+' 00:00:00'
+    if (event.target.id === "from" && event.target.value !== ""){
+      console.log("From", event.target.value)
+      this.fromDate = event.target.value + ' 00:00:00'
     }
-    else if(event.target.id === "from" && event.target.value === ""){
+    else if (event.target.id === "from" && event.target.value === ""){
       this.fromDate = "null"
     }
-    else if(event.target.id === "to"&& event.target.value !== ""){
-      this.toDate = event.target.value+' 00:00:00'
+    else if (event.target.id === "to" && event.target.value !== ""){
+      this.toDate = event.target.value + ' 00:00:00'
     }
-    else if(event.target.id === "to" && event.target.value === ""){
+    else if (event.target.id === "to" && event.target.value === ""){
       this.toDate = "null"
     }
     this.search();
@@ -159,21 +159,28 @@ export class SchoolsComponent implements OnInit {
   }
 
   setPage(eve){
-    console.log("PageSizeCHange",eve)
+    console.log("PageSizeCHange", eve)
   }
 
   getAllSchools() {
     // this.totalRecords = 0;
     let page = this.page.toString();
     let pageNo: number = +page;
+  
     pageNo = pageNo - 1;
     console.log("Page", pageNo);
 // let formObj={
 //   pageno:pageNo
 // }
+const config = () => {
+  let token = localStorage.getItem("BBToken");
+  if (token != ""){
+  return {Authorization: `Bearer ${token}`}
+  }
+}
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.uri + "bully-buddy/school/get_all_school"+ "?pageno=" + pageNo, "")
+        .post(this.uri + "bully-buddy/school/get_all_school" + "?pageno=" + pageNo, '', {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result.content;
@@ -187,12 +194,31 @@ export class SchoolsComponent implements OnInit {
               this.showNoRecord = false;
             }
 
-          } else {
-            alert(res.message + " : " + res.result);
+          } 
+          else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+          else {
+            // alert(res.message + " : " + res.result);
             this.showNoRecord = true;
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result, type: false },
+            });
+
           }
           resolve();
           // this.getZipCode();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
 
     });
@@ -200,12 +226,18 @@ export class SchoolsComponent implements OnInit {
   }
   getSchoolById() {
     let arrLen: any = [];
-    let formObj = {
-      id: this.userInfo.schoolid,
-    };
+    let formObj = new FormData();
+    formObj.append('id',this.userInfo.schoolid)
+    
+    const config = () => {
+      let token = localStorage.getItem("BBToken");
+      if (token != ""){
+      return {Authorization: `Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.uri + "bully-buddy/school/get_school_by_id", formObj)
+        .post(this.uri + "bully-buddy/school/get_school_by_id", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             // this.dataList.push(res.result);
@@ -227,10 +259,26 @@ export class SchoolsComponent implements OnInit {
               this.getAllState();
             }
             // console.log("DATALIST", this.dataList);
-          } else {
-            alert(res.message + " : " + res.result);
+          }  else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }else {
+            // alert(res.message + " : " + res.result);
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result, type: false },
+            });
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -247,52 +295,71 @@ export class SchoolsComponent implements OnInit {
       let from;
       let to;
       let search;
-      if(this.fromDate === undefined){
-        from="null"
+      if (this.fromDate === undefined){
+        from = "null"
     }
     else{
       from = this.fromDate;
     }
-      if(this.toDate === undefined){
-          to="null"
+      if (this.toDate === undefined){
+          to = "null"
       }
       else{
         to = this.toDate;
       }
-      if(this.searchWord === undefined || this.searchWord === null|| this.searchWord === ""){
+      if (this.searchWord === undefined || this.searchWord === null || this.searchWord === ""){
         search = "null"
       }
       else{
         search = this.searchWord
       }
-      let formObj={
-        searchword:search,
-        from:from,
-        to:to
+      let formObj = {
+        searchword: search,
+        from: from,
+        to: to
       }
-      if(search==="null"&&from==="null"&&to==="null"){
+      if (search === "null" && from === "null" && to === "null"){
         this.getAllSchools();
       }
       else{
+        const config = () => {
+          let token = localStorage.getItem("BBToken");
+          if (token != ""){
+          return {Authorization: `Bearer ${token}`}
+          }
+        }
       this.http
         .post(
-          this.uri + "bully-buddy/school/search_school"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to +"&schoolId=" +this.userInfo.schoolid,"")
+          this.uri + "bully-buddy/school/search_school" + "?searchword=" + search + "&from=" + from + "&to=" + to + "&schoolId=" + this.userInfo.schoolid, "", {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
             // this.userData = res.result;
             this.totalRecords = res.result.length
 
-            console.log("Report",res.result);
+            console.log("Report", res.result);
            }
-           if(this.totalRecords === 0){
-            this.showNoRecord =true;
+           if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+           if (this.totalRecords === 0){
+            this.showNoRecord = true;
           }
           else{
             this.showNoRecord = false
           }
 
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
       }
     });
@@ -305,20 +372,20 @@ schoolSearch(eve){
     let to;
     let from;
 
-    if(this.toDate === undefined){
-        to="null"
+    if (this.toDate === undefined){
+        to = "null"
     }
     else{
       to = this.toDate;
     }
-    if(this.fromDate === undefined){
-      from="null"
+    if (this.fromDate === undefined){
+      from = "null"
   }
   else{
     from = this.fromDate;
   }
     //  console.log("searchWord",this.searchWord);
-    if(this.searchWord === "" || this.searchWord === undefined){
+    if (this.searchWord === "" || this.searchWord === undefined){
       this.searchText = eve;
     }
     else{
@@ -329,13 +396,19 @@ schoolSearch(eve){
       // alert("hi");
       this.getAllSchools();
     }
-     if(this.searchText !== undefined)
+     if (this.searchText !== undefined)
     {
     if (this.searchText !== "" && this.searchText.length > 1) {
+      const config = () => {
+        let token = localStorage.getItem("BBToken");
+        if (token != ""){
+        return {Authorization: `Bearer ${token}`}
+        }
+      }
       this.http
         .post(
           this.uri +
-            "bully-buddy/school/search_school" +"?searchword=" + searchWord+ "&from=" + from+ "&to=" + to+"&schoolId="+this.userInfo.schoolid,""
+            "bully-buddy/school/search_school" + "?searchword=" + searchWord + "&from=" + from + "&to=" + to + "&schoolId=" + this.userInfo.schoolid, "", {headers: config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -344,11 +417,24 @@ schoolSearch(eve){
             this.dataList = res.result;
             this.totalRecords = res.result.length;
           }
-          if(this.totalRecords === 0){
-            this.showNoRecord =true;
+          if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+          if (this.totalRecords === 0){
+            this.showNoRecord = true;
           }
           else{
             this.showNoRecord = false
+          }
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
           }
         });
     }
@@ -357,19 +443,24 @@ schoolSearch(eve){
 
   stateFilter(eve) {
     // console.log("STAE", eve);
-  if(eve !== ""){
-   let formObj = {
-      zipCode: "",
-    };
+  if (eve !== ""){
+  //  let formObj = {
+  //     zipCode: "",
+  //   };
+  let formObj = new FormData();
+  formObj.append('zipCode','')
+    const config = () => {
+      let token = localStorage.getItem("BBToken");
+      if (token != ""){
+      return {Authorization: `Bearer ${token}`}
+      }
+    }
      return new Promise<void>((resolve, reject) => {
       this.http
         .post(
           this.uri +
             "bully-buddy/school/get_school_by_statename_zipcode" +
-            "?statename=" +
-            eve,
-          formObj
-        )
+            "?statename=" + eve, formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
@@ -384,10 +475,26 @@ schoolSearch(eve){
             else{
               this.showNoRecord = false;
             }
-          } else {
-            alert(res.message + " : " + res.result);
+          } else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }else {
+            // alert(res.message + " : " + res.result);
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result, type: false },
+            });
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
     this.searchText = eve;
@@ -402,19 +509,42 @@ schoolSearch(eve){
     // let formObj = {
     //   schoolId: this.userInfo.schoolid,
     // };
+    const config = () => {
+      let token = localStorage.getItem("BBToken");
+      if (token != ""){
+      return {Authorization: `Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
-        .get(this.uri + "bully-buddy/state/get_all_state")
+        .post(this.uri + "bully-buddy/state/get_all_state", '', {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.stateItems = res.result;
             this.stateList = JSON.stringify(res.result);
             localStorage.setItem("States", this.stateList);
             // console.log("STATE,", this.stateList);
-          } else {
-            alert(res.message + " : " + res.result);
+          } else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+          else {
+            // alert(res.message + " : " + res.result);
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result, type: false },
+            });
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -422,7 +552,7 @@ schoolSearch(eve){
 
 
   showClear(eve){
-    if(eve !==""){
+    if (eve !== ""){
         this.visibleClear = true;
     }
     else{
@@ -435,8 +565,8 @@ schoolSearch(eve){
 clearResult(){
   // alert("HIT");
   this.visibleClear = false;
-  this.searchText="";
-  this.searchWord="";
+  this.searchText = "";
+  this.searchWord = "";
   this.getAllSchools();
 }
 
@@ -471,6 +601,7 @@ clearResult(){
         school_state: list.stateId,
         zipCode: list.zipCode,
         isBoarding: list.isBoarding,
+        school_city: list.city,
         createdDateTime: list.createdDateTime
       },
     });
@@ -491,8 +622,14 @@ clearResult(){
         let formObj = {
           id: id,
         };
+        const config = () => {
+          let token = localStorage.getItem("BBToken");
+          if (token != ""){
+          return {Authorization: `Bearer ${token}`}
+          }
+        }
         this.http
-          .post(this.uri + "bully-buddy/school/delete_school", formObj)
+          .post(this.uri + "bully-buddy/school/delete_school", formObj,{headers: config()})
           .subscribe((res: any) => {
             if (res.status == "200") {
               this.alertDialog.open(SuccessComponent, {
@@ -500,18 +637,31 @@ clearResult(){
             data: { value: "School Deleted", type: true },
           });
               // console.log("SeatchSchooltext",this.searchText);
-              if(this.searchText === " "|| this.searchText === undefined){
+              if (this.searchText === " " || this.searchText === undefined){
                 // alert("hi");
               this.getAllSchools();
               }
               else{
                 this.schoolSearch(this.searchText);
               }
+            }
+            else if (res.status === "504" || res.status === 504){
+              this.alertDialog.open(SuccessComponent, {
+                width: "30%",
+                data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+              });
+              this.router.navigateByUrl("/login");
             }else{
                  this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "School Delete Failed", type: false },
           });
+            }
+          },error => {
+            console.log('oops', error);
+            if (error.status === 504){
+            alert("You have been logout");
+              this.router.navigateByUrl("/login");
             }
           });
       }
@@ -521,8 +671,8 @@ clearResult(){
     let from = "null";
     let to = "null";
     let state = "null";
-    let stateList:any;
-    stateList= localStorage.getItem("States")
+    let stateList: any;
+    stateList = localStorage.getItem("States")
     // if(this.fromDate !== undefined && this.fromDate !== null){
     //   from = this.fromDate
     // }
@@ -530,15 +680,23 @@ clearResult(){
     //   to = this.toDate
     // }
     // console.log("STATELI",stateList)
-    if(this.selectedState !== null&& this.selectedState !==""){
-      for(let i=0;i<this.stateItems.length;i++){
-        if(this.stateItems[i].statename == this.selectedState){
+    if (this.selectedState !== null && this.selectedState !== ""){
+      for (let i = 0; i < this.stateItems.length; i++){
+        if (this.stateItems[i].statename == this.selectedState){
           state = this.stateItems[i].id;
           state = state.toString();
         }
-      }console.log("STATEID",state)
-    const url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download_school" + "?from=" + from+ "&to=" + to+"&stateId=" + state;
-    this.http.post(url,"", { responseType: "blob" }).subscribe((data) => {
+      }
+      
+      console.log("STATEID", state);
+      const config = () => {
+        let token = localStorage.getItem("BBToken");
+        if (token != ""){
+        return {Authorization: `Bearer ${token}`}
+        }
+      }
+    const url = this.uri + "bully-buddy/excel/download_school" + "?from=" + from + "&to=" + to + "&stateId=" + state;
+    this.http.post(url, '', { headers: config(),responseType: "blob" }).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
@@ -547,6 +705,12 @@ clearResult(){
         type: "application/vnd.ms.excel",
       });
       saveAs(file);
+    },error => {
+      console.log('oops', error);
+      if (error.status === 504){
+      alert("You have been logout");
+        this.router.navigateByUrl("/login");
+      }
     });
   }
   else{
@@ -554,6 +718,7 @@ clearResult(){
       width: "30%",
       data: { value: "Please Select a state to Export Excel!", type: false },
     });
+    this.router.navigateByUrl("/login");
   }
   }
 

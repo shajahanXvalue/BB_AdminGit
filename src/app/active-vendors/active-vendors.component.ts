@@ -184,9 +184,15 @@ dateChanged2(event){
     let formObj = {
       schoolId: this.userInfo.schoolid,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.uri + "bully-buddy/busroute/get_all_busroute", formObj)
+        .post(this.uri + "bully-buddy/busroute/get_all_busroute", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
@@ -203,11 +209,24 @@ dateChanged2(event){
             else{
               this.showNoRecord = false;
             }
-          } else {
+          }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }  else {
             alert(res.message + " : " + res.result);
             this.showNoRecord = true;
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -216,9 +235,15 @@ dateChanged2(event){
     let formObj = {
       id: this.userInfo.schoolid,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.uri + "bully-buddy/busroute/get_busroute_by_id", formObj)
+        .post(this.uri + "bully-buddy/busroute/get_busroute_by_id", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             // this.dataList.push(res.result);
@@ -236,10 +261,23 @@ dateChanged2(event){
               this.totalRecords = res.result.length;
             }
             // console.log("DATALIST", this.dataList);
+          }else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
           } else {
             alert(res.message + " : " + res.result);
           }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -266,6 +304,12 @@ dateChanged2(event){
   }
 
   deleteBusRoute(id) {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     var confirmResult = this.dialog.open(DeleteDialogComponent, {
       width: "20%",
       data: {
@@ -281,7 +325,7 @@ dateChanged2(event){
           id: id,
         };
         this.http
-          .post(this.uri + "bully-buddy/busroute/delete_busroute", formObj)
+          .post(this.uri + "bully-buddy/busroute/delete_busroute", formObj,{ headers: config()})
           .subscribe((res: any) => {
             if (res.status == "200") {
                this.alertDialog.open(SuccessComponent, {
@@ -294,11 +338,24 @@ dateChanged2(event){
               // } else {
               //   this.getTeacherById();
               // }
+            }else if (res.status === "504" || res.status === 504){
+              // this.alertDialog.open(SuccessComponent, {
+              //   width: "30%",
+              //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+              // });
+              alert(res.message + " : " + res.result+ "You have been logout");
+              this.router.navigateByUrl("/login");
             }else{
                this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "BusRoute Deleted Failed", type: false },
           });
+            }
+          },error => {
+            console.log('oops', error);
+            if (error.status === 504){
+            alert("You have been logout");
+              this.router.navigateByUrl("/login");
             }
           });
       }
@@ -318,14 +375,20 @@ dateChanged2(event){
   excelDownload() {
     let from = null;
     let to = null;
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if(this.fromDate !== undefined && this.toDate !== null){
       from = this.fromDate
     }
     if(this.toDate !== undefined && this.toDate !== null){
       to = this.toDate
     }
-    let url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download_busroute"+  "?schoolId=" + this.userInfo.schoolid+ "&from=" + from+ "&to=" + to;
-    this.http.post(url,"", { responseType: "blob" }).subscribe((data) => {
+    let url = this.uri+"bully-buddy/excel/download_busroute"+  "?schoolId=" + this.userInfo.schoolid+ "&from=" + from+ "&to=" + to;
+    this.http.post(url,"", { responseType: "blob", headers: config()}).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
@@ -334,6 +397,12 @@ dateChanged2(event){
         type: "application/vnd.ms.excel",
       });
       saveAs(file);
+    },error => {
+      console.log('oops', error);
+      if (error.status === 504){
+      alert("You have been logout");
+        this.router.navigateByUrl("/login");
+      }
     });
   }
   order() {

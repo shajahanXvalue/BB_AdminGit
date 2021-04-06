@@ -113,9 +113,14 @@
                 <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
                 <td>
                   <div>
-                    <span class="fa fa-pencil fa-options" (click)="editUser(list)"></span>
+                    <!-- <span class="fa fa-pencil fa-options" (click)="editUser(list)"></span>
                     &nbsp;&nbsp;
-                    <span class="fa fa-trash-o fa-options" (click)="deleteUser(list.id)"></span>
+                    <span class="fa fa-trash-o fa-options" (click)="deleteUser(list.id)"></span> -->
+                    <span *ngIf="list.type!=='Admin'" class="fa fa-pencil fa-options" (click)="editUser(list)"></span>
+                    &nbsp;&nbsp;
+                    <span *ngIf="list.type!=='Bus Driver'&&list.type!=='Admin'&&!isSuperAdmin" class="fa fa-trash-o fa-options" (click)="deleteUser(list)"></span>
+                    <span *ngIf="list.type==='Bus Driver'&&list.type!=='Admin'&&!isSuperAdmin"  class="fa fa-trash-o fa-options" (click)="deleteDriver(list.id)"></span>
+                 
                   </div>
                 </td>
               </tr>
@@ -146,10 +151,10 @@
                 <!-- <td><img [src]="(imgPath + list.icon_image)" style="width: 60px;height: 60px;" /></td> -->
                 <td>
                   <div>
-                    <span class="fa fa-pencil fa-options" (click)="editUser(list)"></span>
+                    <span *ngIf="list.type!=='Admin'" class="fa fa-pencil fa-options" (click)="editUser(list)"></span>
                     &nbsp;&nbsp;
-                    <span *ngIf="list.type!=='Bus Driver'&&!isSuperAdmin" class="fa fa-trash-o fa-options" (click)="deleteUser(list)"></span>
-                    <span *ngIf="list.type==='Bus Driver'&&!isSuperAdmin"  class="fa fa-trash-o fa-options" (click)="deleteDriver(list.id)"></span>
+                    <span *ngIf="list.type!=='Bus Driver'&&list.type!=='Admin'&&!isSuperAdmin" class="fa fa-trash-o fa-options" (click)="deleteUser(list)"></span>
+                    <span *ngIf="list.type==='Bus Driver'&&list.type!=='Admin'&&!isSuperAdmin"  class="fa fa-trash-o fa-options" (click)="deleteDriver(list.id)"></span>
                   </div>
                 </td>
               </tr>

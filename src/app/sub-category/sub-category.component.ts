@@ -97,15 +97,15 @@ public myDatePickerOptions2: IMyDpOptions = {
   ngOnInit() {
     if (this.getCookies === "") {
       localStorage.removeItem("userInfo");
-      // this.router.navigateByUrl("/login");
+      this.router.navigateByUrl("/login");
       // window.location.href = this.url+"admin/#/login";
-      window.location.href="https://bullyingbuddyapp.com/admin/#/login";
+      // window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.schoolId === null || this.schoolId === undefined) {
       alert("You Have been LogOut, Kindly LogIn to Continue!");
-      // this.router.navigateByUrl("/login");
+      this.router.navigateByUrl("/login");
       // window.location.href = "/login";
-      window.location.href="https://bullyingbuddyapp.com/admin/#/login";
+      // window.location.href="https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.schoolId.schoolid === 0) {
       this.isSuperAdmin = true;
@@ -277,7 +277,12 @@ dayFilter(eve) {
       schoolid: this.schoolId.schoolid,
       // pageno: 1,
     };
-
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     let page = this.page.toString();
     let pageNo: number = +page;
     pageNo = pageNo - 1;
@@ -286,7 +291,7 @@ dayFilter(eve) {
     this.http
       .post(
         this.url + "bully-buddy/admin/get_all_user" + "?pageno=" + pageNo,
-        formObj
+        formObj, {headers: config()}
       )
       .subscribe((res: any) => {
         if (res.status == "200") {
@@ -318,6 +323,12 @@ dayFilter(eve) {
         }else if(res.status == "400"){
           this.showNoRecord=true;
         }
+      },error => {
+        console.log('oops', error);
+        if (error.status === 504){
+        alert("You have been logout");
+          this.router.navigateByUrl("/login");
+        }
       });
   }
 
@@ -326,8 +337,14 @@ dayFilter(eve) {
     const formObj = {
       id: this.schoolId.schoolid,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     this.http
-      .post(this.url + "bully-buddy/user/get_user_by_id", formObj)
+      .post(this.url + "bully-buddy/user/get_user_by_id", formObj, {headers: config()})
       .subscribe((res: any) => {
         if (res.status == "200") {
           // this.
@@ -345,6 +362,12 @@ dayFilter(eve) {
             this.userData = res.result;
             this.totalUserRecords = res.result.length;
           }
+        }
+      },error => {
+        console.log('oops', error);
+        if (error.status === 504){
+        alert("You have been logout");
+          this.router.navigateByUrl("/login");
         }
       });
   }
@@ -369,9 +392,14 @@ dayFilter(eve) {
     if(this.toDate !== undefined && this.toDate !== null){
       to = this.toDate
     }
-
-    const url = "https://bullyingbuddyapp.com/java-service-admin/api/excel/download" +  "?schoolId=" + this.schoolId.schoolid+ "&from=" + from+ "&to=" + to;
-    this.http.post(url,"", { responseType: "blob" }).subscribe((data) => {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
+    const url = this.url+"api/excel/download" +  "?schoolId=" + this.schoolId.schoolid+ "&from=" + from+ "&to=" + to;
+    this.http.post(url,"", { responseType: "blob", headers: config()}).subscribe((data) => {
       console.log("BLOB", data);
       const blob = new Blob([data], {
         type: "application/vnd.ms.excel",
@@ -380,6 +408,12 @@ dayFilter(eve) {
         type: "application/vnd.ms.excel",
       });
       saveAs(file);
+    },error => {
+      console.log('oops', error);
+      if (error.status === 504){
+      alert("You have been logout");
+        this.router.navigateByUrl("/login");
+      }
     });
   }
   addUser() {
@@ -428,12 +462,17 @@ dayFilter(eve) {
   }
   deleteDriver(id)
   {
-
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     const formObj = {
       id:id,
     };
     this.http
-    .post(this.url + "bully-buddy/user/delete_driver", formObj)
+    .post(this.url + "bully-buddy/user/delete_driver", formObj, {headers: config()})
     .subscribe((res: any) => {
       if (res.status == "200") {
         // if (this.schoolId.schoolid === 0) {
@@ -451,7 +490,7 @@ dayFilter(eve) {
               id: id,
             };
             this.http
-              .post(this.url + "bully-buddy/user/delete_user", formObj)
+              .post(this.url + "bully-buddy/user/delete_user", formObj, {headers: config()})
               .subscribe((res: any) => {
                 if (res.status == "200") {
                   // if (this.schoolId.schoolid === 0) {
@@ -473,6 +512,12 @@ dayFilter(eve) {
                 data: { value: "User Deleted Failed", type: false },
               });
                 }
+              },error => {
+                console.log('oops', error);
+                if (error.status === 504){
+                alert("You have been logout");
+                  this.router.navigateByUrl("/login");
+                }
               });
           }
         });
@@ -490,11 +535,23 @@ dayFilter(eve) {
           data: { value: res.message, type: false },
         });
       }
+    },error => {
+      console.log('oops', error);
+      if (error.status === 504){
+      alert("You have been logout");
+        this.router.navigateByUrl("/login");
+      }
     });
   }
 
   deleteUser(list) {
     let confirmResult;
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     let message=list.id===this.schoolId.userId?"Can't delete this admin as you currently Signed-In.":"Are you want to delete this User!";
     if(list.type==="Student"||list.type === "Parent"){
       message= "Are you want to delete this User?, After deleting this user your parent-child relationship will be removed.";
@@ -523,7 +580,7 @@ dayFilter(eve) {
           id: list.id,
         };
         this.http
-          .post(this.url + "bully-buddy/user/delete_user", formObj)
+          .post(this.url + "bully-buddy/user/delete_user", formObj, {headers: config()})
           .subscribe((res: any) => {
             if (res.status == "200") {
               // if (this.schoolId.schoolid === 0) {
@@ -545,12 +602,24 @@ dayFilter(eve) {
             data: { value: "User Deleted Failed", type: false },
           });
             }
+          },error => {
+            console.log('oops', error);
+            if (error.status === 504){
+            alert("You have been logout");
+              this.router.navigateByUrl("/login");
+            }
           });
       }
     });
   }
 
   search(){
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       let from;
       let to;
@@ -584,7 +653,7 @@ dayFilter(eve) {
       else{
       this.http
         .post(
-          this.url + "bully-buddy/user/search_user"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to+"&schoolId="+this.schoolId.schoolid,"")
+          this.url + "bully-buddy/user/search_user"+ "?searchword=" + search+ "&from=" + from+ "&to=" + to+"&schoolId="+this.schoolId.schoolid,"", {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
@@ -604,6 +673,12 @@ dayFilter(eve) {
           //   alert(res.message + " : " + res.result);
           // }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
       }
     });
@@ -614,7 +689,12 @@ dayFilter(eve) {
     let searchWord = eve;
     let to;
     let from;
-
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if(this.toDate === undefined){
         to="null"
     }
@@ -648,7 +728,7 @@ dayFilter(eve) {
             "bully-buddy/user/search_user" +
             "?searchword=" +
             searchWord+ "&from=" + from+ "&to=" + to+"&schoolId="+this.schoolId.schoolid,
-          ""
+          "", {headers: config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -671,6 +751,12 @@ dayFilter(eve) {
           }
           if(this.totalUserRecords<0){
             this.showNoRecord=true;
+          }
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
           }
         });
     }

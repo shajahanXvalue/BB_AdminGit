@@ -4,10 +4,11 @@ import { Injectable } from "@angular/core";
   providedIn: "root",
 })
 export class PropertyServiceService {
-
-  // uri= "https://www.bullyingbuddyapp.com/java-service-admin/";
-   uri = "https://bullyingbuddyapp.com/java-service-admin/";
+  templateURL = "https://bullyingbuddyapp.com/admin";
+  uri= "https://bullyingbuddyapp.com/java-service-admin/"; 
   // uri = "http://3.139.131.172:5001/";
+  // templateURL = "http://3.139.131.172/admin-dev";
+  
   // uri = "http://3.128.136.18:5001/";
   // uri = "https://service-admin-api.bullyingbuddyapp.com/";
 
@@ -17,4 +18,4 @@ export class PropertyServiceService {
   constructor() {}
 }
 
-// old IP:http://54.215.34.67:5001/
+

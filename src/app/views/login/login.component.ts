@@ -38,6 +38,7 @@ export class LoginComponent {
     localStorage.removeItem("OneChatUsercount");
     localStorage.removeItem("GroupChatUserCount");
     localStorage.removeItem("OneChatUserLength");
+    localStorage.removeItem("BBToken");
   }
   login() {debugger;
     if (this.username !== "" && this.password !== "") {
@@ -60,6 +61,7 @@ export class LoginComponent {
             // document.cookie = "loginstatus=loggedin";
             this.cookieService.put("LoginStatus", "login");
             localStorage.setItem("UserInfo", resData);
+            localStorage.setItem("BBToken",res.token);
             this.router.navigateByUrl("/dash");
           }
           // else {

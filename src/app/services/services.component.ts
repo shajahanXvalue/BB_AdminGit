@@ -63,13 +63,13 @@ export class ServicesComponent implements OnInit {
   ngOnInit() {
     if (this.getCookies !== "login") {
       localStorage.removeItem("userInfo");
-      // this.router.navigateByUrl("/login");
-      window.location.href = "https://bullyingbuddyapp.com/admin/#/login";
+      this.router.navigateByUrl("/login");
+      // window.location.href = "https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.userInfo === null || this.userInfo === undefined) {
       alert("You Have been LogOut, Kindly LogIn to Continue!");
-      // this.router.navigateByUrl("/login");
-      window.location.href = "https://bullyingbuddyapp.com/admin/#/login";
+      this.router.navigateByUrl("/login");
+      // window.location.href = "https://bullyingbuddyapp.com/admin/#/login";
     }
     if (this.userInfo.schoolid === 0) {
       this.isSuperAdmin = true;
@@ -115,9 +115,16 @@ clearResult(){
     let pageNo: number = +page;
     pageNo = pageNo - 1;
     console.log("Page", pageNo);
-    this.http.get(this.url + "bully-buddy/admin/list"+ "?pageno=" + pageNo,).subscribe((res: any) => {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
+    this.http.post(this.url + "bully-buddy/admin/list"+ "?pageno=" + pageNo,'', {headers: config()}).subscribe((res: any) => {
+      // console.log("RESSSSS", res);
       if (res.status == "200") {
-        // console.log("RESSSSS", res);
+        // console.log("RESSSSSww", res);
         arrLen.push(res.result);
         // console.log("RESsss", arrLen[0].length);
         if (arrLen[0].length === 1) {
@@ -137,6 +144,20 @@ clearResult(){
           this.totalPages = res.result.totalPages;
         }
       }
+      if (res.status === "504" || res.status === 504){
+        // this.alertDialog.open(SuccessComponent, {
+        //   width: "30%",
+        //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+        // });
+        alert(res.message + " : " + res.result+ "You have been logout");
+        this.router.navigateByUrl("/login");
+      }
+    },error => {
+      console.log('oops', error);
+      if (error.status === 504){
+      alert("You have been logout");
+        this.router.navigateByUrl("/login");
+      }
     });
   }
 
@@ -144,9 +165,15 @@ clearResult(){
     let formObj = {
       id: this.userInfo.id,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     let arrLen: any = [];
     this.http
-      .post(this.url + "bully-buddy/admin/get_admin_by_id", formObj)
+      .post(this.url + "bully-buddy/admin/get_admin_by_id", formObj,{headers: config()})
       .subscribe((res: any) => {
         if (res.status == "200") {
           // arrLen = [];
@@ -163,8 +190,24 @@ clearResult(){
             this.data = res.result;
             this.totalRecords = res.result.length;
           }
+        }else if (res.status === "504" || res.status === 504){
+          // this.alertDialog.open(SuccessComponent, {
+          //   width: "30%",
+          //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+          // });
+          alert(res.message + " : " + res.result+ "You have been logout");
+          this.router.navigateByUrl("/login");
+        }
+        else{
+
         }
         console.log("ADMINLENGTH", this.totalRecords);
+      },error => {
+        console.log('oops', error);
+        if (error.status === 504){
+        alert("You have been logout");
+          this.router.navigateByUrl("/login");
+        }
       });
   }
   addAdmin() {
@@ -195,6 +238,12 @@ clearResult(){
     });
   }
   search(eve){
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
      console.log("eve",eve)
       let search = eve;
@@ -212,7 +261,7 @@ clearResult(){
       else{
       this.http
         .post(
-          this.url + "bully-buddy/admin/search_admin"+ "?searchword=" + search + "&schoolId=" +this.userInfo.schoolid,"")
+          this.url + "bully-buddy/admin/search_admin"+ "?searchword=" + search + "&schoolId=" +this.userInfo.schoolid,"", {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.adminList  = res.result;
@@ -221,6 +270,17 @@ clearResult(){
 
             console.log("Report",res.result);
            }
+           else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }
+          else{
+
+          }
            if(this.totalUserRecords>0){
 
             this.showNoRecord=false;
@@ -228,16 +288,29 @@ clearResult(){
           if(this.totalUserRecords<=0){
             this.showNoRecord=true;
           }
+
           //  else {
           //   alert(res.message + " : " + res.result);
           // }
           resolve();
+        },error => {
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
       }
     });
   }
 
   deleteAdmin(id) {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     var confirmResult = this.dialog.open(DeleteDialogComponent, {
       width: "20%",
       data: {
@@ -251,7 +324,7 @@ clearResult(){
           id: id,
         };
         this.http
-          .post(this.url + "bully-buddy/admin/delete_admin", formObj)
+          .post(this.url + "bully-buddy/admin/delete_admin", formObj, {headers: config()})
           .subscribe((res: any) => {
             if (res.status == "200") {
                this.alertDialog.open(SuccessComponent, {
@@ -264,12 +337,25 @@ clearResult(){
               } else {
                 this.getAdmin();
               }
+            }else if (res.status === "504" || res.status === 504){
+              // this.alertDialog.open(SuccessComponent, {
+              //   width: "30%",
+              //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+              // });
+              alert(res.message + " : " + res.result+ "You have been logout");
+              this.router.navigateByUrl("/login");
             }
             else{
                this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "Admin Deleted Failed", type: false },
           });
+            }
+          },error => {
+            console.log('oops', error);
+            if (error.status === 504){
+            alert("You have been logout");
+              this.router.navigateByUrl("/login");
             }
           });
       }

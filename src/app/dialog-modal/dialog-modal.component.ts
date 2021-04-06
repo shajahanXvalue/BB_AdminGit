@@ -31,6 +31,7 @@ export interface DialogData {
   school_state: string;
   school_ZipCode: string;
   school_id: any;
+  school_city: any;
   isBoarding:any;
   admin_id: any;
   admin_school_id: any;
@@ -121,6 +122,7 @@ export class DialogModalComponent implements OnInit {
   validationEmail:boolean= false;
   allSchoolList=[];
   schoolList = [];
+
   searchSchoolId:any;
   adminSchoolList = [];
   userTypeList = [];
@@ -195,6 +197,7 @@ export class DialogModalComponent implements OnInit {
   validSAddress="";
   validSState="";
   validSZipCode="";
+  validSCity="";
   validTSchool="";
   validTUName="";
   validTGrade="";
@@ -366,7 +369,8 @@ export class DialogModalComponent implements OnInit {
     this.validSName = this.data.school_name;
     this.validSAddress = this.data.school_address;
     this.validSState = this.data.school_state;
-    this.validSZipCode = this.data.zipCode
+    this.validSZipCode = this.data.zipCode;
+    this.validSCity = this.data.school_city;
     this.validBRoute = this.data.busRoute;
     this.validBDId = this.data.driver_id;
     this.validBDSchool = this.data.school_id;
@@ -420,8 +424,8 @@ export class DialogModalComponent implements OnInit {
       school_address: [this.data.school_address],
       school_state: [this.data.school_state],
       school_ZipCode: [this.data.zipCode],
-      school_boarding: [this.data.isBoarding]
-      // this.selectedValue= [this.data.school_state],
+      school_boarding: [this.data.isBoarding],
+      school_city: [this.data.school_city],
     });
 
     this.saveForm = this.formBuilder.group({
@@ -430,7 +434,8 @@ export class DialogModalComponent implements OnInit {
       school_id: [],
       school_state: [],
       school_ZipCode: [],
-      school_boarding: []
+      school_boarding: [],
+      school_city: [],
     });
     // this.ebbFileForm = this.formBuilder.group({});
     this.adminSaveForm = this.formBuilder.group({
@@ -626,6 +631,12 @@ export class DialogModalComponent implements OnInit {
 
 getDriver(eve){
   let formObj;
+  const config=()=>{
+    let token=localStorage.getItem("BBToken");
+    if(token!=""){
+    return {Authorization:`Bearer ${token}`}
+    }
+  }
   if(eve !== undefined && eve !== null){
     formObj = {
       schoolId:eve
@@ -638,7 +649,7 @@ getDriver(eve){
   }
   if(this.schoolId !== null&&this.schoolId!==""){
     this.http
-    .post(this.url + "bully-buddy/busroute/get_all_drivers_by_school_id", formObj)
+    .post(this.url + "bully-buddy/busroute/get_all_drivers_by_school_id", formObj,{headers: config()})
     .subscribe((res: any) => {
       if (res.status == "200") {
         console.log("DRivers",res)
@@ -654,31 +665,59 @@ getDriver(eve){
         if(res.result.length === 1){
           this.driverId = res.result[0].id;
         }
-      }else{
+      }
+      else if (res.status === "504" || res.status === 504){
+        this.alertDialog.open(SuccessComponent, {
+          width: "30%",
+          data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+        });
+        this.router.navigateByUrl("/login");
+      }
+      else{
 
       }
       console.log("DriverId",this.driverId);
     },error => {
-      console.log('oops', error)
+      console.log('oops', error);
+      if (error.status === 504){
+      alert("You have been logout");
+        this.router.navigateByUrl("/login");
+      }
     });
   }
 
 }
   saveSchool() {
+    let token = localStorage.getItem("BBToken");;
     let school_name = this.saveForm.get("school_name").value;
     let school_address = this.saveForm.get("school_address").value;
     let stateId = this.saveForm.get("school_state").value;
     let zipCode = this.saveForm.get("school_ZipCode").value;
-    let formObj = {
-      schoolName: school_name,
-      schoolAddress: school_address,
-      stateId: stateId,
-      zipCode: zipCode,
-      isBoarding: this.isBoarding
-    };
+    let city = this.saveForm.get("school_city").value;
+    const config=()=>{
+      token = localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
+    let formObj = new FormData();
+    formObj.append('schoolName',school_name)
+    formObj.append('schoolAddress',school_address)
+    formObj.append('stateId',stateId)
+    formObj.append('zipCode',zipCode)
+    formObj.append('isBoarding',this.isBoarding)
+    formObj.append('city',city)
+      // schoolName: school_name,
+      // schoolAddress: school_address,
+      // stateId: stateId,
+      // zipCode: zipCode,
+      // isBoarding: this.isBoarding,
+      // city: "LA"
+    
+  
     if ((school_name != "" && school_name != undefined) && (this.isBoarding !== "" && this.isBoarding !== undefined)) {
       this.http
-        .post(this.url + "bully-buddy/school/add_school", formObj)
+        .post(this.url + "bully-buddy/school/add_school", formObj,{headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
@@ -686,6 +725,12 @@ getDriver(eve){
             width: "30%",
             data: { value: "School Added Successfuly", type: true },
           });
+          } else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
           }else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
@@ -693,7 +738,11 @@ getDriver(eve){
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
   }
@@ -701,17 +750,34 @@ getDriver(eve){
     let school_name = this.editForm.get("school_name").value;
     let school_address = this.editForm.get("school_address").value;
     let zipCode = this.editForm.get("school_ZipCode").value;
-    let formData = {
-      id: this.data.school_id,
-      schoolName: school_name,
-      schoolAddress: school_address,
-      stateId: this.selectedValue,
-      zipCode: zipCode,
-      isBoarding: this.isBoarding
-    };
+    let city = this.saveForm.get("school_city").value;
+    // let formData = {
+    //   id: this.data.school_id,
+    //   schoolName: school_name,
+    //   schoolAddress: school_address,
+    //   stateId: this.selectedValue,
+    //   zipCode: zipCode,
+    //   isBoarding: this.isBoarding,
+    //   city: this.validSCity
+    // };
+    let formData = new FormData();
+    formData.append('id',this.data.school_id)
+    formData.append('schoolName',school_name)
+    formData.append('schoolAddress',school_address)
+    formData.append('stateId',this.selectedValue)
+    formData.append('zipCode',zipCode)
+    formData.append('isBoarding',this.isBoarding)
+    formData.append('city',this.validSCity)
+    
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if ((school_name != "" && school_name != undefined) && (this.isBoarding !== "" && this.isBoarding !== undefined)) {
       this.http
-        .post(this.url + "bully-buddy/school/update_school", formData)
+        .post(this.url + "bully-buddy/school/update_school", formData,{headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
@@ -719,6 +785,12 @@ getDriver(eve){
             width: "30%",
             data: { value: "School Update Successfuly", type: true },
           });
+          } else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
           }else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
@@ -726,7 +798,11 @@ getDriver(eve){
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
   }
@@ -739,7 +815,12 @@ getDriver(eve){
     let userPhone = this.adminSaveForm.get("admin_phone").value;
     let state = this.selectedState!==undefined?this.selectedState:this.userInfo.stateName;
     console.log("this.validAPhone",this.validAPhone);
-
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     let formObj = {
       schoolid: this.schoolId,
       name: this.validAUName,
@@ -748,10 +829,11 @@ getDriver(eve){
       stateName:state,
       ccUser: this.selectedCountryCode,
       userPhone: userPhone,
+      userLang:this.validULang,
     };
-    if ((admin_username !== "" && admin_username !== undefined)&&(state != "" && state != undefined)) {
+    if ((admin_username !== "" && admin_username !== undefined)&&(state != "" && state != undefined)&&(this.validULang != "" && this.validULang != undefined)) {
       this.http
-        .post(this.url + "bully-buddy/admin/add_admin", formObj)
+        .post(this.url + "bully-buddy/admin/add_admin", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
@@ -759,6 +841,12 @@ getDriver(eve){
             width: "30%",
             data: { value: "Admin Added Successfully", type: true },
           });
+          }else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
           }else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
@@ -766,7 +854,11 @@ getDriver(eve){
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
   }
@@ -774,7 +866,7 @@ getDriver(eve){
     let school_id = this.adminEditForm.get("admin_school_id").value;
     let admin_username = this.adminEditForm.get("admin_username").value;
     let admin_password = this.adminEditForm.get("admin_password").value;
-    let stateName = this.selectedState === undefined?this.validAState:this.selectedState;
+    let stateName = this.selectedState === undefined||this.selectedState === null?this.validAState:this.selectedState;
     let userPhone = this.adminEditForm.get("admin_phone").value;
     console.log("this.validAPhone",this.validAPhone);
     console.log("this.selectedState",stateName)
@@ -785,6 +877,12 @@ getDriver(eve){
     ) {
       this.schoolId = this.adminSchoolId;
     }
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     let formData = {
       id: this.data.admin_id,
       schoolid: this.schoolId,
@@ -794,11 +892,12 @@ getDriver(eve){
       password: admin_password,
       stateName: stateName,
       userPhone: userPhone,
-      ccUser: this.validccAdmin
+      ccUser: this.validccAdmin,
+      userLang:this.validULang,
     };
-    if((admin_username != "" && admin_username != undefined)&&(stateName != "" && stateName != undefined)&&(this.validccAdmin != "" && this.validccAdmin != undefined)) {
+    if((admin_username != "" && admin_username != undefined)&&(stateName != "" && stateName != undefined)&&(this.validccAdmin != "" && this.validccAdmin != undefined)&&(this.validULang != "" && this.validULang != undefined)) {
       this.http
-        .post(this.url + "bully-buddy/admin/update_admin", formData)
+        .post(this.url + "bully-buddy/admin/update_admin", formData, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
@@ -806,6 +905,12 @@ getDriver(eve){
             width: "30%",
             data: { value: "Admin Update successfuly", type: true },
           });
+          }else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
           }else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
@@ -813,7 +918,11 @@ getDriver(eve){
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
   }
@@ -904,9 +1013,11 @@ console.log("ZIP",this.zipCodesrch)
 if(this.zipCodesrch===undefined||this.zipCodesrch===null){
   this.zipCodesrch="";
 }
-    let formObj = {
-      zipCode: this.zipCodesrch,
-    };
+    let formObj = new FormData()
+    formObj.append('zipCode',this.zipCodesrch)
+      // zipCode: this.zipCodesrch,
+    
+    
     let selectedState: any;
     console.log("DATASTATE", this.data.state);
     console.log("selectedSATE", this.selectedState);
@@ -920,7 +1031,12 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
     } else {
       this.selectedState = this.data.state;
     }
-
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
         .post(
@@ -928,7 +1044,7 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
             "bully-buddy/school/get_school_by_statename_zipcode" +
             "?statename=" +
             this.selectedState,
-          formObj
+          formObj, {headers: config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -938,12 +1054,22 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
             if (this.schoolList.length === 1) {
               this.editSchoolId = this.schoolList[0].id;
             }
+          } else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
           } else {
             alert(res.message + " : " + res.result);
           }
           resolve();
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -1040,6 +1166,12 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null){
 console.log("gender",gender);
 console.log("schoolId",schoolId);
 
+const config=()=>{
+  let token=localStorage.getItem("BBToken");
+  if(token!=""){
+  return {Authorization:`Bearer ${token}`}
+  }
+}
 // to show validation message
 
     if(email==''){
@@ -1059,7 +1191,7 @@ console.log("schoolId",schoolId);
 console.log("SaveUSer",formObj);
     if ((name != "" && name != undefined)&&(gender=="M"||gender=="F")&&(schoolId!=null)&&(ccUser=="+1"||ccUser=="+91")) {
       this.http
-        .post(this.url + "bully-buddy/user/add_user", formObj)
+        .post(this.url + "bully-buddy/user/add_user", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
@@ -1074,6 +1206,13 @@ console.log("SaveUSer",formObj);
             data: { value: res.message, type: false },
           });
           }
+          else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
           else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
@@ -1081,7 +1220,11 @@ console.log("SaveUSer",formObj);
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
   }
@@ -1171,7 +1314,12 @@ else{
       userLang:this.validULang,
       profileImage: this.profile_Image
     };
-
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     console.log("schoolId",schoolId);
     console.log("deriverdriveer",this.driverDropDown);
     // console.log("agee",agee);
@@ -1199,7 +1347,7 @@ else{
     if ((name != "" && name != undefined)&&(genderPass === true)&&(schoolId!=null)&&(validAge === true)&&(countryCode=="+1"||countryCode=="+91")) {
       console.log("User", formObj);
       this.http
-        .post(this.url + "bully-buddy/user/update_user", formObj)
+        .post(this.url + "bully-buddy/user/update_user", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
@@ -1207,14 +1355,26 @@ else{
             width: "30%",
             data: { value: "User Update Successfully", type: true },
           });
-          }else{
+          }
+          else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+          else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "User Update Failed", type: false },
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
   }
@@ -1266,15 +1426,35 @@ else{
       videoURL: videoURL,
       bullyStatus: bullyStatus,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if (name != "" && name != undefined) {
       this.http
-        .post(this.url + "bully-buddy/incident/update_incident", formObj)
+        .post(this.url + "bully-buddy/incident/update_incident", formObj,{headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
           }
+          else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+          else{
+
+          }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
   }
@@ -1299,9 +1479,15 @@ else{
       grade: grade,
 
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if ((teacher_name != "" && teacher_name != undefined) && (school_id != undefined && school_id != "" && school_id != null)) {
       this.http
-        .post(this.url + "bully-buddy/teachers/add_teacher", formObj)
+        .post(this.url + "bully-buddy/teachers/add_teacher", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
@@ -1309,14 +1495,26 @@ else{
             width: "30%",
             data: { value: "Teacher Added Successfully", type: true },
           });
-          }else{
+          }
+          else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+          else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "Teacher Adding Failed", type: false },
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
     else{
@@ -1346,9 +1544,15 @@ else{
       gender:gender,
       grade: grade,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if ((teacher_name != "" && teacher_name != undefined )&& (school_id != undefined && school_id != "" && school_id != null)) {
       this.http
-        .post(this.url + "bully-buddy/teachers/update_teacher", formObj)
+        .post(this.url + "bully-buddy/teachers/update_teacher", formObj, {headers:config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
@@ -1356,14 +1560,26 @@ else{
             width: "30%",
             data: { value: "Teacher Updated Successfully", type: true },
           });
-          }else{
+          }
+          else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+          else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "Teacher Update Failed", type: false },
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
     else{
@@ -1380,12 +1596,18 @@ else{
       driverId: this.driverId,
       schoolId: school_id,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     // if(this.schoolId != undefined || this.schoolId != ""){
     //   alert("Kindly Select the School to save the Bus Route!")
     // }
     if ((busRoute != "" && busRoute != undefined)&& (school_id != undefined && school_id != "" && school_id != null)) {
       this.http
-        .post(this.url + "bully-buddy/busroute/add_busroute", formObj)
+        .post(this.url + "bully-buddy/busroute/add_busroute", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
@@ -1393,14 +1615,26 @@ else{
             width: "30%",
             data: { value: "BusRoute Added Sucessfully", type: true },
           });
-          }else{
+          }
+          else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+          else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
             data: { value: "BusRoute Adding Failed", type: false },
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
     else{
@@ -1419,12 +1653,18 @@ else{
       driverId: parseInt(this.driverId),
       schoolId: school_id,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     //  if(this.schoolId!== undefined || this.schoolId !== ""){
     //   alert("Kindly Select the School to save the Bus Route!")
     // }
     if ((busRoute != "" && busRoute != undefined) && (school_id != undefined && school_id != "" && school_id != null)) {
       this.http
-        .post(this.url + "bully-buddy/busroute/update_busroute", formObj)
+        .post(this.url + "bully-buddy/busroute/update_busroute", formObj, {headers:config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
@@ -1433,7 +1673,15 @@ else{
             width: "30%",
             data: { value: "BusRoute Updated Successfully", type: true },
           });
-          }else{
+          }
+          else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+          else{
             this.driverUniqueName = [];
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
@@ -1441,7 +1689,11 @@ else{
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
      else{
@@ -1464,11 +1716,17 @@ else{
       latitude: latitude,
       langitude: langitude,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if (school_id != "" && school_id != undefined) {
       this.http
         .post(
           this.url + "bully-buddy/emergencyreport/add_emergencyreport",
-          formObj
+          formObj, {headers: config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -1477,6 +1735,13 @@ else{
             width: "30%",
             data: { value: "Report Added Successfully ", type: true },
           });
+          }
+          else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
           }else{
             this.alertDialog.open(SuccessComponent, {
             width: "30%",
@@ -1484,7 +1749,11 @@ else{
           });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
   }
@@ -1495,10 +1764,16 @@ else{
       id: this.data.id,
       schoolDistrict:schoolDistrict
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     this.http
         .post(
           this.url + "bully-buddy/bereavement/update_bereavement",
-          formObj
+          formObj, {headers: config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
@@ -1507,6 +1782,12 @@ else{
               width: "30%",
               data: { value: "School District Updated Sucessfully", type: true },
             });
+          } else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
           }else{
             this.alertDialog.open(SuccessComponent, {
               width: "30%",
@@ -1514,7 +1795,11 @@ else{
             });
           }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
 
   }
@@ -1536,18 +1821,38 @@ else{
       latitude: latitude,
       langitude: langitude,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if (userId != "" && userId != undefined) {
       this.http
         .post(
           this.url + "bully-buddy/emergencyreport/update_emergencyreport",
-          formObj
+          formObj, {headers: config()}
         )
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.close();
           }
+          else if (res.status === "504" || res.status === 504){
+            this.alertDialog.open(SuccessComponent, {
+              width: "30%",
+              data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            });
+            this.router.navigateByUrl("/login");
+          }
+          else{
+
+          }
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     }
   }
@@ -1853,6 +2158,9 @@ var prexlsToJson3 = [];
             if(!item2.ccUser){
               this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Country Code is missing");
             }
+            if(!item2.userLang){
+              this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" User Language is missing");
+            }
             console.log("item2.ccUseritem2.ccUser",item2.ccUser)
             if(item2.ccUser&&(item2.ccUser !=="+1"&&item2.ccUser !=="+91")){
               this.excelValidationErrors.push("Sheet " + (index+1) +" Row "+ (index2+2) +" Enter Valid Country Code");
@@ -1908,15 +2216,21 @@ var prexlsToJson3 = [];
     formObj.set("adminid", this.userInfo.id);
     let message = "Uploaded the file successfully: " + this.excel_file.name;
     // console.log("Name", message);
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if(this.title === "Upload BusRoute Excel"|| this.title === "Upload School Excel")
    {
     // console.log("ExcelUpload", formObj);
     this.excelValidationErrors = [];
-     url = this.url+"api/excel/upload_excel";
+     url = this.url+"bully-buddy/excel/upload_excel";
 
     if(this.excelValidationErrors.length === 0){
       this.showLoading = true;
-    this.http.post(url, formObj).subscribe(
+    this.http.post(url, formObj, {headers: config()}).subscribe(
       (res: any) => {
         console.log("RESS", res);
         // this.showLoading = true;
@@ -1928,17 +2242,30 @@ var prexlsToJson3 = [];
             data: { value: "Excel Uploaded", type: true },
           });
         }
+        else if (res.status === "504" || res.status === 504){
+          this.alertDialog.open(SuccessComponent, {
+            width: "30%",
+            data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+          });
+          this.router.navigateByUrl("/login");
+        }
 
       },
       (error) => {
         console.log("ERR", error);
+        if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
+          else
+        {
         this.showLoading = false;
         // if (error instanceof HttpErroResponse) {
         this.alertDialog.open(SuccessComponent, {
           width: "30%",
           data: { value: error.error.message, type: false },
         });
-        // }
+        }
       }
     );
     }
@@ -1949,7 +2276,7 @@ var prexlsToJson3 = [];
       console.log("UserExcelUpload", this.xlsToJson);
       if(this.excelValidationErrors.length === 0){
         this.showLoading = true;
-        this.http.post(url, this.xlsToJson).subscribe(
+        this.http.post(url, this.xlsToJson, {headers: config()}).subscribe(
           (res: any) => {
             console.log("RESS", res);
             // this.showLoading = true;
@@ -1975,16 +2302,32 @@ var prexlsToJson3 = [];
                 data: { value:res.message, type: false },
               });
             }
+            if (res.status === "504" || res.status === 504){
+              this.alertDialog.open(SuccessComponent, {
+                width: "30%",
+                data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+              });
+              this.router.navigateByUrl("/login");
+            }
           },
           (error) => {
             console.log("ERR", error);
-            this.showLoading = false;
-            // if (error instanceof HttpErroResponse) {
+            
+            if (error.status === 504){
+              alert("You have been logout");
+                this.router.navigateByUrl("/login");
+              }
+              else
+            {
+              this.showLoading = false;
+            
             this.alertDialog.open(SuccessComponent, {
               width: "30%",
               data: { value: error.error.message, type: false },
             });
-            // }
+            }
+              
+            
           }
         );
         }
@@ -1997,10 +2340,15 @@ var prexlsToJson3 = [];
     // this.page = 1;
     console.log("ALLSCHOOLLIST",this.allSchoolList.length)
     if(this.allSchoolList.length===0){
-
+      const config=()=>{
+        let token=localStorage.getItem("BBToken");
+        if(token!=""){
+        return {Authorization:`Bearer ${token}`}
+        }
+      }
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.url + "bully-buddy/school/get_all_school", "")
+        .post(this.url + "bully-buddy/school/get_all_school", "", {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.allSchoolList = res.result;
@@ -2024,12 +2372,23 @@ var prexlsToJson3 = [];
             //   }
             // }
             // console.log("zipCodeItem", this.zipCodeItem);
-          } else {
+          } if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+           // alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }else {
             alert(res.message + " : " + res.result);
           }
           resolve();
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -2040,9 +2399,15 @@ var prexlsToJson3 = [];
     // };
     let length;
     let userType;
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
-        .get(this.url + "bully-buddy/usertype/get_all_usertype")
+        .post(this.url + "bully-buddy/usertype/get_all_usertype",'', {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             length = res.result.length;
@@ -2057,12 +2422,25 @@ var prexlsToJson3 = [];
                   }
             }
             console.log("USER", this.userTypeList);
-          } else {
-            alert(res.message + " : " + res.result);
+          } 
+          if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            //alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }
+          else {
+            // alert(res.message + " : " + res.result);
           }
           resolve();
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -2071,10 +2449,16 @@ var prexlsToJson3 = [];
     let formObj = {
       schoolId: this.userInfo.schoolid,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if(this.schoolId!==null&&this.schoolId!=="null")
   {  return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.url + "bully-buddy/busroute/get_all_busroute", formObj)
+        .post(this.url + "bully-buddy/busroute/get_all_busroute", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.busRouteList = res.result;
@@ -2122,12 +2506,25 @@ var prexlsToJson3 = [];
               this.editDriverDummy = this.editDriverDummy.filter((value, index, self) => self.map(x => x.name).indexOf(value.name) == index)
             }
 
-          } else {
-            alert(res.message + " : " + res.result);
+          }
+          if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            //alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }
+           else {
+            // alert(res.message + " : " + res.result);
           }
           resolve();
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -2137,9 +2534,15 @@ var prexlsToJson3 = [];
     let formObj = {
       id: this.schoolId,
     };
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.url + "bully-buddy/busroute/get_busroute_by_id", formObj)
+        .post(this.url + "bully-buddy/busroute/get_busroute_by_id", formObj,{headers:config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             // this.dataList.push(res.result);
@@ -2157,12 +2560,25 @@ var prexlsToJson3 = [];
               // this.totalRecords = res.result.length;
             }
             console.log("DATALIST", this.data);
-          } else {
-            alert(res.message + " : " + res.result);
+          }
+          if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            //alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }
+           else {
+            // alert(res.message + " : " + res.result);
           }
           resolve();
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
@@ -2174,6 +2590,12 @@ var prexlsToJson3 = [];
    getSchoolBySearch(school) {
      console.log("SearchSchool",school.term);
 console.log("ZIP",this.zipCodesrch)
+const config=()=>{
+  let token=localStorage.getItem("BBToken");
+  if(token!=""){
+  return {Authorization:`Bearer ${token}`}
+  }
+}
 if(this.zipCodesrch===undefined||this.zipCodesrch===null||this.zipCodesrch===""){
   this.zipCodesrch=null;
 }
@@ -2194,18 +2616,25 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null||this.zipCodesrch==="")
       this.searchSchoolId = 0;
     }
 
- let formObj = {
-      stateId: this.searchSchoolId,
-      zipCode: this.zipCodesrch,
-      schoolName: school.term
-    };
+ let formObj =new FormData();
+ 
+ formObj.append("stateId",this.searchSchoolId)
+ if(this.zipCodesrch !== null)
+ {
+   formObj.append("zipCode",this.zipCodesrch)
+  }
+ formObj.append("schoolName",school.term)
+    //   stateId: this.searchSchoolId,
+    //   zipCode: this.zipCodesrch,
+    //   schoolName: school.term
+    // };
+
     return new Promise<void>((resolve, reject) => {
       this.http
         .post(
           this.url +
             "bully-buddy/school/get_school_auto",
-          formObj
-        )
+          formObj, {headers: config()}        )
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.schoolList = res.result;
@@ -2214,25 +2643,44 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null||this.zipCodesrch==="")
             if (this.schoolList.length === 1) {
               this.editSchoolId = this.schoolList[0].id;
             }
-          } else {
-            alert(res.message + " : " + res.result);
+          }
+          if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            //alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }
+           else {
+            // alert(res.message + " : " + res.result);
           }
           resolve();
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }
    getSchoolById(school) {
      console.log("SchoolIDD",school);
     let arrLen: any = [];
-    let formObj = {
-      id: school,
-    };
+    let formObj = new FormData();
+    formObj.append('id',school)
+      
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     if(school !== ""||school!==0||school!==undefined){
     return new Promise<void>((resolve, reject) => {
       this.http
-        .post(this.url + "bully-buddy/school/get_school_by_id", formObj)
+        .post(this.url + "bully-buddy/school/get_school_by_id", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             // this.dataList.push(res.result);
@@ -2254,12 +2702,23 @@ if(this.zipCodesrch===undefined||this.zipCodesrch===null||this.zipCodesrch==="")
               this.editSchoolId = 0;
             }
             console.log("dropSchoolName", this.allSchoolList);
+          }if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            //alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
           } else {
-            alert(res.message + " : " + res.result);
+            // alert(res.message + " : " + res.result);
           }
           resolve();
         },error => {
-          console.log('oops', error)
+          console.log('oops', error);
+          if (error.status === 504){
+          alert("You have been logout");
+            this.router.navigateByUrl("/login");
+          }
         });
     });
   }

@@ -1,7 +1,7 @@
 {
-  "name": "@coreui/coreui-free-angular-admin-template",
+  "name": "Bullying_Buddy",
   "version": "2.9.2",
-  "description": "CoreUI Free Angular 2+ Admin Template",
+  "description": "Bullying_Buddy",
   "author": {
     "name": "Łukasz Holeczek",
     "url": "http://holeczek.pl",
@@ -60,7 +60,7 @@
     "font-awesome": "^4.7.0",
     "howler": "^2.2.1",
     "jqwidgets-ng": "^9.1.6",
-    "jw-angular-pagination": "^1.1.0",
+    "jw-angular-pagination": "1.1.0",
     "moment": "^2.29.0",
     "multer": "^1.4.2",
     "mutationobserver-shim": "^0.3.5",

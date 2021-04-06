@@ -84,12 +84,18 @@ export class ApproveSchoolComponent implements OnInit {
     });
   }
   getAllApprpveSchools(){
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
     return new Promise<void>((resolve, reject) => {
       let formObj={
         isApproved:0
       }
       this.http
-        .post(this.uri + "bully-buddy/approvedschools/get_all_schools_to_approve", formObj)
+        .post(this.uri + "bully-buddy/approvedschools/get_all_schools_to_approve", formObj,{headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
             this.dataList = res.result;
@@ -115,8 +121,15 @@ export class ApproveSchoolComponent implements OnInit {
               // });
             }
             // console.log("zipCodeItem", this.zipCodeItem);
-          } else {
-            alert(res.message + " : " + res.result);
+          } else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }else {
+            // alert(res.message + " : " + res.result);
             this.showNoRecord = true;
           }
           resolve();
@@ -133,12 +146,18 @@ export class ApproveSchoolComponent implements OnInit {
 
   approveSchool(list)
   {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
      return new Promise<void>((resolve, reject) => {
       let formObj={
         id:list
       }
       this.http
-        .post(this.uri + "bully-buddy/approvedschools/approve_school", formObj)
+        .post(this.uri + "bully-buddy/approvedschools/approve_school", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
            
@@ -147,7 +166,14 @@ export class ApproveSchoolComponent implements OnInit {
             data: { value: "School Approved", type: true },
           });
          
-          } else {
+          } else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }else {
             alert(res.message + " : " + res.result);
            
           }
@@ -165,12 +191,18 @@ export class ApproveSchoolComponent implements OnInit {
 
 rejectSchool(list)
   {
+    const config=()=>{
+      let token=localStorage.getItem("BBToken");
+      if(token!=""){
+      return {Authorization:`Bearer ${token}`}
+      }
+    }
      return new Promise<void>((resolve, reject) => {
       let formObj={
         id:list
       }
       this.http
-        .post(this.uri + "bully-buddy/approvedschools/reject_school", formObj)
+        .post(this.uri + "bully-buddy/approvedschools/reject_school", formObj, {headers: config()})
         .subscribe((res: any) => {
           if (res.status == "200") {
            
@@ -179,7 +211,15 @@ rejectSchool(list)
             data: { value: "School rejected", type: true },
           });
          
-          } else {
+          } else if (res.status === "504" || res.status === 504){
+            // this.alertDialog.open(SuccessComponent, {
+            //   width: "30%",
+            //   data: { value: res.message + " : " + res.result + "You have been logout", type: false },
+            // });
+            alert(res.message + " : " + res.result+ "You have been logout");
+            this.router.navigateByUrl("/login");
+          }
+          else {
             alert(res.message + " : " + res.result);
            
           }

@@ -32,6 +32,9 @@
               <option value="YES">Yes</option>
                  <option value="NO">No</option>
             </select>
+            <input type="text" [(ngModel)]="validSCity" [ngStyle]="validSCity==''|| validSCity==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            class="form-control" formControlName="school_city"
+            required>
             <label>School ZipCode</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validSZipCode" [ngStyle]="validSZipCode==''|| validSZipCode==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
             class="form-control" formControlName="school_ZipCode"
@@ -90,6 +93,10 @@
               <option value="YES">Yes</option>
               <option value="NO">No</option>
             </select>
+            <label>School City</label>&nbsp;<span style="color: red;">*</span>
+            <input type="text" [(ngModel)]="validSCity" [ngStyle]="validSCity==''|| validSCity==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+            class="form-control" formControlName="school_city"
+            required>
             <label>School ZipCode</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validSZipCode" [ngStyle]="validSZipCode==''|| validSZipCode==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
             class="form-control" formControlName="school_ZipCode"
@@ -124,7 +131,7 @@
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of stateList" value={{opt.statename}}>{{opt.statename}}</option>
             </select>
-            <label>Zip Code</label>&nbsp; <span class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label style="font-size: 10px;color:red">To Filter the School (Optional) - Will not be saved</label>
+            <label>Zip Code</label>&nbsp; <span class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label style="font-size: 10px;color:red">To Filter the School </label>
             <input type="text" class="form-control" formControlName="admin_zipCode"
               [(ngModel)]="editUserZipCode" (ngModelChange)="searchSchool($event)"
               maxlength="5">
@@ -174,7 +181,7 @@
             <label>Admin Password</label>&nbsp;<span style="color: red;">*</span>
             <input type="password" [(ngModel)]="validPassword" [ngStyle]="validPassword=='' || validPassword==undefined?{'border-color':'#ef8575'}:{'border-color':''}"class="form-control" formControlName="admin_password"
               required>
-              <label>User Language</label>
+              <label>User Language</label>&nbsp;<span style="color: red;">*</span>
               <div>
                 <select  name="language" [(ngModel)]="validULang" [ngStyle]="validULang=='' || validULang==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
                 [ngModelOptions]="{standalone: true}" class="form-control" style="width: 100%;display: inline;padding: 5px;" (change)="selectLanguage($event.target.value)" required >
@@ -225,7 +232,7 @@
                    <option [ngValue]="null" [disabled]="true" hidden>Select</option>
                    <option *ngFor="let opt of stateList" value={{opt.statename}}>{{opt.statename}}</option>
             </select>
-            <label *ngIf='isSuperAdmin&&adminSchoolId!==0'>Zip Code</label>&nbsp;<span *ngIf='isSuperAdmin&&adminSchoolId!==0' class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf='isSuperAdmin&&adminSchoolId!==0'style="font-size: 10px;color:red">To Filter the School (Optional) - Will not be saved</label>
+            <label *ngIf='isSuperAdmin&&adminSchoolId!==0'>Zip Code</label>&nbsp;<span *ngIf='isSuperAdmin&&adminSchoolId!==0' class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label *ngIf='isSuperAdmin&&adminSchoolId!==0'style="font-size: 10px;color:red">To Filter the School </label>
             <input *ngIf='isSuperAdmin&&adminSchoolId!==0' type="text" class="form-control" formControlName="admin_zipCode"
             [(ngModel)]="editUserZipCode" (ngModelChange)="searchSchool($event)"
               maxlength="5">
@@ -280,7 +287,7 @@
               placeholder="Enter School Id" required> -->
               <label>User Phone</label>&nbsp;<span style="color: red;">*</span>
             <div>
-              <select  name="gender" [(ngModel)]="validccAdmin" [ngStyle]="validccAdmin=='' || validccAdmin==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
+              <select  name="countrycode" [(ngModel)]="validccAdmin" [ngStyle]="validccAdmin=='' || validccAdmin==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
               [ngModelOptions]="{standalone: true}" class="form-control" style="width: 20%;display: inline;padding: 5px;" (change)="selectCountryCode($event.target.value)" required >
                <option [ngValue]="null" [disabled]="true" hidden>Select</option>
                <option value="+1">+1</option>
@@ -302,7 +309,7 @@
             <label>Admin Password</label>&nbsp;<span style="color: red;">*</span>
             <input type="text" [(ngModel)]="validAPassword" [ngStyle]="validAPassword=='' || validAPassword==undefined?{'border-color':'#ef8575'}:{'border-color':''}" class="form-control" formControlName="admin_password"
               required disabled>
-              <label>User Language</label>
+              <label>User Language</label>&nbsp;<span style="color: red;">*</span>
               <div>
                 <select  name="language" [(ngModel)]="validULang" [ngStyle]="validULang=='' || validULang==undefined?{'border-color':'#ef8575'}:{'border-color':''}"
                 [ngModelOptions]="{standalone: true}" class="form-control" style="width: 100%;display: inline;padding: 5px;" (change)="selectLanguage($event.target.value)" required >
@@ -361,7 +368,7 @@
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of stateList" value={{opt.statename}}>{{opt.statename}}</option>
             </select>
-            <label *ngIf="showFields">Zip Code</label>
+            <label *ngIf="showFields">Zip Code</label>&nbsp;<span  *ngIf="showFields" class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label  *ngIf="showFields" style="font-size: 10px;color:red">To Filter the School </label>
             <input *ngIf="showFields" type="text" class="form-control" formControlName="zipCode"
               [(ngModel)]="editUserZipCode" (ngModelChange)="searchSchool($event)"
               maxlength="5">
@@ -532,7 +539,7 @@
               <option [ngValue]="null" [disabled]="true" hidden>Select</option>
               <option *ngFor="let opt of stateList" value={{opt.statename}}>{{opt.statename}}</option>
             </select>
-            <label>Zip Code</label>
+            <label>Zip Code</label>&nbsp;<span class="fa fa-info-circle" style="color: red;"></span>&nbsp;<label style="font-size: 10px;color:red">To Filter the School </label>
             <input type="text" class="form-control" formControlName="zipCode"
               [(ngModel)]="editUserZipCode" (ngModelChange)="searchSchool($event)" maxlength="5">
             <label>User School</label>&nbsp;<span style="color: red;">*</span>
